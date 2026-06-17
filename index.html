@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>skinside SEOUL — Brand Dashboard · Medaltus</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#F4F1EC;--bg2:#EDE8E3;--bg3:#FFFFFF;
+  --ink:#001F60;--ink2:#1A2E5A;--ink3:#6B7BA2;
+  --green:#24E9A3;--teal-light:#E0FBF3;
+  --sand:#F4DFD0;--silver:#CCD3D5;
+  --rose:#B84040;--rose-light:#FAE8E8;
+  --amber-warm:#B8763A;
+  /* mapped aliases for this dashboard */
+  --blush:#24E9A3;--blush-light:#E0FBF3;--blush-dark:#0FA876;
+  --sage:#6B7BA2;--sage-light:#E8ECF4;--sage-dark:#3D5080;
+  --clay:#B8763A;--clay-light:#F4DFD0;--clay-dark:#8A5420;
+  --border:rgba(0,31,96,0.12);--border2:rgba(0,31,96,0.07);
+  --font-serif:'Instrument Serif',Georgia,serif;
+  --font-sans:'DM Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+  --radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-sans);font-size:14px;line-height:1.6;}
+
+/* Header */
+.site-header{background:var(--ink);padding:18px 40px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid var(--green);}
+.brand-wordmark{display:flex;align-items:baseline;gap:10px;}
+.brand-name{font-family:var(--font-sans);font-size:22px;font-weight:600;color:#F4F1EC;letter-spacing:0.01em;}
+.brand-amp{color:var(--green);font-style:normal;}
+.brand-tag{font-family:var(--font-sans);font-size:12px;font-weight:400;color:rgba(244,241,236,0.45);letter-spacing:0.06em;}
+.launch-badge{background:var(--green);color:var(--ink);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:4px 12px;border-radius:20px;}
+.api-row{display:flex;align-items:center;gap:10px;}
+.api-row label{font-size:11px;color:rgba(253,250,247,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+.api-row input{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.14);color:#fff;border-radius:7px;padding:6px 12px;font-size:12px;font-family:var(--font-mono);width:220px;}
+.api-row input::placeholder{color:rgba(244,241,236,0.22);}
+
+/* Nav */
+.tab-nav{background:var(--bg2);border-bottom:1px solid var(--border);display:flex;padding:0 40px;overflow-x:auto;position:sticky;top:61px;z-index:99;gap:2px;}
+.tab-btn{background:none;border:none;border-bottom:3px solid transparent;padding:13px 18px;font-family:var(--font-sans);font-size:12.5px;font-weight:500;color:var(--ink3);cursor:pointer;white-space:nowrap;transition:all .15s;}
+.tab-btn:hover{color:var(--ink);}
+.tab-btn.active{color:var(--ink);border-bottom-color:var(--green);font-weight:600;}
+.page{display:none;padding:40px;max-width:1380px;margin:0 auto;}
+.page.active{display:block;}
+
+/* Compliance alert */
+.compliance-banner{background:linear-gradient(135deg,#FFF3F0 0%,#F4F1EC 100%);border:1.5px solid var(--rose);border-radius:12px;padding:16px 22px;margin-bottom:28px;display:flex;gap:14px;align-items:flex-start;}
+.cb-icon{font-size:20px;flex-shrink:0;}
+.cb-title{font-weight:600;font-size:13.5px;color:var(--rose);margin-bottom:3px;}
+.cb-body{font-size:12.5px;color:var(--ink2);line-height:1.7;}
+
+/* Section */
+.sec{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:28px;margin-bottom:22px;box-shadow:0 1px 3px rgba(28,20,16,0.04);}
+.sec-title{font-family:var(--font-serif);font-size:18px;color:var(--ink);margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border2);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sec-title-sm{font-family:var(--font-serif);font-size:15px;color:var(--ink);margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border2);}
+
+/* Badge */
+.badge{font-family:var(--font-sans);font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;}
+.bg-blush{background:var(--teal-light);color:#0A7A5A;}
+.bg-sage{background:var(--teal-light);color:var(--ink2);}
+.bg-clay{background:var(--sand);color:var(--amber-warm);}
+.bg-alert{background:var(--rose-light);color:var(--rose);}
+
+/* Overview cards */
+.sku-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;margin-bottom:28px;}
+.sku-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .18s;position:relative;overflow:hidden;}
+.sku-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;}
+.sku-card.cleanser::before{background:#24E9A3;}
+.sku-card.serum::before{background:#6B7BA2;}
+.sku-card.cream::before{background:#001F60;}
+.sku-card.mask::before{background:#B8763A;}
+.sku-card:hover{box-shadow:0 4px 16px rgba(28,20,16,0.1);transform:translateY(-1px);}
+.sku-card .sku-id{font-family:var(--font-mono);font-size:10px;color:var(--ink3);margin-bottom:6px;}
+.sku-card .sku-name{font-family:var(--font-serif);font-size:15px;color:var(--ink);margin-bottom:8px;line-height:1.3;}
+.sku-card .sku-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.sku-chip{font-size:10.5px;padding:2px 8px;border-radius:10px;background:var(--bg2);color:var(--ink3);}
+.sku-chip.launch{background:var(--teal-light);color:#0FA876;}
+.sku-status{font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--green);margin-top:10px;}
+
+/* Listing panel */
+.listing-block{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:14px;}
+.listing-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.listing-label .char-count{font-family:var(--font-mono);font-size:10px;padding:2px 8px;border-radius:10px;background:var(--bg2);}
+.char-ok{background:var(--sage-light)!important;color:var(--sage-dark)!important;}
+.char-warn{background:var(--rose-light)!important;color:var(--rose)!important;}
+.listing-value{font-size:13.5px;color:var(--ink2);line-height:1.75;}
+.listing-value.title-display{font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;line-height:1.4;}
+.highlight-field{border-left:3px solid var(--green);padding-left:14px;}
+
+/* Tables */
+table.data{width:100%;border-collapse:collapse;font-size:13px;}
+table.data th{text-align:left;padding:9px 12px;background:var(--ink);color:rgba(253,250,247,0.75);font-size:10.5px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;}
+table.data td{padding:9px 12px;border-bottom:1px solid var(--border2);vertical-align:top;}
+table.data tr:last-child td{border-bottom:none;}
+table.data tr:hover td{background:var(--bg);}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-family:var(--font-mono);font-weight:500;}
+.pill-g{background:var(--sage-light);color:var(--sage-dark);}
+.pill-a{background:var(--clay-light);color:var(--clay-dark);}
+.pill-r{background:var(--rose-light);color:var(--rose);}
+.pill-b{background:var(--blush-light);color:var(--blush-dark);}
+
+/* PPC section */
+.ppc-tier{border-left:3px solid var(--border);padding:14px 18px;margin-bottom:12px;border-radius:0 9px 9px 0;background:var(--bg);}
+.ppc-tier.t1{border-left-color:var(--green);}
+.ppc-tier.t2{border-left-color:var(--ink3);}
+.ppc-tier.t3{border-left-color:var(--sand);border-left-color:var(--amber-warm);}
+.ppc-tier h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--ink);margin-bottom:6px;}
+.ppc-tier p{font-size:13px;color:var(--ink2);line-height:1.65;}
+
+/* Two col */
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.chip{padding:5px 12px;border-radius:20px;font-size:12px;color:var(--ink2);border:1px solid var(--border);background:var(--bg);}
+.chip-g{background:var(--sage-light);border-color:transparent;color:var(--sage-dark);}
+.chip-b{background:var(--teal-light);border-color:transparent;color:#0A7A5A;}
+.chip-r{background:var(--rose-light);border-color:transparent;color:var(--rose);}
+
+/* Opp panel */
+.opp{border-left:3px solid var(--border);padding:14px 18px;margin-bottom:12px;border-radius:0 9px 9px 0;background:var(--bg);}
+.opp.oh{border-left-color:var(--rose);}
+.opp.om{border-left-color:var(--clay);}
+.opp.ol{border-left-color:var(--sage);}
+.opp-hdr{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.opp-hdr .pri{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;}
+.oh .pri{color:var(--rose);}
+.om .pri{color:var(--clay-dark);}
+.ol .pri{color:var(--sage-dark);}
+.otag{font-size:10px;padding:2px 8px;border-radius:12px;background:var(--bg2);color:var(--ink3);}
+.obody{font-size:13px;color:var(--ink2);line-height:1.65;}
+
+/* AI panel */
+.ai-out{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:22px;min-height:120px;}
+.ai-out pre{white-space:pre-wrap;font-family:var(--font-sans);font-size:13.5px;line-height:1.8;color:var(--ink2);}
+.btn{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:10px 24px;font-family:var(--font-sans);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;}
+.btn:hover{background:var(--ink2);}
+.btn:disabled{opacity:.4;cursor:default;}
+.btn-blush{background:var(--green);color:var(--ink);}
+.btn-blush:hover{background:#0FA876;color:#fff;}
+.btn2{background:transparent;color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:9px 18px;font-family:var(--font-sans);font-size:13px;cursor:pointer;margin-left:10px;}
+.btn2:hover{background:var(--bg2);}
+.smsg{font-size:12px;margin-top:10px;min-height:18px;color:var(--ink3);}
+.ts{font-size:11px;color:var(--ink3);font-family:var(--font-mono);margin-top:8px;}
+
+/* Update form */
+.ug{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.ug textarea,.ug input[type=text]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-family:var(--font-mono);font-size:12px;color:var(--ink);resize:vertical;min-height:78px;}
+.ulbl{font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px;}
+.alert{background:var(--sand);border:1px solid rgba(184,118,58,0.3);border-radius:10px;padding:13px 18px;font-size:13px;color:var(--ink);margin-bottom:20px;display:flex;gap:10px;align-items:flex-start;}
+
+/* Overview hero */
+.overview-hero{background:linear-gradient(135deg,#001F60 0%,#0A2F7A 60%,#1A3D8F 100%);border-radius:16px;padding:36px 40px;margin-bottom:28px;position:relative;overflow:hidden;}
+.overview-hero::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(36,233,163,0.1);}
+.overview-hero::before{content:'';position:absolute;right:60px;top:-60px;width:300px;height:300px;border-radius:50%;background:rgba(36,233,163,0.04);}
+.oh-label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:rgba(244,241,236,0.5);margin-bottom:10px;}
+.oh-title{font-family:var(--font-sans);font-size:30px;font-weight:600;color:#F4F1EC;margin-bottom:8px;line-height:1.2;}
+.oh-title .amp{color:var(--blush);font-style:italic;}
+.oh-sub{font-size:14px;color:rgba(244,241,236,0.65);max-width:540px;line-height:1.65;}
+.oh-stats{display:flex;gap:32px;margin-top:24px;}
+.oh-stat .num{font-family:var(--font-sans);font-weight:600;font-size:28px;color:#F4F1EC;}
+.oh-stat .lbl{font-size:11px;color:rgba(244,241,236,0.5);text-transform:uppercase;letter-spacing:0.07em;margin-top:2px;}
+
+/* Compliance callout */
+.no-list-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border2);font-size:13px;}
+.no-list-item:last-child{border-bottom:none;}
+.no-icon{color:var(--rose);font-size:14px;flex-shrink:0;margin-top:2px;}
+.no-text{color:var(--ink2);line-height:1.55;}
+.no-ok{color:var(--sage-dark);}
+
+/* Ingredient display */
+.ing-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+.ing-chip{padding:4px 11px;border-radius:20px;font-size:11.5px;background:var(--bg2);color:var(--ink2);border:1px solid var(--border);}
+.ing-chip.hero{background:var(--teal-light);border-color:var(--green);color:#0A7A5A;font-weight:500;}
+.ing-chip.cica{background:#E8ECF4;border-color:var(--ink3);color:var(--ink2);font-weight:500;}
+
+/* Tab product header */
+.product-header{background:linear-gradient(90deg,#EDE8E3 0%,#FFFFFF 100%);border:1px solid var(--border);border-radius:12px;padding:22px 28px;margin-bottom:22px;display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.ph-left .ph-sku{font-family:var(--font-mono);font-size:10px;color:var(--ink3);margin-bottom:4px;}
+.ph-left .ph-name{font-family:var(--font-serif);font-size:22px;color:var(--ink);line-height:1.2;}
+.ph-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
+.ph-right{text-align:right;}
+.ph-price{font-family:var(--font-serif);font-size:26px;color:var(--ink);}
+.ph-price-sub{font-size:12px;color:var(--ink3);}
+.ph-status{margin-top:8px;font-size:11px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:var(--ink);background:var(--teal-light);padding:4px 12px;border-radius:20px;display:inline-block;}
+
+@media(max-width:900px){.two,.ug,.three{grid-template-columns:1fr;}.site-header,.page{padding:16px 20px;}.tab-nav{padding:0 16px;}.oh-stats{gap:20px;}}
+
+/* Keyword tracker */
+.rank-cell{font-family:var(--font-mono);font-size:12px;text-align:center;}
+.rank-none{color:var(--ink3);font-style:italic;}
+.rank-p1{background:var(--teal-light);color:#0A7A5A;font-weight:600;border-radius:4px;padding:2px 6px;}
+.rank-p2{background:var(--sand);color:var(--amber-warm);font-weight:500;}
+.rank-p4{background:var(--rose-light);color:var(--rose);}
+.kw-group td{font-size:10px !important;}
+
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div style="display:flex;align-items:center;gap:20px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-family:var(--font-sans);font-size:19px;font-weight:600;color:#F4F1EC;letter-spacing:-0.01em;">medal<span style="color:var(--green);">t</span>us<span style="color:var(--ink3);font-size:11px;vertical-align:super;">™</span></span>
+      <span style="width:1px;height:20px;background:rgba(255,255,255,0.18);display:inline-block;"></span>
+    </div>
+    <div class="brand-wordmark">
+      <span class="brand-name">skinside SEOUL</span>
+      <span style="width:1px;height:20px;background:rgba(255,255,255,0.15);display:inline-block;"></span>
+      <span class="brand-tag">Pre-Launch Dashboard</span>
+    </div>
+    <span class="launch-badge">Pre-Launch</span>
+  </div>
+  <div class="api-row">
+    <label>Anthropic API Key</label>
+    <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
+  </div>
+</header>
+
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('tab-overview')">Overview</button>
+  <button class="tab-btn" onclick="showTab('tab-sku1')">SSS0001 — Cleanser</button>
+  <button class="tab-btn" onclick="showTab('tab-sku2')">SSS0002 — Spicule Serum</button>
+  <button class="tab-btn" onclick="showTab('tab-sku3')">SSS0003 — Vit C Serum</button>
+  <button class="tab-btn" onclick="showTab('tab-sku4')">SSS0004 — Snail Essence</button>
+  <button class="tab-btn" onclick="showTab('tab-sku5')">SSS0005 — Snail Cream</button>
+  <button class="tab-btn" onclick="showTab('tab-sku6')">SSS0006 — Vit C Cream</button>
+  <button class="tab-btn" onclick="showTab('tab-keywords')">Keyword Tracker</button>
+  <button class="tab-btn" onclick="showTab('tab-competitors')">Competitors</button>
+  <button class="tab-btn" onclick="showTab('tab-ppc')">PPC Strategy</button>
+</nav>
+
+<!-- ══ OVERVIEW ══ -->
+<div id="tab-overview" class="page active">
+
+  <div class="compliance-banner">
+    <div class="cb-icon">⚠️</div>
+    <div>
+      <div class="cb-title">Amazon Title Policy — Deadline July 27, 2026</div>
+      <div class="cb-body">All titles must be <strong>≤75 characters including spaces</strong>. Amazon will auto-update non-compliant titles after July 27. New field: <strong>Item Highlights</strong> (≤125 characters) — indexed and visible in search results. Title = #1 ranking signal. Item Highlights = #2. All listings below include compliant titles and Item Highlights.</div>
+    </div>
+  </div>
+
+  <div class="overview-hero">
+    <div class="oh-label">Brand Dashboard · June 2026</div>
+    <div class="oh-title">skinside <span style="color:var(--green);">SEOUL</span> — Launch Ready</div>
+    <div class="oh-sub">6 SKUs staged for launch. All listings built with compliant titles (≤75 chars), Item Highlights (≤125 chars), and full listing copy. Cica complex + Korean formulation is the brand's differentiating position across the line.</div>
+    <div class="oh-stats">
+      <div class="oh-stat"><div class="num">6</div><div class="lbl">SKUs Ready</div></div>
+      <div class="oh-stat"><div class="num">1</div><div class="lbl">Pending (SKU 7)</div></div>
+      <div class="oh-stat"><div class="num">Jul 27</div><div class="lbl">Title Deadline</div></div>
+      <div class="oh-stat"><div class="num">✓</div><div class="lbl">Compliant Copy</div></div>
+    </div>
+  </div>
+
+  <div class="sku-grid">
+    <div class="sku-card cleanser" onclick="showTab('tab-sku1')">
+      <div class="sku-id">SSS0001 · CLEANSER</div>
+      <div class="sku-name">Heartleaf Foaming Cleanser</div>
+      <div style="font-size:12px;color:var(--ink3);">5.07 fl oz · $12.00 · $2.37/oz</div>
+      <div class="sku-meta">
+        <span class="sku-chip">Heartleaf + Cica</span>
+        <span class="sku-chip">Oily/Combo Skin</span>
+        <span class="sku-chip launch">Title: 69 chars ✓</span>
+      </div>
+      <div class="sku-status">→ View Listing Build</div>
+    </div>
+    <div class="sku-card serum" onclick="showTab('tab-sku2')">
+      <div class="sku-id">SSS0002 · SERUM</div>
+      <div class="sku-name">200 Spicule Serum</div>
+      <div style="font-size:12px;color:var(--ink3);">1.85 fl oz · $20.00 · $10.81/oz</div>
+      <div class="sku-meta">
+        <span class="sku-chip">Hydrolyzed Spicules</span>
+        <span class="sku-chip">Texture Refining</span>
+        <span class="sku-chip launch">Title: 74 chars ✓</span>
+      </div>
+      <div class="sku-status">→ View Listing Build</div>
+    </div>
+    <div class="sku-card serum" onclick="showTab('tab-sku3')">
+      <div class="sku-id">SSS0003 · SERUM</div>
+      <div class="sku-name">Vitamin C Beads Serum</div>
+      <div style="font-size:12px;color:var(--ink3);">1.85 fl oz · $20.00 · $10.81/oz</div>
+      <div class="sku-meta">
+        <span class="sku-chip">Ascorbyl Palmitate</span>
+        <span class="sku-chip">Fragrance-free preferred</span>
+        <span class="sku-chip launch">Title: 72 chars ✓</span>
+      </div>
+      <div class="sku-status">→ View Listing Build</div>
+    </div>
+    <div class="sku-card serum" onclick="showTab('tab-sku4')">
+      <div class="sku-id">SSS0004 · ESSENCE</div>
+      <div class="sku-name">96% Snail Mucin Essence</div>
+      <div style="font-size:12px;color:var(--ink3);">3.55 fl oz · $20.00 · $5.63/oz</div>
+      <div class="sku-meta">
+        <span class="sku-chip">96% SSF + Cica</span>
+        <span class="sku-chip">Vs COSRX $5.62/oz</span>
+        <span class="sku-chip launch">Title: 74 chars ✓</span>
+      </div>
+      <div class="sku-status">→ View Listing Build</div>
+    </div>
+    <div class="sku-card cream" onclick="showTab('tab-sku5')">
+      <div class="sku-id">SSS0005 · CREAM</div>
+      <div class="sku-name">92% Snail Mucin Cream</div>
+      <div style="font-size:12px;color:var(--ink3);">3.38 fl oz · $12.00 · $3.55/oz</div>
+      <div class="sku-meta">
+        <span class="sku-chip">92% SSF + Panthenol</span>
+        <span class="sku-chip">Dry Skin Focus</span>
+        <span class="sku-chip launch">Title: 67 chars ✓</span>
+      </div>
+      <div class="sku-status">→ View Listing Build</div>
+    </div>
+    <div class="sku-card cream" onclick="showTab('tab-sku6')">
+      <div class="sku-id">SSS0006 · MOISTURIZER</div>
+      <div class="sku-name">Vitamin C Capsule Cream</div>
+      <div style="font-size:12px;color:var(--ink3);">1.69 fl oz · $16.00 · $9.47/oz</div>
+      <div class="sku-meta">
+        <span class="sku-chip">Encapsulated Vit C</span>
+        <span class="sku-chip">Niacinamide + HA</span>
+        <span class="sku-chip launch">Title: 74 chars ✓</span>
+      </div>
+      <div class="sku-status">→ View Listing Build</div>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="sec">
+      <div class="sec-title">Brand Identity — K-Beauty Positioning</div>
+      <p style="font-size:13.5px;color:var(--ink2);line-height:1.85;">
+        skinside SEOUL is a <strong>Southern California–based skincare brand</strong> developed in collaboration with experienced Korean manufacturers. 
+        Focused on approachable, ingredient-forward K-beauty formulas — clear, effective, and built for everyday routines.
+        The brand's signature: a <strong>four-molecule Cica complex</strong> (Madecassoside + Madecassic Acid + Asiaticoside + Asiatic Acid) 
+        appears across all 6 SKUs as a consistent differentiator.
+      </p>
+      <div class="chips" style="margin-top:16px;">
+        <span class="chip chip-g">Cica complex in every SKU</span>
+        <span class="chip chip-g">Sea water mineral base</span>
+        <span class="chip chip-g">Sulfate-free · Silicone-free</span>
+        <span class="chip chip-g">Paraben-free line</span>
+        <span class="chip chip-b">Southern California K-beauty</span>
+        <span class="chip chip-b">Pre-launch — building review base</span>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-title">Launch Readiness Checklist</div>
+      <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text"><strong>Titles ≤75 chars:</strong> All 6 SKUs compliant for July 27 deadline</span></div>
+      <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text"><strong>Item Highlights ≤125 chars:</strong> Built for all 6 SKUs (new #2 ranking signal)</span></div>
+      <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text"><strong>5 Bullets:</strong> Full compliant copy per SKU</span></div>
+      <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text"><strong>Product Description:</strong> A+ content–ready long-form copy</span></div>
+      <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text"><strong>Backend Keywords:</strong> ~500 char keyword string per SKU</span></div>
+      <div class="no-list-item"><span class="no-icon">⏳</span><span class="no-text"><strong>SSS0007:</strong> 7th SKU data pending — tab will be added on receipt</span></div>
+      <div class="no-list-item"><span class="no-icon">⏳</span><span class="no-text"><strong>PPC campaigns:</strong> Ready to build on launch day — see PPC tab</span></div>
+      <div class="no-list-item"><span class="no-icon">⏳</span><span class="no-text"><strong>Competitor data:</strong> Helium 10 Black Box exports to be added post-launch</span></div>
+    </div>
+  </div>
+
+  <!-- Pre-launch opportunities -->
+  <div class="sec">
+    <div class="sec-title">Pre-Launch Opportunities <span class="badge bg-blush">Strategy</span></div>
+    <div class="opp oh"><div class="opp-hdr"><span class="pri">High</span><span class="otag">Title Compliance</span></div><div class="obody"><strong>All titles must be live at ≤75 characters before July 27.</strong> Amazon will begin auto-overwriting non-compliant titles that day. Brand owners get a 14-day review window in Review Listings Changes — plan to publish final titles at least 3 weeks before the deadline to allow review time. All 6 titles below are compliant and ready to copy into Seller Central.</div></div>
+    <div class="opp oh"><div class="opp-hdr"><span class="pri">High</span><span class="otag">Listing / Keywords</span></div><div class="obody"><strong>SSS0004 (96% Snail Mucin Essence) is your most strategically important launch SKU.</strong> COSRX dominates this subcategory at BSR #7 with 103,890 reviews at $5.62/oz — your product is $5.63/oz. Price parity with the category leader is strong positioning, but differentiation must come from the Cica complex and HA stack in the listing copy. Lead with "Cica-Fortified Snail Mucin" in bullets and Item Highlights.</div></div>
+    <div class="opp om"><div class="opp-hdr"><span class="pri">Medium</span><span class="otag">Competitive / Positioning</span></div><div class="obody"><strong>SSS0003 (Vitamin C Beads Serum) category data shows fragrance is the #1 objection.</strong> This product contains fragrance. Reframe as "light, fresh botanical scent" and position it as mild rather than fragrance-free. Do NOT claim fragrance-free. Address the scent proactively in bullet copy: "light, clean scent during application." Competitor EQQUALBERRY dominates with a multi-ingredient Tranexamic Acid + ceramide stack — consider adding TXA to backend keywords.</div></div>
+    <div class="opp om"><div class="opp-hdr"><span class="pri">Medium</span><span class="otag">PPC / Launch</span></div><div class="obody"><strong>Launch all 6 SKUs with Sponsored Products exact-match on Tier 1 keywords from Day 1.</strong> New listings have no organic rank — PPC is the only way to generate sessions and build conversion history. Budget $8–15/day per SKU at launch, targeting 30–40% ACoS for the first 30 days (conversion data collection phase). Pull back to 20–25% ACoS by Day 60 as ranking signals accumulate. See PPC tab for full launch strategy.</div></div>
+    <div class="opp ol"><div class="opp-hdr"><span class="pri">Low</span><span class="otag">Reviews / VOC</span></div><div class="obody"><strong>Build a Vine review request strategy before launch day.</strong> Target 8–15 Vine reviews per SKU in the first 30 days to establish rating credibility. Without reviews, click-through from PPC will be suppressed — every session counts more early. Prioritize SSS0004 and SSS0003 for Vine enrollment given the competitive subcategories (Facial Serums).</div></div>
+  </div>
+
+</div>
+
+<!-- ══ SKU 1 ══ -->
+<div id="tab-sku1" class="page">
+  <div class="product-header">
+    <div class="ph-left">
+      <div class="ph-sku">SSS0001 · CLEANSER</div>
+      <div class="ph-name">Heartleaf Foaming Cleanser</div>
+      <div class="ph-meta">
+        <span class="badge bg-sage">5.07 fl oz</span>
+        <span class="badge bg-clay">$12.00 · $2.37/oz</span>
+        <span class="badge bg-blush">Oily / Combination Skin</span>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-price">$12.00</div>
+      <div class="ph-price-sub">$2.37 per fl oz</div>
+      <div class="ph-status">Pre-Launch</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Listing Build — Title & Item Highlights <span class="badge bg-alert">Deadline: Jul 27</span></div>
+
+    <div class="listing-block">
+      <div class="listing-label">Title <span class="char-count char-ok">69 chars ✓</span></div>
+      <div class="listing-value title-display">skinside SEOUL Heartleaf Foaming Cleanser – Face Wash with Cica, 5 oz</div>
+    </div>
+
+    <div class="listing-block highlight-field">
+      <div class="listing-label">Item Highlights <span class="char-count char-ok">118 chars ✓</span></div>
+      <div class="listing-value">Heartleaf powder + 4-molecule Cica complex + mineral seawater · Sulfate-free · For oily &amp; combination skin · Daily use</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bullets 1–5 <span class="badge bg-sage">Keyword-optimized</span></div>
+    <div class="listing-block"><div class="listing-label">Bullet 1</div><div class="listing-value"><strong>FOAMING FACE WASH WITH HEARTLEAF POWDER</strong> – skinside SEOUL's heartleaf foaming cleanser creates a soft, airy foam that lifts away daily buildup, excess oil, and impurities, delivering a gentle face wash experience with every use.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 2</div><div class="listing-value"><strong>CICA FOAMING CLEANSER INSPIRED BY KOREAN SKIN CARE</strong> – Formulated with a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid) and mineral-rich seawater, this korean face wash helps support skin comfort during cleansing.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 3</div><div class="listing-value"><strong>FACE WASH FOR OILY &amp; COMBINATION SKIN</strong> – This pore cleansing face wash helps lift away surface buildup and excess oil while maintaining moisture balance, leaving skin feeling fresh, comfortable, and never stripped after rinsing.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 4</div><div class="listing-value"><strong>GENTLE FACE WASH FOR SENSITIVE SKIN</strong> – The lightweight foam spreads evenly and rinses clean, making this gentle face wash suitable for daily use on oily, combination, and sensitive skin types that prefer a mild, non-stripping cleanse.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 5</div><div class="listing-value"><strong>SULFATE-FREE KOREAN SKIN CARE CLEANSER</strong> – Free from sulfates, silicones, mineral oil, parabens, and drying alcohols, this daily cleanser fits easily into any Korean skin care routine as a refreshing first or second-cleanse step.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Formula & Positioning</div>
+    <div class="two">
+      <div>
+        <div class="sec-title-sm">Hero Ingredients</div>
+        <div class="ing-list">
+          <span class="ing-chip hero">Houttuynia Cordata Powder</span>
+          <span class="ing-chip cica">Centella Asiatica Extract</span>
+          <span class="ing-chip cica">Madecassoside</span>
+          <span class="ing-chip cica">Madecassic Acid</span>
+          <span class="ing-chip cica">Asiaticoside</span>
+          <span class="ing-chip cica">Asiatic Acid</span>
+          <span class="ing-chip">Glycerin</span>
+          <span class="ing-chip">Vitamin E</span>
+          <span class="ing-chip">Sea Water</span>
+          <span class="ing-chip">Cocamidopropyl Betaine</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title-sm">Clean Standards</div>
+        <div class="chips">
+          <span class="chip chip-g">Sulfate-free</span>
+          <span class="chip chip-g">Silicone-free</span>
+          <span class="chip chip-g">Mineral oil-free</span>
+          <span class="chip chip-g">Paraben-free</span>
+          <span class="chip chip-g">Drying alcohol-free</span>
+          <span class="chip">Contains fragrance</span>
+        </div>
+        <p style="font-size:12px;color:var(--ink3);margin-top:12px;line-height:1.6;">⚠️ Do NOT claim "fragrance-free." Use "light, fresh botanical scent" in listing copy. Fragrance is listed in the INCI.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Backend Keywords <span class="badge bg-sage">~500 char · Spaces only</span></div>
+    <div class="listing-block">
+      <div class="listing-value" style="font-family:var(--font-mono);font-size:12px;line-height:1.9;color:var(--ink3);">face wash facial cleanser face cleanser face wash for women gentle face cleanser foaming face wash foaming cleanser gentle face wash hydrating face wash hydrating facial cleanser hydrating cleanser foaming facial cleanser korean skin care daily facial cleanser daily face wash face wash for sensitive skin gentle facial cleanser sensitive skin face wash cleansing foam foam face wash heartleaf cica care</div>
+    </div>
+  </div>
+
+    <div class="sec">
+    <div class="sec-title">Product Description <span class="badge bg-clay">A9 SEO · Pre-A+ launch copy</span></div>
+    <div class="listing-block">
+<div style="font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;margin-bottom:10px;">skinside SEOUL Heartleaf Foaming Cleanser</div>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">A gentle foaming face wash built for daily use. Formulated with Houttuynia Cordata (Heartleaf) powder and a four-molecule Cica complex — Madecassoside, Madecassic Acid, Asiaticoside, and Asiatic Acid — this korean face wash helps cleanse skin while maintaining comfort throughout the process.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Mineral-rich seawater replaces a portion of the water base, delivering trace minerals that support a refreshed, balanced feel after rinsing. The airy foam texture lifts away excess oil, surface buildup, and daily impurities without the tight, dry sensation associated with stronger cleansers.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Formulated without sulfates, silicones, mineral oil, parabens, or drying alcohols. Suitable for oily, combination, and sensitive skin types — particularly as a face wash for oily skin seeking a non-stripping clean. Use morning or evening as a standalone heartleaf cleanser or as part of a two-step Korean skin care cleansing routine.</p>
+<div style="font-size:12px;color:var(--ink3);font-family:var(--font-mono);line-height:1.8;margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:8px;">Key ingredients: Houttuynia Cordata Powder · Centella Asiatica Extract · Madecassoside · Madecassic Acid · Asiaticoside · Asiatic Acid · Glycerin · Cocamidopropyl Betaine · Vitamin E · Sea Water. 5.07 fl oz / 150 ml.</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.6;">This description is live for A9 indexing until A+ Content is published. Once A+ is live, Amazon suppresses the text description in the storefront, but the copy continues to be indexed. Keep keyword-rich language in place.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI Launch Opportunities <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-1" class="ai-out">
+      <div class="opp ol"><div class="opp-hdr"><span class="pri">Low Priority</span><span class="otag">Listing</span></div><div class="obody">SSS0001 is a low-competition entry. $2.37/oz price point is accessible. Lead PPC on "foaming face wash" and "gentle cleanser for oily skin" — both have high purchase intent at manageable competition. Fragrance note must be proactively managed in copy.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('1')">Regenerate with AI</button>
+      <span id="ai-status-1" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-1"></div>
+  </div>
+</div>
+
+<!-- ══ SKU 2 ══ -->
+<div id="tab-sku2" class="page">
+  <div class="product-header">
+    <div class="ph-left">
+      <div class="ph-sku">SSS0002 · SERUM</div>
+      <div class="ph-name">200 Spicule Serum</div>
+      <div class="ph-meta">
+        <span class="badge bg-sage">1.85 fl oz</span>
+        <span class="badge bg-clay">$20.00 · $10.81/oz</span>
+        <span class="badge bg-blush">All Skin Types</span>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-price">$20.00</div>
+      <div class="ph-price-sub">$10.81 per fl oz</div>
+      <div class="ph-status">Pre-Launch</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Listing Build — Title & Item Highlights <span class="badge bg-alert">Deadline: Jul 27</span></div>
+    <div class="listing-block">
+      <div class="listing-label">Title <span class="char-count char-ok">70 chars ✓</span></div>
+      <div class="listing-value title-display">skinside SEOUL Spicule Serum – Texture Refining Korean Serum with Cica</div>
+    </div>
+    <div class="listing-block highlight-field">
+      <div class="listing-label">Item Highlights <span class="char-count char-ok">112 chars ✓</span></div>
+      <div class="listing-value">Hydrolyzed spicules + Niacinamide + 4-molecule Cica · Microneedling-inspired texture · Macadamia Oil + Adenosine</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bullets 1–5 <span class="badge bg-sage">Keyword-optimized</span></div>
+    <div class="listing-block"><div class="listing-label">Bullet 1</div><div class="listing-value"><strong>SPICULE SERUM FOR SMOOTHER SKIN TEXTURE</strong> – skinside SEOUL's 200 Spicule Serum is a texture refining serum formulated with Hydrolyzed Sponge Spicules, which work on the skin's surface to help support a smoother, more refined-looking complexion.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 2</div><div class="listing-value"><strong>KOREAN SPICULE SERUM WITH MICRONEEDLING-INSPIRED ACTION</strong> – Rooted in modern korean skin care innovation, this korean spicule serum delivers a microneedling-inspired texture experience that helps refine the look of uneven skin texture and dullness.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 3</div><div class="listing-value"><strong>NIACINAMIDE SERUM WITH SOOTHING CICA COMPLEX</strong> – Paired with Niacinamide and a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid), this niacinamide serum helps support an even, comfortable complexion after each application.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 4</div><div class="listing-value"><strong>HYDRATING SERUM WITH HYALURONIC ACID &amp; MACADAMIA OIL</strong> – Formulated with Sodium Hyaluronate and Macadamia Seed Oil, this lightweight hydrating serum helps replenish moisture while supporting skin comfort and a soft, supple feel throughout the day.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 5</div><div class="listing-value"><strong>LIGHTWEIGHT KOREAN SKIN CARE SERUM FOR ALL SKIN TYPES</strong> – This fast-absorbing face serum layers easily under moisturizers and sunscreen, making it a versatile addition to any Korean skin care routine seeking both texture refinement and daily hydration.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Formula & Positioning</div>
+    <div class="two">
+      <div>
+        <div class="sec-title-sm">Hero Ingredients</div>
+        <div class="ing-list">
+          <span class="ing-chip hero">Hydrolyzed Spicules</span>
+          <span class="ing-chip hero">Niacinamide</span>
+          <span class="ing-chip">Sodium Hyaluronate</span>
+          <span class="ing-chip cica">Centella Asiatica</span>
+          <span class="ing-chip cica">Madecassoside</span>
+          <span class="ing-chip cica">Madecassic Acid</span>
+          <span class="ing-chip cica">Asiaticoside</span>
+          <span class="ing-chip cica">Asiatic Acid</span>
+          <span class="ing-chip">Macadamia Seed Oil</span>
+          <span class="ing-chip">Adenosine</span>
+          <span class="ing-chip">Vitamin E</span>
+          <span class="ing-chip">Sea Water</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title-sm">Positioning Notes</div>
+        <p style="font-size:13px;color:var(--ink2);line-height:1.75;">Spicule serums are a niche, premium Korean skin care category. "Microneedling-inspired" language is the consumer-facing hook — avoid "microneedling" as a direct claim unless you have clinical data. Position as texture-refining, not as a substitute for professional treatment. Niacinamide supports uneven skin tone claims; use "uneven skin tone" or "dull-looking skin" — avoid "brightening."</p>
+      </div>
+    </div>
+  </div>
+
+    <div class="sec">
+    <div class="sec-title">Backend Keywords <span class="badge bg-sage">~500 char · Spaces only</span></div>
+    <div class="listing-block">
+      <div class="listing-value" style="font-family:var(--font-mono);font-size:12px;line-height:1.9;color:var(--ink3);">spicule serum korean spicule serum texture refining serum niacinamide serum microneedling serum face serum for women korean skin care serum hydrating face serum korean skincare serum spicule face serum cica serum hyaluronic acid serum skin texture serum smoothing serum pore refining serum korean beauty serum niacinamide face serum korean serum for women</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Product Description <span class="badge bg-clay">A9 SEO · Pre-A+ launch copy</span></div>
+    <div class="listing-block">
+<div style="font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;margin-bottom:10px;">skinside SEOUL 200 Spicule Serum</div>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">A texture refining serum built around Hydrolyzed Sponge Spicules — a key material in Korean skin care innovation. Applied to the skin, the spicule formula delivers a microneedling-inspired surface experience — making it a practical microneedling serum alternative that helps support a smoother, more refined-looking complexion over time.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Formulated alongside Niacinamide and a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid), this korean spicule serum supports skin comfort and a more even-looking appearance. Sodium Hyaluronate and Macadamia Seed Oil provide moisture support and a lightweight, non-greasy feel throughout the day.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Adenosine and Vitamin E round out the formula to help maintain a firm, refreshed-looking complexion with regular use. The lightweight texture absorbs quickly and layers easily into both simple and multi-step routines.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Suitable for all skin types. Use 2–3 times per week, or as tolerated. Apply to clean, dry skin before moisturizer.</p>
+<div style="font-size:12px;color:var(--ink3);font-family:var(--font-mono);line-height:1.8;margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:8px;">Key ingredients: Hydrolyzed Sponge (Spicules) · Niacinamide · Sodium Hyaluronate · Centella Asiatica Extract · Madecassoside · Madecassic Acid · Asiaticoside · Asiatic Acid · Macadamia Seed Oil · Adenosine · Vitamin E · Sea Water. 1.85 fl oz / 55 ml.</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.6;">This description is live for A9 indexing until A+ Content is published. Once A+ is live, Amazon suppresses the text description in the storefront, but the copy continues to be indexed. Keep keyword-rich language in place.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI Launch Opportunities <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-2" class="ai-out">
+      <div class="opp om"><div class="opp-hdr"><span class="pri">Medium</span><span class="otag">Keyword / Niche</span></div><div class="obody">Spicule serum is a low-volume, high-differentiation niche. PPC at launch should target "spicule serum," "korean spicule serum," and "microneedling serum" — the last has more volume but more competition. Budget conservatively ($5–8/day) and focus on brand-building at launch. Niacinamide + HA angle opens up broader Facial Serum targeting in months 2–3.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('2')">Regenerate with AI</button>
+      <span id="ai-status-2" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-2"></div>
+  </div>
+</div>
+
+<!-- ══ SKU 3 ══ -->
+<div id="tab-sku3" class="page">
+  <div class="product-header">
+    <div class="ph-left">
+      <div class="ph-sku">SSS0003 · SERUM</div>
+      <div class="ph-name">Vitamin C Beads Serum</div>
+      <div class="ph-meta">
+        <span class="badge bg-sage">1.85 fl oz</span>
+        <span class="badge bg-clay">$20.00 · $10.81/oz</span>
+        <span class="badge bg-blush">Sensitive Skin</span>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-price">$20.00</div>
+      <div class="ph-price-sub">$10.81 per fl oz</div>
+      <div class="ph-status">Pre-Launch</div>
+    </div>
+  </div>
+
+  <div class="compliance-banner">
+    <div class="cb-icon">⚠️</div>
+    <div>
+      <div class="cb-title">Fragrance Note for SSS0003</div>
+      <div class="cb-body">Category audit shows <strong>fragrance is the #1 objection</strong> in Vitamin C serums. SSS0003 contains fragrance (listed in INCI). Do NOT claim "fragrance-free." In copy, describe as "light, fresh scent" and ensure bullet 3 or 5 proactively notes the mild nature of the scent. Do NOT use brightening/brighten keywords — this triggers annual skin-lightening compliance testing.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Listing Build — Title & Item Highlights <span class="badge bg-alert">Deadline: Jul 27</span></div>
+    <div class="listing-block">
+      <div class="listing-label">Title <span class="char-count char-ok">72 chars ✓</span></div>
+      <div class="listing-value title-display">skinside SEOUL Vitamin C Serum – Korean Gel Serum with Cica & HA Complex</div>
+    </div>
+    <div class="listing-block highlight-field">
+      <div class="listing-label">Item Highlights <span class="char-count char-ok">119 chars ✓</span></div>
+      <div class="listing-value">Ascorbyl Palmitate Vit C beads + 4-molecule Cica + 4-type HA · Fragrance-light · Gel texture · Sensitive skin</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bullets 1–5 <span class="badge bg-sage">Keyword-optimized</span></div>
+    <div class="listing-block"><div class="listing-label">Bullet 1</div><div class="listing-value"><strong>VITAMIN C SERUM FOR FACE WITH ENCAPSULATED BEADS</strong> – skinside SEOUL's vitamin c beads serum features Ascorbyl Palmitate encapsulated in micro-beads that melt on contact, delivering a fresh vitamin c serum for face experience with every application.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 2</div><div class="listing-value"><strong>KOREAN VITAMIN C SERUM WITH CICA COMPLEX</strong> – Formulated as a refreshing vitamin c gel serum, this korean vitamin c serum pairs Ascorbyl Palmitate with a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid) for soothing hydration support.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 3</div><div class="listing-value"><strong>HYALURONIC ACID VITAMIN C SERUM WITH 4-TYPE HA COMPLEX</strong> – Layering four forms of Hyaluronic Acid — Sodium Hyaluronate, Hydrolyzed Hyaluronic Acid, Sodium Hyaluronate Crosspolymer, and Sodium Acetylated Hyaluronate — this serum helps deliver moisture at multiple skin depths.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 4</div><div class="listing-value"><strong>CICA SERUM FOR SENSITIVE SKIN WITH VITAMIN E</strong> – Enriched with Vitamin E and a soothing Cica complex, this cica serum for sensitive skin supports a comfortable, calmed-looking complexion, making it a suitable daily serum for those with reactive or sensitive skin.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 5</div><div class="listing-value"><strong>LIGHTWEIGHT GEL SERUM THAT LAYERS UNDER MOISTURIZER</strong> – The refreshing gel texture absorbs quickly without heaviness, making this korean skin care serum easy to layer with a moisturizer, sunscreen, or additional treatment steps in a morning or evening routine.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Compliance — Prohibited Keywords for SSS0003</div>
+    <div class="no-list-item"><span class="no-icon">🚫</span><span class="no-text"><strong>brightening / brighten / bright</strong> → Use: illuminate, restore radiance, healthy-looking glow, refreshed complexion</span></div>
+    <div class="no-list-item"><span class="no-icon">🚫</span><span class="no-text"><strong>dark spot / dark spot corrector / discoloration correcting</strong> → Use: uneven skin tone, skin tone, radiance</span></div>
+    <div class="no-list-item"><span class="no-icon">🚫</span><span class="no-text"><strong>fragrance-free</strong> → Use: light, fresh scent OR do not call out scent at all</span></div>
+    <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text">Current bullet copy is compliant — no brightening language detected</span></div>
+    <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text">Vitamin C form (Ascorbyl Palmitate) noted — stable form that doesn't require oxidation disclaimer</span></div>
+  </div>
+
+    <div class="sec">
+    <div class="sec-title">Backend Keywords <span class="badge bg-sage">~500 char · Spaces only</span></div>
+    <div class="listing-block">
+      <div class="listing-value" style="font-family:var(--font-mono);font-size:12px;line-height:1.9;color:var(--ink3);">vitamin c serum for face korean vitamin c serum vitamin c beads serum vitamin c gel serum hyaluronic acid vitamin c serum cica serum for sensitive skin korean skin care serum facial serum vitamin c vitamin c face serum gel serum for face sensitive skin serum vitamin c korean skincare serum for sensitive skin vitamin c hydrating serum vitamin c cica serum</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Product Description <span class="badge bg-clay">A9 SEO · Pre-A+ launch copy</span></div>
+    <div class="listing-block">
+<div style="font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;margin-bottom:10px;">skinside SEOUL Vitamin C Beads Serum</div>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">A vitamin c serum for face built around a unique encapsulated bead delivery system. Each micro-bead holds Ascorbyl Palmitate — a stable, oil-soluble form of Vitamin C — and melts into the skin on application. The vitamin c gel serum base ensures a lightweight, non-sticky feel that works for all skin types, including sensitive skin.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">This korean vitamin c serum pairs the Vitamin C delivery system with a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid) for layered soothing support. The hyaluronic acid vitamin c serum formula includes four distinct HA molecules — Sodium Hyaluronate, Hydrolyzed Hyaluronic Acid, Sodium Hyaluronate Crosspolymer, and Sodium Acetylated Hyaluronate — which support moisture retention at multiple skin depths simultaneously.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Jojoba Esters and Vitamin E support a soft, comfortable skin feel after application. Sea Water provides a mineral-rich base in place of standard water.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Formulated without sulfates, parabens, or silicones. Apply after cleansing and before moisturizer, morning or evening.</p>
+<div style="font-size:12px;color:var(--ink3);font-family:var(--font-mono);line-height:1.8;margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:8px;">Key ingredients: Ascorbyl Palmitate (Vitamin C) · Tocopheryl Acetate (Vitamin E) · Centella Asiatica Extract · Madecassoside · Madecassic Acid · Asiaticoside · Asiatic Acid · Sodium Hyaluronate · Hydrolyzed Hyaluronic Acid · Sodium Hyaluronate Crosspolymer · Sodium Acetylated Hyaluronate · Jojoba Esters · Sea Water. 1.85 fl oz / 55 ml.</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.6;">This description is live for A9 indexing until A+ Content is published. Once A+ is live, Amazon suppresses the text description in the storefront, but the copy continues to be indexed. Keep keyword-rich language in place.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI Launch Opportunities <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-3" class="ai-out">
+      <div class="opp oh"><div class="opp-hdr"><span class="pri">High</span><span class="otag">Competitive Risk</span></div><div class="obody">SSS0003 is in the most competitive Vitamin C serum space. Category leader EQQUALBERRY stacks Acerola C + Niacinamide + Arbutin + TXA + ceramides + HA — a substantially richer formula. To compete, skinside SEOUL's angle must lead with the Cica complex differentiation and the encapsulated bead delivery format, which is visually demonstrable in images. Backend keywords should include "tranexamic acid serum" and "korean vitamin c serum" as long-tail opportunities.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('3')">Regenerate with AI</button>
+      <span id="ai-status-3" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-3"></div>
+  </div>
+</div>
+
+<!-- ══ SKU 4 ══ -->
+<div id="tab-sku4" class="page">
+  <div class="product-header">
+    <div class="ph-left">
+      <div class="ph-sku">SSS0004 · ESSENCE</div>
+      <div class="ph-name">96% Snail Mucin Essence</div>
+      <div class="ph-meta">
+        <span class="badge bg-sage">3.55 fl oz</span>
+        <span class="badge bg-clay">$20.00 · $5.63/oz</span>
+        <span class="badge bg-blush">HIGHEST STRATEGIC PRIORITY</span>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-price">$20.00</div>
+      <div class="ph-price-sub">$5.63 per fl oz</div>
+      <div class="ph-status">Pre-Launch · Priority SKU</div>
+    </div>
+  </div>
+
+  <div class="compliance-banner" style="border-color:var(--green);background:linear-gradient(135deg,#E0FBF3 0%,#F4F1EC 100%);">
+    <div class="cb-icon">📌</div>
+    <div>
+      <div class="cb-title" style="color:#0A7A5A;">Strategic Note — SSS0004 is the most important SKU at launch</div>
+      <div class="cb-body">COSRX (BSR #7, $18.98, $5.62/oz) is the category benchmark at 103,890 reviews. skinside SEOUL is entering at <strong>$5.63/oz</strong> — near-identical price parity. Differentiation must be built through the <strong>Cica complex + HA stack</strong> not available in COSRX's formula. Lead title with concentration ("96% Snail Mucin"), and lead Item Highlights with the Cica differentiation. This SKU should receive the highest Vine enrollment and PPC investment at launch.</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Listing Build — Title & Item Highlights <span class="badge bg-alert">Deadline: Jul 27</span></div>
+    <div class="listing-block">
+      <div class="listing-label">Title <span class="char-count char-ok">71 chars ✓</span></div>
+      <div class="listing-value title-display">skinside SEOUL 96% Snail Mucin Essence – Korean Serum with Cica, 3.5 oz</div>
+    </div>
+    <div class="listing-block highlight-field">
+      <div class="listing-label">Item Highlights <span class="char-count char-ok">124 chars ✓</span></div>
+      <div class="listing-value">96% Snail Secretion Filtrate + 4-molecule Cica complex + HA · Lightweight essence · Fragrance-light · Cica-fortified formula</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bullets 1–5 <span class="badge bg-sage">Keyword-optimized</span></div>
+    <div class="listing-block"><div class="listing-label">Bullet 1</div><div class="listing-value"><strong>96% SNAIL MUCIN SERUM WITH CICA COMPLEX</strong> – skinside SEOUL's snail mucin serum is formulated with 96% Snail Secretion Filtrate, helping to hydrate and support smoother-looking skin texture, while a four-molecule Cica complex adds soothing support not found in standard 96 snail mucin serums.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 2</div><div class="listing-value"><strong>SNAIL MUCIN ESSENCE POWERED BY SNAIL SECRETION FILTRATE</strong> – Unlike a heavier cream, this snail mucin essence absorbs in seconds and layers effortlessly into Korean skin care routines — morning or night — as a lightweight snail secretion filtrate serum step after cleansing.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 3</div><div class="listing-value"><strong>CICA SNAIL SERUM WITH FOUR-MOLECULE CICA STACK</strong> – This cica snail serum pairs Snail Secretion Filtrate with Madecassoside, Madecassic Acid, Asiaticoside, and Asiatic Acid — four distinct Cica molecules that support skin comfort and a balanced-looking complexion together.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 4</div><div class="listing-value"><strong>CENTELLA ASIATICA SERUM WITH HYALURONIC ACID</strong> – Formulated as a centella asiatica serum, this essence includes moisture-supporting Sodium Hyaluronate and Arginine to help replenish hydration and maintain a soft, smooth skin feel throughout the day.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 5</div><div class="listing-value"><strong>SNAIL MUCIN KOREAN SKINCARE ESSENCE FOR DAILY USE</strong> – A staple of snail mucin korean skincare routines, this lightweight essence suits all skin types and fits between the toner and moisturizer step, delivering concentrated snail mucin benefits in 3.5 fl oz.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Competitive Context</div>
+    <table class="data">
+      <thead><tr><th>Brand</th><th>Concentration</th><th>Price/oz</th><th>BSR (Facial Serums)</th><th>Reviews</th><th>Cica Complex</th><th>Threat Level</th></tr></thead>
+      <tbody>
+        <tr class="our" style="background:#E0FBF3;"><td><strong>skinside SEOUL</strong></td><td>96%</td><td>$5.63</td><td>Not launched</td><td>0</td><td><span class="pill pill-g">Yes — 4 molecules</span></td><td>—</td></tr>
+        <tr><td>COSRX</td><td>96.3%</td><td>$5.62</td><td>#7</td><td>103,890</td><td><span class="pill pill-r">No</span></td><td><span style="color:var(--rose);font-weight:600;">HIGH</span></td></tr>
+        <tr><td>BYOMA Phyto-Mucin</td><td>Vegan alt.</td><td>$11.84</td><td>#73</td><td>350</td><td><span class="pill pill-r">No</span></td><td><span style="color:var(--clay-dark);font-weight:600;">MED</span></td></tr>
+        <tr><td>Beauty of Joseon</td><td>—</td><td>$15.50</td><td>—</td><td>120</td><td><span class="pill pill-r">No</span></td><td><span style="color:var(--sage-dark);font-weight:600;">LOW</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+    <div class="sec">
+    <div class="sec-title">Backend Keywords <span class="badge bg-sage">~500 char · Spaces only</span></div>
+    <div class="listing-block">
+      <div class="listing-value" style="font-family:var(--font-mono);font-size:12px;line-height:1.9;color:var(--ink3);">snail mucin serum snail mucin essence 96 snail mucin cica snail serum snail secretion filtrate serum centella asiatica serum snail mucin korean skincare korean skin care essence snail essence snail mucin hydrating serum korean snail serum snail mucin serum for face snail serum facial essence korean beauty snail mucin snail filtrate serum</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Product Description <span class="badge bg-clay">A9 SEO · Pre-A+ launch copy</span></div>
+    <div class="listing-block">
+<div style="font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;margin-bottom:10px;">skinside SEOUL 96% Snail Mucin Essence</div>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">A lightweight snail mucin essence built around 96% Snail Secretion Filtrate — one of the highest concentrations available in this format. The formula delivers the hydrating and texture-supporting benefits of snail mucin in an essence texture that absorbs immediately and layers cleanly under any moisturizer.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">What separates this from a standard 96 snail mucin serum is the four-molecule Cica complex: Madecassoside, Madecassic Acid, Asiaticoside, and Asiatic Acid. Each molecule targets a different aspect of skin comfort and barrier support, making this a cica snail serum and a centella asiatica serum in one step.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Sodium Hyaluronate provides moisture replenishment alongside the Snail Secretion Filtrate. Arginine and Vitamin E support a healthy, even-looking complexion with regular use. Sea Water replaces standard water as the base, delivering trace minerals with every application.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Suitable for all skin types. Apply 2–4 drops to clean skin after toner, before moisturizer. Morning or evening.</p>
+<div style="font-size:12px;color:var(--ink3);font-family:var(--font-mono);line-height:1.8;margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:8px;">Key ingredients: Snail Secretion Filtrate (96%) · Sodium Hyaluronate · Centella Asiatica Extract · Madecassoside · Madecassic Acid · Asiaticoside · Asiatic Acid · Arginine · Tocopheryl Acetate (Vitamin E) · Sea Water. 3.55 fl oz / 105 ml.</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.6;">This description is live for A9 indexing until A+ Content is published. Once A+ is live, Amazon suppresses the text description in the storefront, but the copy continues to be indexed. Keep keyword-rich language in place.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI Launch Opportunities <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-4" class="ai-out">
+      <div class="opp oh"><div class="opp-hdr"><span class="pri">High</span><span class="otag">Priority · Competitive</span></div><div class="obody"><strong>SSS0004 enters one of the hardest-contested subcategories on Amazon.</strong> COSRX owns BSR #7 with 103,890 reviews — winning on volume alone is impossible at launch. The strategy is to own "Cica-fortified snail mucin" as a positioning niche, capturing consumers who want both snail mucin AND Cica in one product. Bullet 2 above (the Cica differentiation bullet) is the most important bullet on the page — it's the one thing COSRX cannot copy. Consider making it Bullet 1.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('4')">Regenerate with AI</button>
+      <span id="ai-status-4" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-4"></div>
+  </div>
+</div>
+
+<!-- ══ SKU 5 ══ -->
+<div id="tab-sku5" class="page">
+  <div class="product-header">
+    <div class="ph-left">
+      <div class="ph-sku">SSS0005 · CREAM</div>
+      <div class="ph-name">92% Snail Mucin Cream</div>
+      <div class="ph-meta">
+        <span class="badge bg-sage">3.38 fl oz</span>
+        <span class="badge bg-clay">$12.00 · $3.55/oz</span>
+        <span class="badge bg-blush">Dry Skin Focus</span>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-price">$12.00</div>
+      <div class="ph-price-sub">$3.55 per fl oz</div>
+      <div class="ph-status">Pre-Launch</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Listing Build — Title & Item Highlights <span class="badge bg-alert">Deadline: Jul 27</span></div>
+    <div class="listing-block">
+      <div class="listing-label">Title <span class="char-count char-ok">67 chars ✓</span></div>
+      <div class="listing-value title-display">skinside SEOUL 92% Snail Mucin Cream – Korean Moisturizer with Cica</div>
+    </div>
+    <div class="listing-block highlight-field">
+      <div class="listing-label">Item Highlights <span class="char-count char-ok">122 chars ✓</span></div>
+      <div class="listing-value">92% Snail Secretion Filtrate + Panthenol + Allantoin + Adenosine + Cica · Rich-yet-lightweight · For dry skin</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bullets 1–5 <span class="badge bg-sage">Keyword-optimized</span></div>
+    <div class="listing-block"><div class="listing-label">Bullet 1</div><div class="listing-value"><strong>SNAIL MUCIN CREAM WITH 92% SNAIL SECRETION FILTRATE</strong> – skinside SEOUL's snail cream face moisturizer is formulated with 92% Snail Secretion Filtrate for deep, lasting hydration — a rich snail mucin cream that supports smoother, softer-feeling skin with daily use.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 2</div><div class="listing-value"><strong>SNAIL MUCIN MOISTURIZER WITH HYALURONIC ACID &amp; PANTHENOL</strong> – This snail mucin moisturizer layers Sodium Hyaluronate, Panthenol, and Allantoin alongside the Snail Secretion Filtrate to help replenish moisture and support a comfortable, conditioned skin feel throughout the day.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 3</div><div class="listing-value"><strong>CICA MOISTURIZER WITH A FOUR-MOLECULE CICA COMPLEX</strong> – Enriched with Madecassoside, Madecassic Acid, Asiaticoside, and Asiatic Acid, this cica moisturizer delivers layered soothing support alongside the snail mucin base, setting it apart from single-molecule cica creams.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 4</div><div class="listing-value"><strong>KOREAN MOISTURIZER FOR DRY SKIN WITH ADENOSINE</strong> – Formulated as a korean moisturizer for dry skin, the rich yet lightweight cream texture helps maintain the skin's natural moisture barrier without heaviness, making it comfortable for use morning and evening.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 5</div><div class="listing-value"><strong>MADECASSOSIDE CREAM THAT LAYERS IN ANY KOREAN ROUTINE</strong> – As a madecassoside cream, this moisturizer pairs seamlessly with essences, serums, and sunscreen. Vitamin E and Betaine round out the formula for a nourishing finish that supports healthy-looking skin daily.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Formula & Positioning</div>
+    <div class="two">
+      <div>
+        <div class="sec-title-sm">Hero Ingredients</div>
+        <div class="ing-list">
+          <span class="ing-chip hero">Snail Secretion Filtrate 92%</span>
+          <span class="ing-chip">Sodium Hyaluronate</span>
+          <span class="ing-chip">Panthenol</span>
+          <span class="ing-chip">Allantoin</span>
+          <span class="ing-chip cica">Centella Asiatica</span>
+          <span class="ing-chip cica">Madecassoside</span>
+          <span class="ing-chip cica">Madecassic Acid</span>
+          <span class="ing-chip cica">Asiaticoside</span>
+          <span class="ing-chip cica">Asiatic Acid</span>
+          <span class="ing-chip">Betaine</span>
+          <span class="ing-chip">Adenosine</span>
+          <span class="ing-chip">Vitamin E</span>
+          <span class="ing-chip">Sea Water</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title-sm">Positioning Notes</div>
+        <p style="font-size:13px;color:var(--ink2);line-height:1.75;">Panthenol + Allantoin + Adenosine make this formula significantly richer than the SSS0004 essence. The differentiation from SSS0004 should be clear in copy: the cream is for deeper moisture and dry skin; the essence is for layering and texture. Both feature the Cica complex — this is the brand's signature differentiation.</p>
+      </div>
+    </div>
+  </div>
+
+    <div class="sec">
+    <div class="sec-title">Backend Keywords <span class="badge bg-sage">~500 char · Spaces only</span></div>
+    <div class="listing-block">
+      <div class="listing-value" style="font-family:var(--font-mono);font-size:12px;line-height:1.9;color:var(--ink3);">snail mucin cream snail mucin moisturizer korean moisturizer for dry skin snail cream face moisturizer cica moisturizer madecassoside cream korean snail cream snail mucin face cream korean skin care moisturizer snail mucin face moisturizer hydrating face cream for dry skin korean moisturizer cream snail cream moisturizer cica face cream</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Product Description <span class="badge bg-clay">A9 SEO · Pre-A+ launch copy</span></div>
+    <div class="listing-block">
+<div style="font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;margin-bottom:10px;">skinside SEOUL 92% Snail Mucin Cream</div>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">A nourishing snail mucin cream built around 92% Snail Secretion Filtrate. Richer in texture than the brand's snail mucin essence, this snail cream face moisturizer is formulated for deeper moisture support and daily barrier care — particularly for dry or dehydrated skin.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">The formula goes beyond a standard snail mucin moisturizer by layering a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid) alongside Panthenol, Allantoin, and Sodium Hyaluronate. Together, these ingredients support moisture retention, skin comfort, and a healthy-looking complexion with regular use. The Madecassoside content makes this a true madecassoside cream — not simply a cica moisturizer that includes a trace amount.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Adenosine and Betaine support skin vitality and a smooth texture on application. Vitamin E provides antioxidant support. Sea Water replaces standard water as the formula base.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">This korean moisturizer for dry skin is rich enough for dry skin yet lightweight enough to wear comfortably under sunscreen. Suitable for dry, normal, and combination skin. Apply after serum or essence, morning and evening.</p>
+<div style="font-size:12px;color:var(--ink3);font-family:var(--font-mono);line-height:1.8;margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:8px;">Key ingredients: Snail Secretion Filtrate (92%) · Sodium Hyaluronate · Panthenol · Allantoin · Centella Asiatica Extract · Madecassoside · Madecassic Acid · Asiaticoside · Asiatic Acid · Betaine · Adenosine · Vitamin E · Sea Water. 3.38 fl oz / 100 ml.</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.6;">This description is live for A9 indexing until A+ Content is published. Once A+ is live, Amazon suppresses the text description in the storefront, but the copy continues to be indexed. Keep keyword-rich language in place.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI Launch Opportunities <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-5" class="ai-out">
+      <div class="opp om"><div class="opp-hdr"><span class="pri">Medium</span><span class="otag">Listing / Differentiation</span></div><div class="obody">SSS0005 and SSS0004 are companion SKUs — position them clearly as Cream (moisture barrier) vs Essence (lightweight layering step). Bundle opportunity may exist post-launch. At $3.55/oz, this is price-accessible for first-time buyers — consider making SSS0005 the hero SKU for acquisition and SSS0004 the hero for conversion depth.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('5')">Regenerate with AI</button>
+      <span id="ai-status-5" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-5"></div>
+  </div>
+</div>
+
+<!-- ══ SKU 6 ══ -->
+<div id="tab-sku6" class="page">
+  <div class="product-header">
+    <div class="ph-left">
+      <div class="ph-sku">SSS0006 · MOISTURIZER</div>
+      <div class="ph-name">Vitamin C Capsule Cream</div>
+      <div class="ph-meta">
+        <span class="badge bg-sage">1.69 fl oz</span>
+        <span class="badge bg-clay">$16.00 · $9.47/oz</span>
+        <span class="badge bg-blush">Women-focused</span>
+      </div>
+    </div>
+    <div class="ph-right">
+      <div class="ph-price">$16.00</div>
+      <div class="ph-price-sub">$9.47 per fl oz</div>
+      <div class="ph-status">Pre-Launch</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Listing Build — Title & Item Highlights <span class="badge bg-alert">Deadline: Jul 27</span></div>
+    <div class="listing-block">
+      <div class="listing-label">Title <span class="char-count char-ok">74 chars ✓</span></div>
+      <div class="listing-value title-display">skinside SEOUL Vitamin C Capsule Cream – Face Moisturizer with Niacinamide</div>
+    </div>
+    <div class="listing-block highlight-field">
+      <div class="listing-label">Item Highlights <span class="char-count char-ok">113 chars ✓</span></div>
+      <div class="listing-value">Encapsulated Ascorbyl Glucoside + Niacinamide + 4-type HA + Squalane + Shea + Cica · Gel-cream · For radiant skin</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Bullets 1–5 <span class="badge bg-sage">Keyword-optimized</span></div>
+    <div class="listing-block"><div class="listing-label">Bullet 1</div><div class="listing-value"><strong>VITAMIN C CAPSULE CREAM WITH ENCAPSULATED ASCORBYL GLUCOSIDE</strong> – skinside SEOUL's vitamin c capsule cream suspends stabilized Ascorbyl Glucoside capsules in a lightweight gel base, so the Vitamin C activates fresh on contact — preserving potency in every use.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 2</div><div class="listing-value"><strong>NIACINAMIDE MOISTURIZER WITH FOUR-TYPE HYALURONIC ACID</strong> – As a niacinamide moisturizer, this cream pairs Niacinamide with Sodium Hyaluronate, Hydrolyzed Hyaluronic Acid, and Squalane to help support moisture balance, skin comfort, and a healthy-looking complexion.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 3</div><div class="listing-value"><strong>VITAMIN C MOISTURIZER WITH SQUALANE &amp; SHEA BUTTER</strong> – This vitamin c moisturizer goes beyond Vitamin C alone, adding Squalane, Shea Butter, and Jojoba Seed Oil to nourish and support the skin barrier, leaving skin feeling soft and comfortable after each application.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 4</div><div class="listing-value"><strong>KOREAN MOISTURIZER WITH CICA COMPLEX &amp; PANTHENOL</strong> – Formulated with a four-molecule Cica complex and Panthenol, this korean moisturizer supports a calm, even-looking complexion, fitting naturally as the final moisturizer step in any modern Korean skin care routine.</div></div>
+    <div class="listing-block"><div class="listing-label">Bullet 5</div><div class="listing-value"><strong>VITAMIN C FACE CREAM THAT WORKS AS A SERUM-CREAM HYBRID</strong> – This vitamin c face cream's lightweight gel texture absorbs like a serum while delivering the coverage of a daily moisturizer, making it suitable for morning routines under sunscreen or as a standalone evening step.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Formula & Compliance Notes</div>
+    <div class="two">
+      <div>
+        <div class="sec-title-sm">Hero Ingredients</div>
+        <div class="ing-list">
+          <span class="ing-chip hero">Niacinamide</span>
+          <span class="ing-chip hero">Ascorbyl Glucoside (Vit C)</span>
+          <span class="ing-chip">Beta-Carotene</span>
+          <span class="ing-chip">Sodium Hyaluronate</span>
+          <span class="ing-chip">Hydrolyzed HA</span>
+          <span class="ing-chip">Squalane</span>
+          <span class="ing-chip">Shea Butter</span>
+          <span class="ing-chip">Jojoba Seed Oil</span>
+          <span class="ing-chip">Panthenol</span>
+          <span class="ing-chip cica">Centella Asiatica</span>
+          <span class="ing-chip cica">Madecassoside</span>
+          <span class="ing-chip cica">Madecassic Acid</span>
+          <span class="ing-chip cica">Asiaticoside</span>
+          <span class="ing-chip">Vitamin E</span>
+        </div>
+      </div>
+      <div>
+        <div class="sec-title-sm">Compliance Flags</div>
+        <div class="no-list-item"><span class="no-icon">🚫</span><span class="no-text"><strong>Do NOT use:</strong> brightening, brighten, dark spot → use: radiant, illuminate, healthy-looking glow</span></div>
+        <div class="no-list-item"><span class="no-icon">🚫</span><span class="no-text"><strong>Niacinamide</strong> — avoid "reduces dark spots" or "corrects discoloration." Use "supports even-looking skin tone."</span></div>
+        <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text">Ascorbyl Glucoside (stable form) — no oxidation disclaimer needed</span></div>
+        <div class="no-list-item"><span class="no-icon no-ok">✓</span><span class="no-text">All current bullets reviewed — no prohibited language detected</span></div>
+      </div>
+    </div>
+  </div>
+
+    <div class="sec">
+    <div class="sec-title">Backend Keywords <span class="badge bg-sage">~500 char · Spaces only</span></div>
+    <div class="listing-block">
+      <div class="listing-value" style="font-family:var(--font-mono);font-size:12px;line-height:1.9;color:var(--ink3);">vitamin c moisturizer niacinamide moisturizer vitamin c capsule cream korean moisturizer vitamin c face cream encapsulated vitamin c serum vitamin c face moisturizer niacinamide face cream korean skin care moisturizer vitamin c daily moisturizer vitamin c gel cream vitamin c korean moisturizer niacinamide vitamin c moisturizer korean vitamin c cream</div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Product Description <span class="badge bg-clay">A9 SEO · Pre-A+ launch copy</span></div>
+    <div class="listing-block">
+<div style="font-family:var(--font-serif);font-size:16px;color:var(--ink);font-weight:600;margin-bottom:10px;">skinside SEOUL Vitamin C Capsule Cream</div>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">A vitamin c capsule cream that combines targeted Vitamin C delivery with a full daily moisturizer formula. Ascorbyl Glucoside — a stable, water-soluble form of Vitamin C — is encapsulated and suspended in the gel base, activating when massaged into the skin. This encapsulated vitamin c serum approach helps maintain ingredient freshness throughout the product&#39;s use. This approach helps maintain ingredient freshness throughout the product's use.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">The formula functions as a niacinamide moisturizer alongside the Vitamin C: Niacinamide and a four-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid) help support an even, comfortable complexion. Four forms of Hyaluronic Acid — Sodium Hyaluronate, Hydrolyzed Hyaluronic Acid, and additional HA variants — deliver moisture at multiple skin depths.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">Squalane, Shea Butter, and Jojoba Seed Oil provide nourishing, skin-compatible lipids without heaviness. Panthenol and Vitamin E round out the formula as supporting actives.</p>
+<p style="font-size:13.5px;color:var(--ink2);line-height:1.85;margin-bottom:12px;">The lightweight gel-cream texture absorbs quickly and layers cleanly under sunscreen. Suitable as a vitamin c face cream for morning use, or as an evening moisturizer. Appropriate for all skin types, including combination and oily skin.</p>
+<div style="font-size:12px;color:var(--ink3);font-family:var(--font-mono);line-height:1.8;margin-top:14px;padding:12px 14px;background:var(--bg2);border-radius:8px;">Key ingredients: Niacinamide · Ascorbyl Glucoside (Vitamin C) · Beta-Carotene · Sodium Hyaluronate · Hydrolyzed Hyaluronic Acid · Squalane · Shea Butter · Jojoba Seed Oil · Panthenol · Centella Asiatica Extract · Madecassoside · Madecassic Acid · Asiatic Acid · Asiaticoside · Vitamin E. 1.69 fl oz / 50 ml.</div>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink3);margin-top:12px;line-height:1.6;">This description is live for A9 indexing until A+ Content is published. Once A+ is live, Amazon suppresses the text description in the storefront, but the copy continues to be indexed. Keep keyword-rich language in place.</p>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI Launch Opportunities <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-6" class="ai-out">
+      <div class="opp om"><div class="opp-hdr"><span class="pri">Medium</span><span class="otag">Keyword / Positioning</span></div><div class="obody">SSS0006 has the richest ingredient stack of all 6 SKUs (Squalane + Shea + HA + Vitamin C + Niacinamide + Cica). At $9.47/oz it's positioned above budget but below premium. PPC keyword strategy: "vitamin c moisturizer," "niacinamide moisturizer," "korean moisturizer" — all with high search intent and winnable at this price point. Avoid brightening keywords throughout.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('6')">Regenerate with AI</button>
+      <span id="ai-status-6" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-6"></div>
+  </div>
+</div>
+
+<!-- ══ KEYWORD TRACKER ══ -->
+<div id="tab-keywords" class="page">
+
+  <div class="sec">
+    <div class="sec-title">Organic Keyword Rank Tracker <span class="badge bg-blush">Weekly · Helium 10 Export</span></div>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.65;">Tracks organic search position only — not PPC rank. Paste weekly Helium 10 Keyword Tracker CSV data below to update. All ranks pre-launch show as Not Ranked. <strong>Page 1 = ranks 1–16 · Page 2–3 = 17–48 · Page 4+ = 49+.</strong></p>
+
+    <div style="overflow-x:auto;">
+    <table class="data" id="kw-table">
+      <thead>
+        <tr>
+          <th>Keyword</th>
+          <th>SKU</th>
+          <th>Est. Vol/mo</th>
+          <th>Week 1</th>
+          <th>Week 2</th>
+          <th>Week 3</th>
+          <th>Week 4</th>
+          <th>Current Rank</th>
+          <th>Δ</th>
+          <th>Page</th>
+        </tr>
+      </thead>
+      <tbody id="kw-tbody">
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">SSS0001 — Heartleaf Foaming Cleanser</td></tr>
+        <tr><td>foaming face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~18K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>gentle face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~12K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>korean face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~8K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>pore cleansing face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~4K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>face wash for oily skin</td><td><span class="pill pill-g">SSS0001</span></td><td>~22K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>heartleaf cleanser</td><td><span class="pill pill-g">SSS0001</span></td><td>~1K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>cica foaming cleanser</td><td><span class="pill pill-g">SSS0001</span></td><td>~2K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">SSS0002 — 200 Spicule Serum</td></tr>
+        <tr><td>spicule serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~500</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>korean spicule serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~300</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>texture refining serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~2K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>microneedling serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~5K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>niacinamide serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~35K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">SSS0003 — Vitamin C Beads Serum</td></tr>
+        <tr><td>vitamin c serum for face</td><td><span class="pill pill-b">SSS0003</span></td><td>~45K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>korean vitamin c serum</td><td><span class="pill pill-b">SSS0003</span></td><td>~6K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>vitamin c beads serum</td><td><span class="pill pill-b">SSS0003</span></td><td>~800</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>hyaluronic acid vitamin c serum</td><td><span class="pill pill-b">SSS0003</span></td><td>~12K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>cica serum for sensitive skin</td><td><span class="pill pill-b">SSS0003</span></td><td>~2K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>vitamin c gel serum</td><td><span class="pill pill-b">SSS0003</span></td><td>~3K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">SSS0004 — 96% Snail Mucin Essence ⭐ Priority SKU</td></tr>
+        <tr><td>snail mucin serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~30K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>snail mucin essence</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~18K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>96 snail mucin</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~8K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>cica snail serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~1.5K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>snail secretion filtrate serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~3K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>centella asiatica serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~4K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>snail mucin korean skincare</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~5K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">SSS0005 — 92% Snail Mucin Cream</td></tr>
+        <tr><td>snail mucin cream</td><td><span class="pill pill-a">SSS0005</span></td><td>~12K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>snail mucin moisturizer</td><td><span class="pill pill-a">SSS0005</span></td><td>~8K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>korean moisturizer for dry skin</td><td><span class="pill pill-a">SSS0005</span></td><td>~6K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>snail cream face moisturizer</td><td><span class="pill pill-a">SSS0005</span></td><td>~3K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>madecassoside cream</td><td><span class="pill pill-a">SSS0005</span></td><td>~600</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>cica moisturizer</td><td><span class="pill pill-a">SSS0005</span></td><td>~4K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">SSS0006 — Vitamin C Capsule Cream</td></tr>
+        <tr><td>vitamin c moisturizer</td><td><span class="pill pill-a">SSS0006</span></td><td>~20K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>niacinamide moisturizer</td><td><span class="pill pill-a">SSS0006</span></td><td>~15K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>vitamin c capsule cream</td><td><span class="pill pill-a">SSS0006</span></td><td>~2K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>korean moisturizer</td><td><span class="pill pill-a">SSS0006</span></td><td>~10K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>encapsulated vitamin c serum</td><td><span class="pill pill-a">SSS0006</span></td><td>~1K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>vitamin c face cream</td><td><span class="pill pill-a">SSS0006</span></td><td>~8K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+        <tr class="kw-group"><td colspan="10" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">Cross-SKU — Brand Umbrella Terms</td></tr>
+        <tr><td>korean skincare for sensitive skin</td><td><span class="pill" style="background:var(--bg2);color:var(--ink3);">ALL</span></td><td>~8K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>korean skin care</td><td><span class="pill" style="background:var(--bg2);color:var(--ink3);">ALL</span></td><td>~80K</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+        <tr><td>skinside seoul</td><td><span class="pill" style="background:var(--bg2);color:var(--ink3);">ALL</span></td><td>Brand</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell rank-none">Not ranked</td><td class="rank-cell">—</td><td class="rank-cell">—</td></tr>
+
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="two">
+    <div class="sec">
+      <div class="sec-title">Update Organic Rankings</div>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;">Paste your Helium 10 Keyword Tracker export. Format: <code style="font-family:var(--font-mono);font-size:12px;background:var(--bg2);padding:2px 6px;border-radius:4px;">keyword, rank</code> — one per line.</p>
+      <div style="margin-bottom:12px;">
+        <div class="ulbl">Week Label</div>
+        <input type="text" id="kw-week-label" placeholder="e.g. Week 1 · Jul 7" style="min-height:auto;height:40px;width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0 14px;font-family:var(--font-sans);font-size:13px;color:var(--ink);margin-top:4px;" />
+      </div>
+      <div>
+        <div class="ulbl">Keyword Rankings</div>
+        <textarea id="kw-paste" rows="8" style="margin-top:4px;" placeholder="foaming face wash, 142&#10;snail mucin serum, 89&#10;vitamin c serum for face, 201&#10;snail mucin essence, 156"></textarea>
+      </div>
+      <button class="btn" onclick="updateKeywords()" style="margin-top:12px;">Update Rankings</button>
+      <span id="kw-status" class="smsg"></span>
+    </div>
+
+    <div class="sec">
+      <div class="sec-title">Rank Legend & Milestones</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;background:var(--teal-light);">
+          <span style="font-size:18px;font-weight:700;color:var(--ink);font-family:var(--font-mono);min-width:40px;">1–16</span>
+          <div><div style="font-weight:600;font-size:13px;color:var(--ink);">Page 1</div><div style="font-size:12px;color:var(--ink3);">Primary goal — generates organic sessions</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;background:var(--sand);">
+          <span style="font-size:18px;font-weight:700;color:var(--amber-warm);font-family:var(--font-mono);min-width:40px;">17–48</span>
+          <div><div style="font-weight:600;font-size:13px;color:var(--ink);">Pages 2–3</div><div style="font-size:12px;color:var(--ink3);">PPC still needed — organic traction building</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;background:var(--rose-light);">
+          <span style="font-size:18px;font-weight:700;color:var(--rose);font-family:var(--font-mono);min-width:40px;">49+</span>
+          <div><div style="font-weight:600;font-size:13px;color:var(--ink);">Page 4+</div><div style="font-size:12px;color:var(--ink3);">Organic visibility low — PPC carries the keyword</div></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border2);padding-top:16px;">
+        <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--ink3);margin-bottom:10px;">Organic rank targets</div>
+        <div class="no-list-item" style="padding:6px 0;border-bottom:1px solid var(--border2);font-size:12.5px;"><span class="no-icon no-ok" style="color:var(--ink3);">Day 30</span><span class="no-text">All T1 keywords ranking (any page)</span></div>
+        <div class="no-list-item" style="padding:6px 0;border-bottom:1px solid var(--border2);font-size:12.5px;"><span class="no-icon no-ok" style="color:var(--ink3);">Day 60</span><span class="no-text">Top 3 keywords per SKU on page 2–3</span></div>
+        <div class="no-list-item" style="padding:6px 0;font-size:12.5px;"><span class="no-icon no-ok" style="color:var(--ink3);">Day 90</span><span class="no-text">1–2 keywords per SKU breaking page 1</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ COMPETITORS ══ -->
+<div id="tab-competitors" class="page">
+
+  <div class="sec">
+    <div class="sec-title">Competitor BSR & Rank Tracker <span class="badge bg-blush">Weekly Snapshot</span></div>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:20px;line-height:1.65;">Track BSR movement across your top competitors each week. Paste new BSR data into the update panel below — the table adds a weekly column automatically. <strong>Lower BSR = better rank.</strong> Green border = improving (BSR dropping), Red = declining.</p>
+
+    <div style="overflow-x:auto;">
+    <table class="data" id="comp-table">
+      <thead>
+        <tr>
+          <th>ASIN</th>
+          <th>Brand / Product</th>
+          <th>SKU Competing</th>
+          <th>Subcategory</th>
+          <th>Price/oz</th>
+          <th>Reviews</th>
+          <th>Week 1</th>
+          <th>Week 2</th>
+          <th>Week 3</th>
+          <th>Week 4</th>
+          <th>Current BSR</th>
+          <th>Δ BSR</th>
+        </tr>
+      </thead>
+      <tbody id="comp-tbody">
+        <!-- Our Products -->
+        <tr class="kw-group"><td colspan="12" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">skinside SEOUL — Our Products (BSR tracking begins at launch)</td></tr>
+        <tr class="our" style="background:var(--teal-light);border-left:3px solid var(--green);">
+          <td style="font-family:var(--font-mono);font-size:11px;">—</td><td><strong>SSS0001</strong> Heartleaf Cleanser</td><td><span class="pill pill-g">SSS0001</span></td><td>Face Cleansers</td><td>$2.37</td><td>0</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">Not launched</td><td>—</td>
+        </tr>
+        <tr class="our" style="background:var(--teal-light);border-left:3px solid var(--green);">
+          <td style="font-family:var(--font-mono);font-size:11px;">—</td><td><strong>SSS0004</strong> 96% Snail Essence</td><td><span class="pill pill-g">SSS0004</span></td><td>Facial Serums</td><td>$5.63</td><td>0</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">Not launched</td><td>—</td>
+        </tr>
+        <tr class="our" style="background:var(--teal-light);border-left:3px solid var(--green);">
+          <td style="font-family:var(--font-mono);font-size:11px;">—</td><td><strong>SSS0003</strong> Vit C Beads Serum</td><td><span class="pill pill-g">SSS0003</span></td><td>Facial Serums</td><td>$10.81</td><td>0</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">Not launched</td><td>—</td>
+        </tr>
+        <tr class="our" style="background:var(--teal-light);border-left:3px solid var(--green);">
+          <td style="font-family:var(--font-mono);font-size:11px;">—</td><td><strong>SSS0005</strong> 92% Snail Cream</td><td><span class="pill pill-g">SSS0005</span></td><td>Face Moisturizers</td><td>$3.55</td><td>0</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">—</td><td class="rank-cell rank-none">Not launched</td><td>—</td>
+        </tr>
+
+        <!-- Snail Mucin Competitors -->
+        <tr class="kw-group"><td colspan="12" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">Snail Mucin Segment — SSS0004 &amp; SSS0005</td></tr>
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:11px;">B00PBX3L7K</td><td>COSRX — 96% Snail Mucin Serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>Facial Serums</td><td>$5.62</td><td>103,890</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell" id="comp-cosrx">#7</td><td>—</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:11px;">B0DR9VMF5N</td><td>BYOMA — Phyto-Mucin Glow Serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>Facial Serums</td><td>$11.84</td><td>350</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">#73</td><td>—</td>
+        </tr>
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:11px;">B0B3R1R2DG</td><td>Beauty of Joseon — Snail + Ginseng Serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>Facial Serums</td><td>$15.50</td><td>120</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td>—</td>
+        </tr>
+
+        <!-- Vit C Serum Competitors -->
+        <tr class="kw-group"><td colspan="12" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">Vitamin C Serum Segment — SSS0003</td></tr>
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:11px;">—</td><td>EQQUALBERRY — Vit C + TXA + Niacinamide Serum</td><td><span class="pill pill-b">SSS0003</span></td><td>Facial Serums</td><td>~$8–12/oz</td><td>—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">Category leader</td><td>—</td>
+        </tr>
+
+        <!-- Cleanser Competitors -->
+        <tr class="kw-group"><td colspan="12" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">Cleanser Segment — SSS0001</td></tr>
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:11px;">B0BG58N6FL</td><td>MIZON — Cicaluronic Low pH Cleanser</td><td><span class="pill pill-g">SSS0001</span></td><td>Face Cleansers</td><td>$3.83</td><td>61</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">#425</td><td>—</td>
+        </tr>
+
+        <!-- Moisturizer Competitors -->
+        <tr class="kw-group"><td colspan="12" style="background:var(--ink);color:rgba(244,241,236,0.6);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;padding:7px 12px;">Moisturizer Segment — SSS0005 &amp; SSS0006</td></tr>
+        <tr>
+          <td style="font-family:var(--font-mono);font-size:11px;">—</td><td>COSRX — Snail 92 All-in-One Cream</td><td><span class="pill pill-a">SSS0005</span></td><td>Face Moisturizers</td><td>~$4–5/oz</td><td>—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">—</td><td class="rank-cell">Monitor</td><td>—</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <!-- BSR Chart -->
+  <div class="sec">
+    <div class="sec-title">BSR Trend Chart — Snail Mucin Segment <span class="badge bg-blush">Updates on data entry</span></div>
+    <p style="font-size:12.5px;color:var(--ink3);margin-bottom:16px;">Y-axis inverted — higher on chart = better BSR. skinside SEOUL line populates after launch data is entered.</p>
+    <div style="position:relative;height:280px;">
+      <canvas id="bsr-chart"></canvas>
+    </div>
+  </div>
+
+  <!-- Update panel -->
+  <div class="sec">
+    <div class="sec-title">Update Competitor BSR Data</div>
+    <p style="font-size:13px;color:var(--ink3);margin-bottom:16px;">Paste this week's BSR readings. Format: <code style="font-family:var(--font-mono);font-size:12px;background:var(--bg2);padding:2px 6px;border-radius:4px;">ASIN or product name, BSR number</code> — one per line.</p>
+    <div class="ug">
+      <div>
+        <div class="ulbl">Week Label</div>
+        <input type="text" id="comp-week-label" placeholder="e.g. Week 1 · Jul 1" style="min-height:auto;height:42px;width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0 14px;font-family:var(--font-sans);font-size:13px;color:var(--ink);" />
+      </div>
+      <div>
+        <div class="ulbl">BSR Readings (name or ASIN, BSR)</div>
+        <textarea id="comp-paste" rows="6" placeholder="COSRX snail mucin, 7&#10;BYOMA phyto-mucin, 73&#10;SSS0004 skinside SEOUL, 1250"></textarea>
+      </div>
+    </div>
+    <button class="btn" onclick="updateCompetitors()">Update BSR Data</button>
+    <span id="comp-status" class="smsg"></span>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Competitive Intelligence Notes</div>
+    <div class="two">
+      <div>
+        <div class="sec-title-sm" style="font-size:13px;font-weight:600;margin-bottom:10px;">What to watch weekly</div>
+        <div class="no-list-item"><span class="no-icon no-ok">📌</span><span class="no-text">COSRX BSR in Facial Serums — if it drops below #5, review velocity has accelerated; if above #15, subcategory opportunity opens</span></div>
+        <div class="no-list-item"><span class="no-icon no-ok">📌</span><span class="no-text">BYOMA Phyto-Mucin trajectory — vegan mucin segment is emerging; track if it breaks below #50</span></div>
+        <div class="no-list-item"><span class="no-icon no-ok">📌</span><span class="no-text">Any new entrant appearing in BSR 200–500 in Facial Serums — add them to this tracker immediately</span></div>
+        <div class="no-list-item"><span class="no-icon no-ok">📌</span><span class="no-text">Price changes by COSRX — even a $1 move affects SSS0004's price parity story</span></div>
+      </div>
+      <div>
+        <div class="sec-title-sm" style="font-size:13px;font-weight:600;margin-bottom:10px;">Key benchmarks at launch</div>
+        <table class="data" style="font-size:12px;">
+          <thead><tr><th>Metric</th><th>Target (Day 30)</th><th>Target (Day 90)</th></tr></thead>
+          <tbody>
+            <tr><td>SSS0004 BSR (Facial Serums)</td><td>&lt; 5,000</td><td>&lt; 2,000</td></tr>
+            <tr><td>SSS0003 BSR (Facial Serums)</td><td>&lt; 8,000</td><td>&lt; 4,000</td></tr>
+            <tr><td>SSS0001 BSR (Face Cleansers)</td><td>&lt; 3,000</td><td>&lt; 1,500</td></tr>
+            <tr><td>SSS0005 BSR (Moisturizers)</td><td>&lt; 5,000</td><td>&lt; 2,500</td></tr>
+            <tr><td>Vine reviews per SKU</td><td>8+</td><td>15+</td></tr>
+            <tr><td>Unit session %</td><td>8%+</td><td>12%+</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+<!-- ══ PPC STRATEGY ══ -->
+<div id="tab-ppc" class="page">
+
+  <div class="sec">
+    <div class="sec-title">PPC Launch Framework — Days 1 to 90</div>
+    <div class="alert" style="margin-bottom:20px;">⚠️ PPC strategy recommendations. All bids, budgets, and campaign structures should be reviewed by your PPC manager before going live. ACoS targets are benchmarks — adjust based on margin and goals.</div>
+    <div class="three">
+      <div class="ppc-tier t1">
+        <h4>Days 1–14 · Data Collection</h4>
+        <p><strong>Goal:</strong> Impressions and conversion history. ACoS target: 40–50% (acceptable at launch). Auto campaigns + exact match on Tier 1 keywords. Budget: $10–15/day per SKU.</p>
+      </div>
+      <div class="ppc-tier t2">
+        <h4>Days 15–45 · Optimization</h4>
+        <p><strong>Goal:</strong> Pull search term reports, negate low performers, increase bids on converting keywords. ACoS target: 25–35%. Add Tier 2 keywords in separate phrase match campaigns.</p>
+      </div>
+      <div class="ppc-tier t3">
+        <h4>Days 46–90 · Scale</h4>
+        <p><strong>Goal:</strong> Reach 10–15% TACoS. Organic rank building on Tier 1 keywords. Reduce PPC bid on any keyword ranking organically in top 20. Move qualifying Tier 3 keywords to Tier 2.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Tier 1 — Launch Day Exact Match Targets <span class="badge bg-sage">Active from Day 1</span></div>
+    <div style="overflow-x:auto;">
+    <table class="data">
+      <thead><tr><th>Keyword</th><th>SKU</th><th>Est. Vol/mo</th><th>Match Type</th><th>Starting Bid</th><th>ACoS Target</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr class="kw-group"><td colspan="7" style="background:rgba(0,31,96,0.06);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:6px 12px;color:var(--ink3);">SSS0001 — Cleanser</td></tr>
+        <tr><td>foaming face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~18K</td><td><span class="pill pill-g">Exact</span></td><td>$0.80–1.20</td><td>40–50%</td><td>Primary ranking target — high intent</td></tr>
+        <tr><td>gentle face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~12K</td><td><span class="pill pill-g">Exact</span></td><td>$0.70–1.00</td><td>40–50%</td><td>Sensitive skin buyer signal</td></tr>
+        <tr><td>korean face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~8K</td><td><span class="pill pill-g">Exact</span></td><td>$0.60–0.90</td><td>40–50%</td><td>K-beauty buyer — strong brand fit</td></tr>
+        <tr><td>heartleaf cleanser</td><td><span class="pill pill-g">SSS0001</span></td><td>~1K</td><td><span class="pill pill-g">Exact</span></td><td>$0.40–0.60</td><td>30–40%</td><td>Low comp niche — own this term</td></tr>
+        <tr><td>pore cleansing face wash</td><td><span class="pill pill-g">SSS0001</span></td><td>~4K</td><td><span class="pill pill-a">Phrase</span></td><td>$0.60–0.80</td><td>40–50%</td><td>Pore benefit — supports bullet 4</td></tr>
+
+        <tr class="kw-group"><td colspan="7" style="background:rgba(0,31,96,0.06);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:6px 12px;color:var(--ink3);">SSS0002 — Spicule Serum</td></tr>
+        <tr><td>spicule serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~500</td><td><span class="pill pill-g">Exact</span></td><td>$0.50–0.80</td><td>40–50%</td><td>Category-defining term — own it from day 1</td></tr>
+        <tr><td>korean spicule serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~300</td><td><span class="pill pill-g">Exact</span></td><td>$0.40–0.60</td><td>40–50%</td><td>Low comp — very ownable niche</td></tr>
+        <tr><td>texture refining serum</td><td><span class="pill pill-a">SSS0002</span></td><td>~2K</td><td><span class="pill pill-a">Phrase</span></td><td>$0.60–0.90</td><td>40–50%</td><td>Benefit-based term — broad audience</td></tr>
+
+        <tr class="kw-group"><td colspan="7" style="background:rgba(0,31,96,0.06);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:6px 12px;color:var(--ink3);">SSS0003 — Vitamin C Beads Serum</td></tr>
+        <tr><td>vitamin c serum for face</td><td><span class="pill pill-b">SSS0003</span></td><td>~45K</td><td><span class="pill pill-g">Exact</span></td><td>$1.20–1.80</td><td>40–50%</td><td>Highest vol target — competitive, essential</td></tr>
+        <tr><td>korean vitamin c serum</td><td><span class="pill pill-b">SSS0003</span></td><td>~6K</td><td><span class="pill pill-g">Exact</span></td><td>$0.80–1.20</td><td>40–50%</td><td>K-beauty differentiator angle</td></tr>
+        <tr><td>vitamin c beads serum</td><td><span class="pill pill-b">SSS0003</span></td><td>~800</td><td><span class="pill pill-g">Exact</span></td><td>$0.50–0.80</td><td>30–40%</td><td>Format-specific — low comp, own it</td></tr>
+
+        <tr class="kw-group"><td colspan="7" style="background:rgba(0,31,96,0.06);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:6px 12px;color:var(--ink3);">SSS0004 — 96% Snail Mucin Essence ⭐ Priority</td></tr>
+        <tr><td>snail mucin serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~30K</td><td><span class="pill pill-g">Exact</span></td><td>$1.00–1.60</td><td>40–50%</td><td>Primary category term — highest priority</td></tr>
+        <tr><td>snail mucin essence</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~18K</td><td><span class="pill pill-g">Exact</span></td><td>$0.90–1.30</td><td>40–50%</td><td>Format-specific — strong intent</td></tr>
+        <tr><td>96 snail mucin</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~8K</td><td><span class="pill pill-g">Exact</span></td><td>$0.80–1.10</td><td>40–50%</td><td>Concentration-specific buyer — high intent</td></tr>
+        <tr><td>cica snail serum</td><td><span class="pill" style="background:#E0FBF3;color:#0A7A5A;">SSS0004</span></td><td>~1.5K</td><td><span class="pill pill-g">Exact</span></td><td>$0.50–0.80</td><td>30–40%</td><td>Brand differentiator keyword — own it</td></tr>
+
+        <tr class="kw-group"><td colspan="7" style="background:rgba(0,31,96,0.06);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:6px 12px;color:var(--ink3);">SSS0005 — 92% Snail Mucin Cream</td></tr>
+        <tr><td>snail mucin cream</td><td><span class="pill pill-a">SSS0005</span></td><td>~12K</td><td><span class="pill pill-g">Exact</span></td><td>$0.90–1.30</td><td>40–50%</td><td>Primary category term for this SKU</td></tr>
+        <tr><td>snail mucin moisturizer</td><td><span class="pill pill-a">SSS0005</span></td><td>~8K</td><td><span class="pill pill-g">Exact</span></td><td>$0.80–1.10</td><td>40–50%</td><td>Moisturizer framing — dry skin buyers</td></tr>
+        <tr><td>korean moisturizer for dry skin</td><td><span class="pill pill-a">SSS0005</span></td><td>~6K</td><td><span class="pill pill-a">Phrase</span></td><td>$0.70–1.00</td><td>40–50%</td><td>Skin type targeting — strong fit</td></tr>
+
+        <tr class="kw-group"><td colspan="7" style="background:rgba(0,31,96,0.06);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;padding:6px 12px;color:var(--ink3);">SSS0006 — Vitamin C Capsule Cream</td></tr>
+        <tr><td>vitamin c moisturizer</td><td><span class="pill pill-a">SSS0006</span></td><td>~20K</td><td><span class="pill pill-g">Exact</span></td><td>$1.00–1.50</td><td>40–50%</td><td>Primary term — competitive but essential</td></tr>
+        <tr><td>niacinamide moisturizer</td><td><span class="pill pill-a">SSS0006</span></td><td>~15K</td><td><span class="pill pill-g">Exact</span></td><td>$0.90–1.30</td><td>40–50%</td><td>Niacinamide buyers — ingredient intent</td></tr>
+        <tr><td>vitamin c capsule cream</td><td><span class="pill pill-a">SSS0006</span></td><td>~2K</td><td><span class="pill pill-g">Exact</span></td><td>$0.50–0.80</td><td>30–40%</td><td>Format-specific — own this term from day 1</td></tr>
+        <tr><td>encapsulated vitamin c serum</td><td><span class="pill pill-a">SSS0006</span></td><td>~1K</td><td><span class="pill pill-g">Exact</span></td><td>$0.50–0.70</td><td>30–40%</td><td>Low comp niche — exact match only</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Tier 2 — Add at Day 15 <span class="badge bg-clay">Phrase match · After first STR pull</span></div>
+    <div style="overflow-x:auto;">
+    <table class="data">
+      <thead><tr><th>Keyword</th><th>SKU(s)</th><th>Est. Vol/mo</th><th>Match Type</th><th>Why Wait?</th></tr></thead>
+      <tbody>
+        <tr><td>face wash for oily skin</td><td>SSS0001</td><td>~22K</td><td><span class="pill pill-a">Phrase</span></td><td>High vol, moderate comp — needs conversion data first</td></tr>
+        <tr><td>microneedling serum</td><td>SSS0002</td><td>~5K</td><td><span class="pill pill-a">Phrase</span></td><td>Higher comp — let Tier 1 build history first</td></tr>
+        <tr><td>hyaluronic acid vitamin c serum</td><td>SSS0003</td><td>~12K</td><td><span class="pill pill-a">Phrase</span></td><td>Very high vol — needs conversion data to bid efficiently</td></tr>
+        <tr><td>cica serum for sensitive skin</td><td>SSS0003, SSS0004</td><td>~2K</td><td><span class="pill pill-g">Exact</span></td><td>Brand differentiator — add once listing has reviews</td></tr>
+        <tr><td>centella asiatica serum</td><td>SSS0004</td><td>~4K</td><td><span class="pill pill-g">Exact</span></td><td>Ingredient-specific buyers — high intent, lower vol</td></tr>
+        <tr><td>snail mucin korean skincare</td><td>SSS0004, SSS0005</td><td>~5K</td><td><span class="pill pill-a">Phrase</span></td><td>Cross-SKU umbrella — phrase only</td></tr>
+        <tr><td>madecassoside cream</td><td>SSS0005</td><td>~600</td><td><span class="pill pill-g">Exact</span></td><td>Low vol, zero comp — add when ready to own niche</td></tr>
+        <tr><td>korean moisturizer</td><td>SSS0006</td><td>~10K</td><td><span class="pill pill-a">Phrase</span></td><td>Broad — phrase only, negate irrelevant after STR review</td></tr>
+        <tr><td>korean skincare for sensitive skin</td><td>All</td><td>~8K</td><td><span class="pill pill-a">Phrase</span></td><td>Brand umbrella — run across all campaigns in phrase</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">Tier 3 — Organic Rank Watch Only <span class="badge bg-alert">No PPC until Day 60+</span></div>
+    <div style="overflow-x:auto;">
+    <table class="data">
+      <thead><tr><th>Keyword</th><th>Est. Vol/mo</th><th>Trigger to promote</th></tr></thead>
+      <tbody>
+        <tr><td>korean skin care</td><td>~80K</td><td>When SSS0004 or SSS0003 rank organically in top 100</td></tr>
+        <tr><td>snail mucin</td><td>High</td><td>When SSS0004 has 20+ reviews and page 2 organic rank</td></tr>
+        <tr><td>vitamin c serum</td><td>Very High</td><td>When SSS0003 has 15+ reviews — CPCs too high before then</td></tr>
+        <tr><td>face moisturizer</td><td>Very High</td><td>Too broad at launch — revisit at 90 days</td></tr>
+        <tr><td>niacinamide serum</td><td>~35K</td><td>Strong SSS0002/0006 fit — add at Day 60 with conversion data</td></tr>
+        <tr><td>snail secretion filtrate</td><td>~3K</td><td>When SSS0004 is on page 2 organically — ingredient buyers convert well</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-title">AI — PPC Launch Strategy Insights <span class="badge bg-blush">AI-Generated</span></div>
+    <div id="ai-out-ppc" class="ai-out">
+      <div class="opp oh"><div class="opp-hdr"><span class="pri">High</span><span class="otag">Budget Allocation</span></div><div class="obody"><strong>Allocate 60% of launch PPC budget to SSS0004 and SSS0003.</strong> These two SKUs are in the highest-volume subcategories (Facial Serums) and have the most competitive intelligence available. SSS0004 enters a $1.4M/month subcategory anchored by COSRX — even 0.5% organic share is meaningful volume.</div></div>
+      <div class="opp om"><div class="opp-hdr"><span class="pri">Medium</span><span class="otag">Brand Defense</span></div><div class="obody">Run a branded Sponsored Brand campaign with the skinside SEOUL brand term from Day 1. Budget $2–3/day. No competitor should own your brand keyword at launch. Branded impressions also train the algorithm even with 0 reviews.</div></div>
+    </div>
+    <div style="margin-top:14px;display:flex;align-items:center;gap:10px;">
+      <button class="btn btn-blush" onclick="runAI('ppc')">Regenerate with AI</button>
+      <span id="ai-status-ppc" class="smsg"></span>
+    </div>
+    <div class="ts" id="ai-ts-ppc"></div>
+  </div>
+</div>
+
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  const target = document.getElementById(id);
+  if(target) target.classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>{
+    const oc = b.getAttribute('onclick')||'';
+    if(oc.indexOf("'"+id+"'")!==-1) b.classList.add('active');
+  });
+  if(id==='tab-competitors') setTimeout(initBSRChart,80);
+}
+
+const skuContext = {
+  '1': {name:'Heartleaf Foaming Cleanser', sku:'SSS0001', price:'$12', size:'5.07 fl oz', ingredients:'Heartleaf powder, Cica complex (4 molecules), Mineral seawater, Glycerin, Vitamin E', category:'Foaming Cleanser', skin:'Oily/Combination', fragrance:'Contains fragrance (light botanical)', clean:'Sulfate-free, silicone-free, paraben-free'},
+  '2': {name:'200 Spicule Serum', sku:'SSS0002', price:'$20', size:'1.85 fl oz', ingredients:'Hydrolyzed Spicules, Niacinamide, Sodium Hyaluronate, Cica complex (4 molecules), Macadamia Seed Oil, Adenosine, Vitamin E', category:'Face Serum', skin:'All types', fragrance:'Contains fragrance (mild)', clean:'Sulfate-free, paraben-free'},
+  '3': {name:'Vitamin C Beads Serum', sku:'SSS0003', price:'$20', size:'1.85 fl oz', ingredients:'Ascorbyl Palmitate (Vit C), Vitamin E, Cica complex, 4-type HA complex, Jojoba Esters, Sea Water', category:'Vitamin C Serum', skin:'Sensitive', fragrance:'Contains fragrance — top category objection', clean:'Sulfate-free, paraben-free'},
+  '4': {name:'96% Snail Mucin Essence', sku:'SSS0004', price:'$20', size:'3.55 fl oz ($5.63/oz)', ingredients:'Snail Secretion Filtrate 96%, Sodium Hyaluronate, Cica complex (4 molecules), Arginine, Vitamin E, Sea Water', category:'Snail Mucin Essence', skin:'All types', fragrance:'Minimal/light scent', clean:'Fragrance-light'},
+  '5': {name:'92% Snail Mucin Cream', sku:'SSS0005', price:'$12', size:'3.38 fl oz', ingredients:'Snail Secretion Filtrate 92%, HA, Panthenol, Allantoin, Cica complex, Betaine, Adenosine, Vitamin E, Sea Water', category:'Face Moisturizer/Cream', skin:'Dry skin', fragrance:'Light, mild cosmetic scent', clean:'Sulfate-free, paraben-free'},
+  '6': {name:'Vitamin C Capsule Cream', sku:'SSS0006', price:'$16', size:'1.69 fl oz', ingredients:'Niacinamide, Ascorbyl Glucoside (Vit C), Beta-Carotene, 4-type HA, Squalane, Shea Butter, Jojoba Oil, Panthenol, Cica complex, Vitamin E', category:'Daily Face Moisturizer', skin:'All types/women', fragrance:'Light, soft scent', clean:'Sulfate-free, paraben-free'},
+  'ppc': {name:'Full Line PPC Strategy', sku:'ALL', price:'Various', size:'6 SKUs', ingredients:'Cica complex across all SKUs', category:'Skincare — Pre-Launch', skin:'Various', fragrance:'Varies by SKU', clean:'Sulfate-free line'}
+};
+
+async function runAI(skuId){
+  const key = document.getElementById('api-key').value.trim();
+  if(!key){
+    document.getElementById(`ai-status-${skuId}`).textContent = 'Paste your API key in the header first.';
+    return;
+  }
+  const btn = event.target;
+  btn.disabled = true;
+  const statusEl = document.getElementById(`ai-status-${skuId}`);
+  statusEl.textContent = 'Generating insights...';
+  const ctx = skuContext[skuId];
+  const prompt = skuId === 'ppc'
+    ? `You are an Amazon PPC strategist for a pre-launch Korean skincare brand called skinside SEOUL. 6 SKUs are launching: Heartleaf Foaming Cleanser ($12), Spicule Serum ($20), Vitamin C Beads Serum ($20), 96% Snail Mucin Essence ($20 at $5.63/oz — competing with COSRX at BSR #7 with 103,890 reviews), 92% Snail Mucin Cream ($12), Vitamin C Capsule Cream ($16). The brand's differentiator is a 4-molecule Cica complex (Madecassoside, Madecassic Acid, Asiaticoside, Asiatic Acid) in every product. ACoS target post-launch: 30% / TACoS target: 10-15%. COMPLIANCE RULES: never use brightening/brighten/dark spot keywords — they trigger Amazon skin-lightening testing. Never use anti-inflammatory/heals/eliminates. Generate 3 specific, data-driven PPC launch opportunities formatted as: [PRIORITY: High/Med/Low] [TAG: category] bold headline. Body: 2-3 sentences. Focus on budget allocation, keyword strategy, and launch sequence.`
+    : `You are an Amazon listing and PPC strategist for a pre-launch Korean skincare brand called skinside SEOUL. The product is: ${ctx.name} (${ctx.sku}), Price: ${ctx.price}, Size: ${ctx.size}, Category: ${ctx.category}, Key ingredients: ${ctx.ingredients}, Skin type: ${ctx.skin}, Fragrance: ${ctx.fragrance}, Clean standard: ${ctx.clean}. The brand differentiator is a 4-molecule Cica complex across all SKUs. AMAZON COMPLIANCE RULES (strict): NEVER use brightening/brighten/bright/dark spot — use illuminate, radiance, healthy-looking glow instead. Never use anti-inflammatory, heals, healing, fragrance-free (if product contains fragrance), kills bacteria, relieves as cure claim, or any unsubstantiated time-based claims. Never use brightening keywords even in PPC — they trigger compliance testing. Generate 3 specific launch opportunities for this SKU. Format each as: [PRIORITY: High/Med/Low] [TAG: PPC/Listing/Competitive] bold action headline. Then 2-3 sentence explanation with specifics.`;
+
+  try{
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-6',
+        max_tokens:1000,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    if(data.error){statusEl.textContent='Error: '+data.error.message;btn.disabled=false;return;}
+    const text = data.content[0].text;
+    // Parse and render
+    const lines = text.split('\n').filter(l=>l.trim());
+    let html = '';
+    let currentOpp = null;
+    for(const line of lines){
+      if(line.includes('[PRIORITY:')){
+        if(currentOpp) html += `<div class="obody">${currentOpp.body}</div></div>`;
+        const priMatch = line.match(/\[PRIORITY:\s*(High|Med|Low)\]/i);
+        const tagMatch = line.match(/\[TAG:\s*([^\]]+)\]/i);
+        const pri = priMatch ? priMatch[1] : 'Med';
+        const tag = tagMatch ? tagMatch[1] : 'General';
+        const cls = pri.toLowerCase()==='high'?'oh':pri.toLowerCase()==='low'?'ol':'om';
+        const pcls = pri.toLowerCase()==='high'?'oh':pri.toLowerCase()==='low'?'ol':'om';
+        const boldMatch = line.replace(/\[PRIORITY:[^\]]+\]/,'').replace(/\[TAG:[^\]]+\]/,'').trim();
+        currentOpp = {body:''};
+        html += `<div class="opp ${cls}"><div class="opp-hdr"><span class="pri">${pri}</span><span class="otag">${tag}</span></div><div class="obody"><strong>${boldMatch}</strong> `;
+      } else if(currentOpp){
+        currentOpp.body = (currentOpp.body||'') + line + ' ';
+        // Update the last opened div
+        const lastIdx = html.lastIndexOf('<div class="obody">');
+        if(lastIdx>=0) html = html.substring(0,lastIdx) + `<div class="obody">${currentOpp.body}`;
+      }
+    }
+    if(currentOpp) html += `</div></div>`;
+    if(!html) html = `<pre>${text}</pre>`;
+    document.getElementById(`ai-out-${skuId}`).innerHTML = html;
+    document.getElementById(`ai-ts-${skuId}`).textContent = 'Last generated: '+new Date().toLocaleString();
+    statusEl.textContent = '';
+  } catch(e){
+    statusEl.textContent = 'Error: '+e.message;
+  }
+  btn.disabled = false;
+}
+
+// ── Keyword ranking state ──
+const kwState = {};
+document.querySelectorAll('#kw-tbody tr[data-kw]').forEach(r=>{
+  kwState[r.dataset.kw] = {ranks:[]};
+});
+
+function updateKeywords(){
+  const label = document.getElementById('kw-week-label').value.trim() || 'Week';
+  const raw = document.getElementById('kw-paste').value.trim();
+  if(!raw){document.getElementById('kw-status').textContent='Paste keyword ranks first.';return;}
+  const lines = raw.split('\n').filter(l=>l.trim());
+  const updates = {};
+  lines.forEach(l=>{
+    const parts = l.split(',');
+    if(parts.length>=2){
+      const kw = parts[0].trim().toLowerCase();
+      const rank = parseInt(parts.slice(1).join(',').trim());
+      if(!isNaN(rank)) updates[kw] = rank;
+    }
+  });
+  let count = 0;
+  document.querySelectorAll('#kw-tbody tr').forEach(row=>{
+    const rankCells = row.querySelectorAll('.rank-cell');
+    if(!rankCells.length) return;
+    const kwCell = row.querySelector('td:first-child');
+    if(!kwCell) return;
+    const kw = kwCell.textContent.trim().toLowerCase();
+    if(updates[kw]===undefined) return;
+    const rank = updates[kw];
+    const cs = [...rankCells];
+    // cols: W1 W2 W3 W4 Current Δ Page  (7 rank-cells)
+    // Shift W1←W2, W2←W3, W3←W4, W4←Current
+    for(let i=0;i<cs.length-3;i++){
+      cs[i].textContent = cs[i+1].textContent;
+      cs[i].className   = cs[i+1].className;
+    }
+    // Previous = old Current (index -3)
+    const prevRank = parseInt(cs[cs.length-3].textContent.replace('#',''));
+    cs[cs.length-3].textContent = cs[cs.length-2].textContent;  // W4 ← old Current display
+    // Current rank
+    const curCell = cs[cs.length-2];
+    curCell.textContent = '#'+rank;
+    curCell.className   = 'rank-cell '+(rank<=16?'rank-p1':rank<=48?'rank-p2':'rank-p4');
+    // Δ
+    const deltaCell = cs[cs.length-1];
+    if(!isNaN(prevRank) && prevRank>0){
+      const d = prevRank - rank; // positive = rank improved (number went down)
+      deltaCell.textContent  = d>0?'↑'+d:d<0?'↓'+Math.abs(d):'—';
+      deltaCell.style.color  = d>0?'#0A7A5A':d<0?'var(--rose)':'var(--ink3)';
+      deltaCell.style.fontWeight = d!==0?'600':'400';
+    } else {
+      deltaCell.textContent = 'New';
+      deltaCell.style.color = 'var(--ink3)';
+    }
+    // Page label
+    const pageCell = cs[cs.length];  // last cell is "Page" — actually it's outside rank-cells
+    // Update the last td in the row (Page column)
+    const allTds = row.querySelectorAll('td');
+    const lastTd = allTds[allTds.length-1];
+    if(lastTd && lastTd!==kwCell){
+      lastTd.textContent = rank<=16?'P1':rank<=48?'P2–3':'P4+';
+      lastTd.style.fontWeight = rank<=16?'600':'400';
+      lastTd.style.color = rank<=16?'#0A7A5A':rank<=48?'var(--amber-warm)':'var(--rose)';
+    }
+    count++;
+  });
+  document.getElementById('kw-status').textContent = `Updated ${count} keyword${count!==1?'s':''} — ${label}`;
+  document.getElementById('kw-paste').value = '';
+}
+
+// ── Competitor BSR state + chart ──
+const compHistory = {
+  cosrx:[7],byoma:[73],pbjay_sse:[],pbjay_vc:[]
+};
+
+let bsrChart = null;
+function initBSRChart(){
+  const ctx = document.getElementById('bsr-chart');
+  if(!ctx||bsrChart) return;
+  bsrChart = new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['Launch'],
+      datasets:[
+        {label:'COSRX Snail Mucin',data:[7],borderColor:'#B84040',backgroundColor:'rgba(184,64,64,0.06)',borderWidth:2,pointRadius:4,tension:0.3},
+        {label:'BYOMA Phyto-Mucin',data:[73],borderColor:'#6B7BA2',backgroundColor:'rgba(107,123,162,0.06)',borderWidth:2,pointRadius:4,tension:0.3,borderDash:[6,3]},
+        {label:'skinside SEOUL SSS0004',data:[null],borderColor:'#24E9A3',backgroundColor:'rgba(36,233,163,0.12)',borderWidth:3,pointRadius:5,tension:0.3}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      scales:{
+        y:{reverse:true,title:{display:true,text:'BSR (lower = better)',color:'#6B7BA2',font:{size:11}},ticks:{color:'#6B7BA2'},grid:{color:'rgba(0,31,96,0.07)'}},
+        x:{ticks:{color:'#6B7BA2'},grid:{color:'rgba(0,31,96,0.07)'}}
+      },
+      plugins:{legend:{labels:{color:'#1A2E5A',font:{size:12}}}}
+    }
+  });
+}
+
+function updateCompetitors(){
+  const label = document.getElementById('comp-week-label').value.trim() || 'Week';
+  const raw = document.getElementById('comp-paste').value.trim();
+  if(!raw){document.getElementById('comp-status').textContent='Paste BSR data first.';return;}
+  const lines = raw.split('\n').filter(l=>l.trim());
+  const updates = {};
+  lines.forEach(l=>{
+    const parts = l.split(',');
+    if(parts.length>=2){
+      const name = parts[0].trim().toLowerCase();
+      const bsr = parseInt(parts[1].trim().replace(/[^0-9]/g,''));
+      if(!isNaN(bsr)) updates[name] = bsr;
+    }
+  });
+
+  // Update table cells
+  document.querySelectorAll('#comp-tbody tr').forEach(row=>{
+    const nameCell = row.querySelector('td:nth-child(2)');
+    const cells = row.querySelectorAll('.rank-cell');
+    if(!nameCell||!cells.length) return;
+    const name = nameCell.textContent.trim().toLowerCase();
+    let matched = null;
+    for(const [k,v] of Object.entries(updates)){
+      if(name.includes(k)||k.includes(name.split(' ')[0])){matched=v;break;}
+    }
+    if(matched!==null){
+      const cs = [...cells];
+      for(let i=0;i<cs.length-2;i++){cs[i].textContent=cs[i+1].textContent;cs[i].className=cs[i+1].className;}
+      const prevCell = cs[cs.length-2];
+      const curCell = cs[cs.length-1];
+      const prevVal = parseInt(curCell.textContent.replace('#',''));
+      prevCell.textContent = curCell.textContent;
+      prevCell.className = curCell.className;
+      curCell.textContent = '#'+matched;
+      curCell.className = 'rank-cell';
+      const deltaCell = row.querySelector('td:last-child');
+      if(deltaCell&&!isNaN(prevVal)){
+        const d = prevVal - matched;
+        deltaCell.textContent = d>0?'↓'+d+' ✓':d<0?'↑'+Math.abs(d)+' ⚠':'—';
+        deltaCell.style.color = d>0?'var(--sage-dark)':d<0?'var(--rose)':'var(--ink3)';
+      }
+    }
+  });
+
+  // Update chart
+  if(bsrChart){
+    bsrChart.data.labels.push(label);
+    for(const [k,v] of Object.entries(updates)){
+      if(k.includes('cosrx')){bsrChart.data.datasets[0].data.push(v);}
+      else if(k.includes('byoma')){bsrChart.data.datasets[1].data.push(v);}
+      else if(k.includes('pb')||k.includes('sss0004')){bsrChart.data.datasets[2].data.push(v);}
+    }
+    bsrChart.update();
+  }
+  document.getElementById('comp-status').textContent = `Updated — ${label}`;
+  document.getElementById('comp-paste').value='';
+}
+
+// Chart init: tab-competitors triggers initBSRChart inside showTab above
+
+</script>
+
+<div style="background:var(--ink);padding:20px 40px;margin-top:60px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <span style="font-family:var(--font-sans);font-size:16px;font-weight:600;color:#F4F1EC;letter-spacing:-0.01em;">medal<span style="color:var(--green);">t</span>us<span style="color:var(--ink3);font-size:10px;vertical-align:super;">™</span></span>
+    <span style="font-size:11px;color:rgba(244,241,236,0.4);font-family:var(--font-sans);">A trusted partner for your brand.</span>
+  </div>
+  <div style="display:flex;gap:20px;align-items:center;">
+    <span style="font-size:10px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:rgba(244,241,236,0.35);font-family:var(--font-sans);">skinside SEOUL · Pre-Launch Dashboard</span>
+    <span style="font-size:10px;color:rgba(244,241,236,0.25);font-family:var(--font-mono);">Est. 1997 · Integrity · Service · Growth</span>
+  </div>
+</div>
+
+</body>
+</html>
