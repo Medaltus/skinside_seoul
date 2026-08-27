@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Évolis — Internal Dashboard · Medaltus</title>
-<!-- PLACEHOLDER — replace data-clerk-publishable-key with Évolis's real Clerk publishable key -->
+<title>Skinside Seoul — Internal Dashboard · Medaltus</title>
+<!-- Shared Medaltus Clerk account key — same key across every brand's repo, not brand-specific. Nothing to change here. -->
 <script async crossorigin="anonymous"
   data-clerk-publishable-key="pk_live_Y2xlcmsucmVwb3J0cy5tZWRhbHR1cy5jb20k"
   src="https://cdn.jsdelivr.net/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
@@ -1482,7 +1482,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
       <div class="kpi-card">
         <div class="kpi-label">Our Fulfillment Promise · Last 7 Days</div>
-        <div class="kpi-value" style="color:#1db88a;">100%</div>
+        <div class="kpi-value" style="color:#1db88a;">—</div>
         <div style="font-size:11px;color:var(--muted);margin-top:4px;">Same Day Fulfilled · weekday orders before 1p</div>
       </div>
       <div class="kpi-card">
@@ -1575,8 +1575,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div class="channel-tabs">
         <button class="ch-tab active" onclick="showChannel('sales','s-overview',this)">Overview</button>
         <button class="ch-tab" onclick="showChannel('sales','s-amazon',this)">Amazon</button>
-        <button class="ch-tab" onclick="showChannel('sales','s-website',this)">Website</button>
-        <button class="ch-tab" onclick="showChannel('sales','s-walmart',this)">Walmart</button>
+        <!-- Walmart hidden from nav for now (coming later, per Jaclyn) — button
+             removed from the tab bar, but the s-walmart page/JS below stays
+             intact and ready to re-enable. Website removed entirely below,
+             not hidden — Skinside Seoul has no Website/DTC channel. -->
       </div>
       <!-- Period selector — added 2026-08-12, moved here 2026-08-12 per
            Jaclyn so it sits on the same row as the channel tabs instead of
@@ -1640,11 +1642,11 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <span id="amazon-hdr-date" style="font-size:11px;color:var(--muted);">📅 Loading…</span>
       </div>
       <div class="kpi-row">
-        <div class="kpi-card kpi-card-tall" id="kpi-total-units"><div class="kpi-label">Total Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-territory" id="kpi-total-units-territory"></div></div>
-        <div class="kpi-card kpi-card-tall" id="kpi-total-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-territory" id="kpi-total-orders-territory"></div></div>
-        <div class="kpi-card kpi-card-tall" id="kpi-avg-order"><div class="kpi-label">Average Order</div><div class="kpi-value sm">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-territory" id="kpi-avg-order-territory"></div></div>
-        <div class="kpi-card kpi-card-tall" id="kpi-units-ads"><div class="kpi-label">Units (Ads)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-territory" id="kpi-units-ads-territory"></div></div>
-        <div class="kpi-card kpi-card-tall" id="kpi-units-organic"><div class="kpi-label">Units (Organic)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-territory" id="kpi-units-organic-territory"></div></div>
+        <div class="kpi-card kpi-card-tall" id="kpi-total-units"><div class="kpi-label">Total Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card kpi-card-tall" id="kpi-total-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card kpi-card-tall" id="kpi-avg-order"><div class="kpi-label">Average Order</div><div class="kpi-value sm">—</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card kpi-card-tall" id="kpi-units-ads"><div class="kpi-label">Units (Ads)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card kpi-card-tall" id="kpi-units-organic"><div class="kpi-label">Units (Organic)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       </div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -1680,170 +1682,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
 
-    <div class="channel-page" id="s-website">
-      <div class="channel-hdr">
-        <span style="font-size:16px;font-weight:600;color:var(--navy);">WEB — skinside-seoul.com</span>
-        <span id="web-hdr-date" style="font-size:11px;color:var(--muted);">📅 Loading…</span>
-      </div>
-
-      <!-- Order-type sub-tabs — Skinside Seoul-specific: website order data is
-           split by SKU prefix into Customer (C-), Physician (P-),
-           International (I-), and Samples (S-) order types. Samples was
-           added 2026-08-11 as a 4th tab per Jaclyn — originally excluded
-           entirely (2026-08-10), but requested afterward once internal
-           feedback said the data would be useful to see after all.
-           Customer is the default/primary tab — it keeps all the original
-           element IDs (web-kpi-*, chart-web, web-tp-tbody, etc.) so the
-           PDF export (which only ever reads those IDs) picks up Customer
-           data automatically without any export-side changes. This
-           sub-tab split is Skinside Seoul-specific and should NOT be replicated
-           to other brands by default.
-
-           Period selector — added 2026-08-12, see évolis handoff doc.
-           Positioned per Jaclyn: its own fully separate pill box, on the
-           same row as the order-type sub-tabs (not the outer channel
-           tabs, since each of the 4 order types needs its own
-           independent period selector) — same height, right side.
-           .sub-tabs already has its own pill-shaped background/border, so
-           this needs its own wrapping row rather than living inside that
-           same box. Content is swapped by showWebOrderType() below
-           depending on which order-type tab is active. -->
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px;">
-        <div class="sub-tabs" style="margin-bottom:0;">
-          <button class="sub-tab active" onclick="showWebOrderType('customer', this)">Consumer</button>
-          <button class="sub-tab" onclick="showWebOrderType('physician', this)">Physician</button>
-          <button class="sub-tab" onclick="showWebOrderType('international', this)">International</button>
-          <button class="sub-tab" onclick="showWebOrderType('samples', this)">Samples</button>
-        </div>
-        <div class="period-selector" id="web-period-selector" style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Period</span>
-          <div class="period-pills" id="web-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;"></div>
-        </div>
-      </div>
-
-      <div class="web-order-type-page active" id="web-ordertype-customer">
-        <div class="kpi-row">
-          <div class="kpi-card kpi-card-tall" id="web-kpi-total-units"><div class="kpi-label">Total Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="web-kpi-total-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="web-kpi-avg-order"><div class="kpi-label">Average Order</div><div class="kpi-value sm">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="web-kpi-units-ads"><div class="kpi-label">Units (Ads)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="web-kpi-units-organic"><div class="kpi-label">Units (Organic)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-        </div>
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
-            <div id="legend-web" style="display:flex;align-items:center;"></div>
-          </div>
-          <div style="position:relative;height:320px;"><canvas id="chart-web"></canvas></div>
-        </div>
-        <div class="card" id="web-top-products-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-            <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
-            <span id="web-products-source" style="font-size:10px;color:var(--muted);"></span>
-          </div>
-          <table class="data-table" id="web-top-sellers">
-            <thead><tr><th style="width:32px;">#</th><th>Product</th><th>Units</th><th>Units (Ads)</th><th>Units (Organic)</th></tr></thead>
-            <tbody id="web-tp-tbody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
-          </table>
-        </div>
-        <div class="insight-bar">
-          <strong>Key Insight:</strong>
-          <span class="insight-text" id="web-insight-text">Loading…</span>
-          <div class="insight-actions">
-            <button class="btn-edit" id="web-insight-edit-btn">✏️ Edit</button>
-          </div>
-        </div>
-        <div class="insight-editor" id="web-insight-editor">
-          <textarea id="web-insight-textarea"></textarea>
-          <div class="editor-footer">
-            <span class="editor-note">Saves directly to the report sheet as a draft.</span>
-            <button class="btn-cancel" id="web-insight-cancel">Cancel</button>
-            <button class="btn-save-stage" id="web-insight-save">Save</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="web-order-type-page" id="web-ordertype-physician" style="display:none;">
-        <div class="kpi-row">
-          <div class="kpi-card kpi-card-tall" id="webphys-kpi-total-units"><div class="kpi-label">Total Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="webphys-kpi-total-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="webphys-kpi-avg-order"><div class="kpi-label">Average Order</div><div class="kpi-value sm">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="webphys-kpi-units-ads"><div class="kpi-label">Units (Ads)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="webphys-kpi-units-organic"><div class="kpi-label">Units (Organic)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-        </div>
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
-            <div id="legend-webphys" style="display:flex;align-items:center;"></div>
-          </div>
-          <div style="position:relative;height:320px;"><canvas id="chart-webphys"></canvas></div>
-        </div>
-        <div class="card" id="webphys-top-products-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-            <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
-            <span id="webphys-products-source" style="font-size:10px;color:var(--muted);"></span>
-          </div>
-          <table class="data-table" id="webphys-top-sellers">
-            <thead><tr><th style="width:32px;">#</th><th>Product</th><th>Units</th><th>Units (Ads)</th><th>Units (Organic)</th></tr></thead>
-            <tbody id="webphys-tp-tbody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="web-order-type-page" id="web-ordertype-international" style="display:none;">
-        <div class="kpi-row">
-          <div class="kpi-card kpi-card-tall" id="webintl-kpi-total-units"><div class="kpi-label">Total Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="webintl-kpi-total-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="webintl-kpi-avg-order"><div class="kpi-label">Average Order</div><div class="kpi-value sm">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="webintl-kpi-units-ads"><div class="kpi-label">Units (Ads)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="webintl-kpi-units-organic"><div class="kpi-label">Units (Organic)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-        </div>
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
-            <div id="legend-webintl" style="display:flex;align-items:center;"></div>
-          </div>
-          <div style="position:relative;height:320px;"><canvas id="chart-webintl"></canvas></div>
-        </div>
-        <div class="card" id="webintl-top-products-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-            <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
-            <span id="webintl-products-source" style="font-size:10px;color:var(--muted);"></span>
-          </div>
-          <table class="data-table" id="webintl-top-sellers">
-            <thead><tr><th style="width:32px;">#</th><th>Product</th><th>Units</th><th>Units (Ads)</th><th>Units (Organic)</th></tr></thead>
-            <tbody id="webintl-tp-tbody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="web-order-type-page" id="web-ordertype-samples" style="display:none;">
-        <div class="kpi-row">
-          <div class="kpi-card kpi-card-tall" id="websamp-kpi-total-units"><div class="kpi-label">Total Units</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="websamp-kpi-total-orders"><div class="kpi-label">Total Orders</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div><div class="kpi-yoy flat"></div></div>
-          <div class="kpi-card kpi-card-tall" id="websamp-kpi-avg-order"><div class="kpi-label">Average Order</div><div class="kpi-value sm">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="websamp-kpi-units-ads"><div class="kpi-label">Units (Ads)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-          <div class="kpi-card kpi-card-tall" id="websamp-kpi-units-organic"><div class="kpi-label">Units (Organic)</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
-        </div>
-        <div class="card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-            <div class="card-title" style="margin-bottom:0;">Sales Revenue by Month</div>
-            <div id="legend-websamp" style="display:flex;align-items:center;"></div>
-          </div>
-          <div style="position:relative;height:320px;"><canvas id="chart-websamp"></canvas></div>
-        </div>
-        <div class="card" id="websamp-top-products-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:14px;">
-            <span class="card-title" style="margin-bottom:0;">Sales by Product <span style="font-size:11px;color:var(--muted);font-weight:400;">(by Units)</span></span>
-            <span id="websamp-products-source" style="font-size:10px;color:var(--muted);"></span>
-          </div>
-          <table class="data-table" id="websamp-top-sellers">
-            <thead><tr><th style="width:32px;">#</th><th>Product</th><th>Units</th><th>Units (Ads)</th><th>Units (Organic)</th></tr></thead>
-            <tbody id="websamp-tp-tbody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
+    <!-- Website channel removed entirely 2026-08-27 per Jaclyn — Skinside Seoul has no Website/DTC channel, unlike Skinuva/évolis. -->
 
     <div class="channel-page" id="s-walmart">
       <div class="channel-hdr">
@@ -2068,46 +1907,12 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div><div class="page-title">Marketing</div><div class="page-sub">Brand stewardship · Growth opportunities</div></div>
     </div>
     <div class="channel-tabs">
-      <button class="ch-tab active" onclick="showChannel('marketing','m-fulfillment-cs',this)">Fulfillment & Customer Service</button>
+      <button class="ch-tab active" onclick="showChannel('marketing','m-fulfillment-cs',this)">Customer Service</button>
       <button class="ch-tab" onclick="showChannel('marketing','m-stewardship',this)">Brand Stewardship</button>
       <button class="ch-tab" onclick="showChannel('marketing','m-opportunities',this)">Opportunities</button>
     </div>
 
     <div class="channel-page active" id="m-fulfillment-cs">
-
-      <div class="page-sub" id="mfc-page-sub" style="margin-bottom:14px;">Loading…</div>
-
-      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;">
-        <div class="kpi-card">
-          <div class="kpi-label" id="mfc-lbl-shipped">Shipped Website Orders</div>
-          <div class="kpi-value" id="mfc-kpi-shipped30">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Our Fulfillment Promise</div>
-          <div class="kpi-value" style="color:#1db88a;">100%</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Same Day Fulfilled · weekday orders before 1p</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Avg Processing Time</div>
-          <div class="kpi-value" id="mfc-kpi-proctime">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;">Business days · weekends excluded</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Avg Shipping Cost</div>
-          <div class="kpi-value" id="mfc-kpi-shipcost">—</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label">Inventory Prepped</div>
-          <div class="kpi-value" id="mfc-kpi-invprepped">—</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:4px;" id="mfc-lbl-invprepped">Units received</div>
-        </div>
-      </div>
-
-      <div class="ppc-card">
-        <div class="ppc-card-title" id="mfc-lbl-chart">Website Orders Shipped by Date</div>
-        <div style="position:relative;height:170px;"><canvas id="mfc-shipped-chart"></canvas></div>
-        <div class="ppc-note" id="mfc-chart-footer">Loading…</div>
-      </div>
 
       <div class="section-label" style="margin-top:4px;">Customer Service</div>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;margin-top:4px;">
@@ -2128,47 +1933,21 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
       </div>
 
-      <div class="ppc-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-          <div class="ppc-card-title" style="margin-bottom:0;">Website Orders by State · Last 30 Days</div>
-          <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);">
-            <span>Fewer</span>
-            <div style="width:80px;height:7px;border-radius:4px;background:linear-gradient(to right,#dce6f5,#001F60);"></div>
-            <span>More</span>
-          </div>
-        </div>
-        <div style="position:relative;padding:8px 0;">
-          <div class="ff-map-tooltip" id="mfc-map-tip"></div>
-          <svg id="mfc-us-svg" viewBox="0 0 959 593" style="width:100%;height:auto;display:block;"></svg>
-        </div>
-        <div class="ppc-note" id="mfc-map-footer">Loading…</div>
-        <div style="border-top:1px solid var(--border);margin-top:12px;overflow-y:auto;max-height:400px;">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>State</th><th>Orders</th>
-                <th>State</th><th>Orders</th>
-                <th>State</th><th>Orders</th>
-                <th>State</th><th>Orders</th>
-                <th>State</th><th>Orders</th>
-              </tr>
-            </thead>
-            <tbody id="mfc-state-table-body"><tr><td colspan="10" style="color:var(--muted);">Loading…</td></tr></tbody>
-          </table>
-        </div>
-      </div>
-
-    </div><!-- /m-fulfillment-cs -->
+    </div><!-- /m-fulfillment-cs — Fulfillment KPIs/chart/map removed 2026-08-27
+                per Jaclyn: Skinside Seoul does not use 3PL fulfillment services.
+                Customer Service content (reviews, compliance, returns) kept —
+                still ID'd m-fulfillment-cs internally to avoid touching every
+                onclick/init reference; tab label changed to "Customer Service" only. -->
 
     <div class="channel-page" id="m-stewardship">
 
       <div class="section-label">Key Performance Metrics</div>
       <div class="kpi-row">
-        <div class="kpi-card" id="kpi-pct-revenue-invested"><div class="kpi-label">% Revenue Invested</div><div class="kpi-value">5%</div><div class="kpi-mom flat"></div></div>
-        <div class="kpi-card" id="kpi-amazon-fees"><div class="kpi-label">Amazon Fees</div><div class="kpi-value sm">$613.86</div><div class="kpi-mom flat"></div></div>
-        <div class="kpi-card" id="kpi-pct-units-ads"><div class="kpi-label">% Units from Ads</div><div class="kpi-value">26%</div><div class="kpi-mom flat"></div></div>
-        <div class="kpi-card" id="kpi-ad-clicks"><div class="kpi-label">Ad Clicks</div><div class="kpi-value">272</div><div class="kpi-mom flat">0% MOM</div></div>
-        <div class="kpi-card" id="kpi-ad-impressions"><div class="kpi-label">Ad Impressions</div><div class="kpi-value">85K</div><div class="kpi-mom dn">▼ 38% MOM</div></div>
+        <div class="kpi-card" id="kpi-pct-revenue-invested"><div class="kpi-label">% Revenue Invested</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+        <div class="kpi-card" id="kpi-amazon-fees"><div class="kpi-label">Amazon Fees</div><div class="kpi-value sm">—</div><div class="kpi-mom flat"></div></div>
+        <div class="kpi-card" id="kpi-pct-units-ads"><div class="kpi-label">% Units from Ads</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
+        <div class="kpi-card" id="kpi-ad-clicks"><div class="kpi-label">Ad Clicks</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card" id="kpi-ad-impressions"><div class="kpi-label">Ad Impressions</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       </div>
 
       <div class="two-col" style="margin-bottom:20px;align-items:stretch;">
@@ -2226,8 +2005,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
       <div class="section-label">Subscribe &amp; Save</div>
       <div class="kpi-row" style="margin-bottom:20px;">
-        <div class="kpi-card" id="kpi-active-subs"><div class="kpi-label">Active Subscriptions</div><div class="kpi-value" style="font-size:36px;">123</div><div class="kpi-mom flat">Loading…</div></div>
-        <div class="kpi-card" id="kpi-retention"><div class="kpi-label">Subscribe &amp; Save Retention (90 Days)</div><div class="kpi-value" style="font-size:36px;">70%</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card" id="kpi-active-subs"><div class="kpi-label">Active Subscriptions</div><div class="kpi-value" style="font-size:36px;">—</div><div class="kpi-mom flat">Loading…</div></div>
+        <div class="kpi-card" id="kpi-retention"><div class="kpi-label">Subscribe &amp; Save Retention (90 Days)</div><div class="kpi-value" style="font-size:36px;">—</div><div class="kpi-mom flat">Loading…</div></div>
       </div>
       <div class="card" style="margin-bottom:20px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -2304,7 +2083,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
         <div class="kpi-card">
           <div class="kpi-label">Our Fulfillment Promise · Last 7 Days</div>
-          <div class="kpi-value" style="color:#1db88a;">100%</div>
+          <div class="kpi-value" style="color:#1db88a;">—</div>
           <div style="font-size:11px;color:var(--muted);margin-top:4px;">Same Day Fulfilled · weekday orders before 1p</div>
         </div>
         <div class="kpi-card">
@@ -2387,7 +2166,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div class="section-label">Key Performance Metrics</div>
       <div class="kpi-row">
         <div class="kpi-card" id="mx-kpi-pct-revenue-invested"><div class="kpi-label">% Revenue Invested</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
-        <div class="kpi-card" id="mx-kpi-amazon-fees"><div class="kpi-label">Amazon Fees</div><div class="kpi-value sm">$613.86</div><div class="kpi-mom flat"></div></div>
+        <div class="kpi-card" id="mx-kpi-amazon-fees"><div class="kpi-label">Amazon Fees</div><div class="kpi-value sm">—</div><div class="kpi-mom flat"></div></div>
         <div class="kpi-card" id="mx-kpi-pct-units-ads"><div class="kpi-label">% Units from Ads</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
         <div class="kpi-card" id="mx-kpi-ad-clicks"><div class="kpi-label">Ad Clicks</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
         <div class="kpi-card" id="mx-kpi-ad-impressions"><div class="kpi-label">Ad Impressions</div><div class="kpi-value">—</div><div class="kpi-mom flat"></div></div>
@@ -6379,65 +6158,31 @@ async function initSns() {
     badge.textContent = `${pctVal > 0 ? '+' : ''}${pctVal}% ${label}`;
   }
 
-  function renderKPIs(curr, prev, prevYear, adUnits = 0, prevAdUnits = 0, byTerritory = null, adUnitsByTerritory = null) {
+  function renderKPIs(curr, prev, prevYear, adUnits = 0, prevAdUnits = 0) {
     const fmt  = n => (n ?? 0).toLocaleString();
     const fmt2 = n => parseFloat(n ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    // Territory breakdown — added 2026-08-19 per Jaclyn, Skinside Seoul-specific
-    // (Amazon Sales page only, not applied to other brands). Replaces the
-    // YoY badge slot: instead of a single prior-year comparison, shows a
-    // compact US/CA/UK column for whichever KPI the value is territory-
-    // breakable for (Total Units, Total Orders, Average Order — Units
-    // (Ads)/(Organic) can't be, since the ad summary sheet has no
-    // per-territory granularity at all).
-    function renderTerritory(cardId, valueFn) {
-      const el = document.getElementById(`${cardId}-territory`);
-      if (!el || !byTerritory) return;
-      el.innerHTML = ['US', 'CA', 'UK'].map(t => {
-        const data = byTerritory[t];
-        const val = data ? valueFn(data) : '—';
-        return `<div class="kpi-territory-col"><div class="kpi-territory-lbl">${t}</div><div class="kpi-territory-val">${val}</div></div>`;
-      }).join('');
-    }
 
     // Total Units
     setKpiValue('kpi-total-units', fmt(curr.totalUnits));
     setBadge('kpi-total-units', '.kpi-mom', prev   ? pct(curr.totalUnits, prev.totalUnits)       : null, 'MOM');
-    renderTerritory('kpi-total-units', d => fmt(d.totalUnits));
 
     // Total Orders
     setKpiValue('kpi-total-orders', fmt(curr.totalOrders));
     setBadge('kpi-total-orders', '.kpi-mom', prev   ? pct(curr.totalOrders, prev.totalOrders)       : null, 'MOM');
-    renderTerritory('kpi-total-orders', d => fmt(d.totalOrders));
 
     // Average Order
     setKpiValue('kpi-avg-order', '$' + fmt2(curr.avgOrder));
     setBadge('kpi-avg-order', '.kpi-mom', prev ? pct(Math.round(curr.avgOrder * 100), Math.round(prev.avgOrder * 100)) : null, 'MOM');
-    renderTerritory('kpi-avg-order', d => '$' + fmt2(d.avgOrder));
 
     // Units Ads — from advertising cache sheet
     setKpiValue('kpi-units-ads', fmt(adUnits));
     setBadge('kpi-units-ads', '.kpi-mom', (prevAdUnits != null && prev) ? pct(adUnits, prevAdUnits) : null, 'MOM');
-    if (adUnitsByTerritory) {
-      const el = document.getElementById('kpi-units-ads-territory');
-      if (el) el.innerHTML = ['US', 'CA', 'UK'].map(t =>
-        `<div class="kpi-territory-col"><div class="kpi-territory-lbl">${t}</div><div class="kpi-territory-val">${fmt(adUnitsByTerritory[t] || 0)}</div></div>`
-      ).join('');
-    }
 
     // Units Organic = Total Units - Units Ads
     const organicUnits = curr.totalUnits - adUnits;
     setKpiValue('kpi-units-organic', fmt(organicUnits));
     const prevOrganic = prev ? prev.totalUnits - (prevAdUnits || 0) : null;
     setBadge('kpi-units-organic', '.kpi-mom', prevOrganic != null ? pct(organicUnits, prevOrganic) : null, 'MOM');
-    if (byTerritory && adUnitsByTerritory) {
-      const el = document.getElementById('kpi-units-organic-territory');
-      if (el) el.innerHTML = ['US', 'CA', 'UK'].map(t => {
-        const territoryData = byTerritory[t];
-        const territoryOrganic = territoryData ? Math.max(0, territoryData.totalUnits - (adUnitsByTerritory[t] || 0)) : 0;
-        return `<div class="kpi-territory-col"><div class="kpi-territory-lbl">${t}</div><div class="kpi-territory-val">${fmt(territoryOrganic)}</div></div>`;
-      }).join('');
-    }
   }
 
   // ── Data source label ─────────────────────────────────────────────────────
@@ -6498,22 +6243,7 @@ async function initSns() {
       const HIST_GID = window.SHEET_CFG.SHEET_ORDERS_HISTORICAL.gid;
 
       console.log('[Skinside Seoul] Starting fetch...');
-      // Skinside Seoul-CA tabs — added 2026-08-19 per Jaclyn. Skinside Seoul-CA orders
-      // used to get combined into the main skinside-seoul tab (relying on the
-      // channel/marketplace column to tell them apart, per the
-      // territory-tagging block below) — a new dedicated brand/tab
-      // ("skinside-seoul-ca") now exists instead, on the SAME 4 files, just
-      // different gids. SHEET_ORDERS_HISTORICAL has NOT been split
-      // (confirmed by Jaclyn) — Last Year/YoY still relies on the
-      // channel-column fallback for any historical CA rows. Every row
-      // fetched from these CA-specific tabs is unconditionally tagged CA
-      // below, regardless of its own channel/marketplace column value,
-      // since the whole tab is now CA-dedicated.
-      const CA_SYNC_GID       = '1347068338';
-      const CA_RETURNS_GID    = '2019659648';
-      const CA_AD_ORDERS_GID  = '1657515163';
-      const CA_AD_SUMMARY_GID = '193268511';
-      const [syncCsv, histCsv, adSummaryCsv, adOrdersCsv, amzReturnsCsv, caSyncCsv, caReturnsCsv, caAdOrdersCsv, caAdSummaryCsv] = await Promise.all([
+      const [syncCsv, histCsv, adSummaryCsv, adOrdersCsv, amzReturnsCsv] = await Promise.all([
         fetch(sheetCsvUrl(SYNC_SHEET_ID, SYNC_GID)).then(r => r.ok ? r.text() : (console.warn('[Skinside Seoul] Sheet fetch not ok:', r.status, r.url), '')).catch(e => (console.warn('[Skinside Seoul] Sheet fetch error:', e.message), '')),
         fetch(sheetCsvUrl(HISTORICAL_SHEET_ID, HIST_GID)).then(r => r.ok ? r.text() : (console.warn('[Skinside Seoul] Sheet fetch not ok:', r.status, r.url), '')).catch(e => (console.warn('[Skinside Seoul] Sheet fetch error:', e.message), '')),
         fetch(sheetCsvUrl(AD_SUMMARY_SHEET_ID, AD_SUMMARY_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : (console.warn('[Skinside Seoul] Sheet fetch not ok:', r.status, r.url), '')).catch(e => (console.warn('[Skinside Seoul] Sheet fetch error:', e.message), '')),
@@ -6525,10 +6255,6 @@ async function initSns() {
         // file (same sheet/tab already confirmed via the Overview page's
         // returns netting).
         fetch(sheetCsvUrl(OV_RETURNS_SHEET_ID, OV_RETURNS_EVOLIS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
-        fetch(sheetCsvUrl(SYNC_SHEET_ID, CA_SYNC_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
-        fetch(sheetCsvUrl(OV_RETURNS_SHEET_ID, CA_RETURNS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
-        fetch(sheetCsvUrl(AD_ORDERS_SHEET_ID, CA_AD_ORDERS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
-        fetch(sheetCsvUrl(AD_SUMMARY_SHEET_ID, CA_AD_SUMMARY_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
       ]);
 
       console.log('[Skinside Seoul] syncCsv length:', syncCsv.length, 'isCsv:', isCsv(syncCsv));
@@ -6561,39 +6287,29 @@ async function initSns() {
       _amzAdSummaryRows = isCsv(adSummaryCsv) ? parseCsv(adSummaryCsv) : [];
       _amzAdOrdersRowsAll = isCsv(adOrdersCsv) ? parseCsv(adOrdersCsv) : [];
 
-      // Merge in the skinside-seoul-ca tabs — every row unconditionally tagged
-      // CA (not run through amazonTerritoryFor below, since the whole tab
-      // is CA-dedicated now, regardless of what its own channel/
-      // marketplace column happens to say).
-      const caSyncRows = isCsv(caSyncCsv) ? filterRows(parseCsv(caSyncCsv)) : [];
-      caSyncRows.forEach(r => { r._territory = 'CA'; });
-      _amzSyncRows = _amzSyncRows.concat(caSyncRows);
+      // Skinside Seoul is Amazon.com (US) only right now — no CA/UK tab merge.
+      // Every row gets tagged US by amazonTerritoryFor() below (or stays
+      // whatever it already is), which keeps aggregateFilteredRows' byTerritory
+      // math harmless (it'll just always be 100% US) without threading a
+      // second brand's real data through this page. Removed 2026-08-27: a
+      // block here previously fetched a "skinside-seoul-ca" tab via hardcoded
+      // gids (CA_SYNC_GID etc.) that were never actually this brand's —
+      // they were Skinuva's real Canadian-tab gids, carried over unchanged
+      // by an earlier mechanical brand-rename pass (numeric literals don't
+      // get caught by a text find/replace). That meant every KPI on this
+      // page was silently including Skinuva's Canadian sales data. Confirmed
+      // and removed per Jaclyn, 2026-08-27.
+      console.log('[Skinside Seoul][CA-merge] removed — Amazon.com (US) only for this brand.');
 
-      const caReturnRows = isCsv(caReturnsCsv) ? parseCsv(caReturnsCsv) : [];
-      caReturnRows.forEach(r => { r._territory = 'CA'; });
-      _amzReturnRows = _amzReturnRows.concat(caReturnRows);
-
-      const caAdOrderRows = isCsv(caAdOrdersCsv) ? parseCsv(caAdOrdersCsv) : [];
-      caAdOrderRows.forEach(r => { r._territory = 'CA'; });
-      _amzAdOrdersRowsAll = _amzAdOrdersRowsAll.concat(caAdOrderRows);
-
-      const caAdSummaryRows = isCsv(caAdSummaryCsv) ? parseCsv(caAdSummaryCsv) : [];
-      caAdSummaryRows.forEach(r => { r._territory = 'CA'; });
-      _amzAdSummaryRows = _amzAdSummaryRows.concat(caAdSummaryRows);
-      _amzAdSummaryRows.forEach(r => { if (!r._territory) r._territory = 'US'; }); // pre-merge (skinside-seoul tab) rows default to US
-
-      console.log('[Skinside Seoul][CA-merge][qa] caSyncRows:', caSyncRows.length, 'caReturnRows:', caReturnRows.length, 'caAdOrderRows:', caAdOrderRows.length, 'caAdSummaryRows:', caAdSummaryRows.length);
-
-      // FIXED 2026-08-12 per Jaclyn — Canadian orders were coming through
-      // REVISED 2026-08-19 per Jaclyn — Skinside Seoul-specific change, NOT
-      // applied to other brands. Skinside Seoul is now live on Amazon.ca and
-      // launching soon on Amazon.uk, so orders from those territories are
-      // real, wanted data — not contamination to exclude. Previously this
-      // block filtered non-US rows OUT entirely (see the surrounding
-      // comments above, dated 2026-08-12/13, for that history). Now it
-      // TAGS every row with its territory instead, so nothing gets
-      // dropped — every KPI shows a combined US+CA+UK total, with a
-      // per-territory breakdown alongside it (see renderKPIs below).
+      // Territory tagging — kept as defensive logic even though Skinside
+      // Seoul is Amazon.com (US) only right now. amazonTerritoryFor()
+      // below only returns 'CA'/'UK' if a row's own channel/marketplace
+      // column explicitly says so; for this brand's real data that should
+      // never happen, so every row resolves to 'US' and the combined KPI
+      // total is unaffected. This comment previously (incorrectly) claimed
+      // "Skinside Seoul is now live on Amazon.ca and launching soon on
+      // Amazon.uk" — that was Skinuva's own history, carried over verbatim
+      // by an earlier mechanical brand-rename pass. Corrected 2026-08-27.
       const amazonTerritoryFor = row => {
         const channel = (row.channel || '').trim().toLowerCase();
         const marketplace = (row.marketplace || '').trim().toLowerCase();
@@ -6601,15 +6317,9 @@ async function initSns() {
         if (channel.includes('.uk') || marketplace.includes('.uk')) return 'UK';
         return 'US'; // blank = amazon.com, per Jaclyn (older rows predate this column being populated)
       };
-      // Skips rows that already have _territory set — the skinside-seoul-ca
-      // tab's rows were tagged CA unconditionally when merged in above;
-      // running them through amazonTerritoryFor here would incorrectly
-      // recompute them as US, since their own channel/marketplace column
-      // may well be blank (they're not relying on that column anymore,
-      // the whole tab IS the CA designation now).
       _amzSyncRows.forEach(r => { if (!r._territory) r._territory = amazonTerritoryFor(r); });
       _amzHistRows.forEach(r => { if (!r._territory) r._territory = amazonTerritoryFor(r); });
-      console.log(`[Skinside Seoul] Territory tagging (US/CA/UK, all retained): sync ${_amzSyncRows.length} rows, hist ${_amzHistRows.length} rows`);
+      console.log(`[Skinside Seoul] Territory tagging (defensive, expect 100% US): sync ${_amzSyncRows.length} rows, hist ${_amzHistRows.length} rows`);
 
       try {
         const master = await getProductMaster();
@@ -6853,7 +6563,7 @@ async function initSns() {
       });
     }
 
-    renderKPIs(curr, prev, prevYoy, adUnitsKpi, cfg.prevYear ? prevAdUnitsKpi : null, currWithTerritory.byTerritory, adUnitsByTerritory);
+    renderKPIs(curr, prev, prevYoy, adUnitsKpi, cfg.prevYear ? prevAdUnitsKpi : null);
     setSourceLabel(cfg.year, cfg.month);
 
     // ── Top Selling Products ──
@@ -13115,7 +12825,9 @@ async function initSnsExternal() {
   document.addEventListener('DOMContentLoaded', function () {
     // Amazon/Web/Walmart are window.xxx async functions defined in the inner IIFE
     if (typeof window.initAmazonLive  === 'function') window.initAmazonLive();
-    if (typeof window.initWebLive     === 'function') window.initWebLive();
+    // window.initWebLive() intentionally not called — Website channel
+    // removed entirely 2026-08-27 (no s-website container exists to
+    // populate, and no point fetching a Shopify sheet this brand doesn't use).
     if (typeof window.initWalmartLive === 'function') window.initWalmartLive();
     // Stewardship and SNS are plain functions defined at script scope
     if (typeof window.initStewardshipLive === 'function') window.initStewardshipLive();
@@ -18771,7 +18483,11 @@ async function mfcLoadInventoryPrepped() {
 }
 
 window.initMarketingFulfillmentCS = async function() {
-  await Promise.all([mfcLoadKpis(), mfcLoadShippedChart(), mfcLoadStates(), mfcLoadReturns(), mfcLoadComplianceCases(), mfcLoadInventoryPrepped()]);
+  // Fulfillment KPIs/chart/map (mfcLoadKpis, mfcLoadShippedChart,
+  // mfcLoadStates, mfcLoadInventoryPrepped) intentionally dropped
+  // 2026-08-27 — Skinside Seoul does not use 3PL fulfillment services.
+  // Only the Customer Service pieces (Returns, Compliance/Reviews) remain.
+  await Promise.all([mfcLoadReturns(), mfcLoadComplianceCases()]);
 };
 
 
@@ -20955,7 +20671,7 @@ async function loadAuditResultsFromSheet() {
     // cut off at the page's right edge.
     const topKpis = [
       { label: 'Shipped Orders (30d)', value: pdfxText('#mfc-kpi-shipped30') },
-      { label: 'Fulfillment Promise (7d)', value: '100%' },
+      { label: 'Fulfillment Promise (7d)', value: '—' },
       { label: 'Avg Processing Time (7d)', value: pdfxText('#mfc-kpi-proctime') },
       { label: 'Avg Shipping Cost (7d)', value: pdfxText('#mfc-kpi-shipcost') },
       { label: 'Inventory Prepped', value: pdfxText('#mfc-kpi-invprepped') },
