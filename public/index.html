@@ -1661,8 +1661,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <span id="amazon-products-source" style="font-size:10px;color:var(--muted);"></span>
         </div>
         <table class="data-table" id="amazon-top-sellers">
-          <thead><tr><th style="width:32px;">#</th><th>Product</th><th>US</th><th>CA</th><th style="border-right:1px dotted var(--border);padding-right:22px;">UK</th><th style="border-left:1px dotted var(--border);padding-left:22px;">Ads</th><th>Organic</th></tr></thead>
-          <tbody id="tp-tbody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+          <thead><tr><th style="width:32px;">#</th><th>Product</th><th style="border-right:1px dotted var(--border);padding-right:22px;">Total Units</th><th style="border-left:1px dotted var(--border);padding-left:22px;">Ads</th><th>Organic</th></tr></thead>
+          <tbody id="tp-tbody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
         </table>
       </div>
       <div class="insight-bar">
@@ -6719,7 +6719,7 @@ async function initSns() {
 
     const tbody = document.getElementById('tp-tbody');
     if (!monthRows.length) {
-      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--slate);font-style:italic;font-size:12px;">No data for this period.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:24px;color:var(--slate);font-style:italic;font-size:12px;">No data for this period.</td></tr>';
       return;
     }
 
@@ -6874,9 +6874,7 @@ async function initSns() {
       tr.innerHTML = `
         <td>${idx + 1}.</td>
         <td>${name}</td>
-        <td><div class="tp-cell"><span class="tp-units">${p.territory.US.toLocaleString()}</span></div></td>
-        <td><div class="tp-cell"><span class="tp-units">${p.territory.CA.toLocaleString()}</span></div></td>
-        <td style="border-right:1px dotted var(--border);padding-right:22px;"><div class="tp-cell"><span class="tp-units">${p.territory.UK.toLocaleString()}</span></div></td>
+        <td style="border-right:1px dotted var(--border);padding-right:22px;"><div class="tp-cell"><span class="tp-units">${p.units.toLocaleString()}</span></div></td>
         <td style="border-left:1px dotted var(--border);padding-left:22px;"><div class="tp-cell"><span class="tp-units">${p.adUnits.toLocaleString()}</span></div></td>
         <td><div class="tp-cell"><span class="tp-units">${orgUnits.toLocaleString()}</span></div></td>`;
       tbody.appendChild(tr);
