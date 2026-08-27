@@ -29,13 +29,10 @@
  *                   family and related sheets).
  * active:          set false to pause without deleting config.
  * amazonBrandName: EXACT string as registered in Amazon Brand Registry,
- *                   ALL CAPS. PLACEHOLDER ONLY — not sourced from any
- *                   confirmed reference this session (unlike Skinuva's
- *                   entry, which was at least copied from évolis's
- *                   already-verified file). Confirm the real value
- *                   against Amazon Brand Registry before this is used
- *                   anywhere that filters/matches by brand name (e.g.
- *                   SP-API brand-scoped calls).
+ *                   ALL CAPS. Confirmed 2026-08-27 against the shared
+ *                   évolis-repo's own brands.js registry, where this brand
+ *                   already has a live, active entry:
+ *                   amazonBrandName: 'SKINSIDE SEOUL'.
  */
 module.exports = [
   {
@@ -43,7 +40,7 @@ module.exports = [
     tabName:         'skinside-seoul',
     skuPrefix:       'SSS',
     displayName:     'Skinside Seoul',
-    amazonBrandName: 'SKINSIDE SEOUL', // TODO: confirm against Amazon Brand Registry
+    amazonBrandName: 'SKINSIDE SEOUL',
     active:          true,
   },
 ];
