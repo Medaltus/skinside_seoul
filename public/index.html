@@ -1347,7 +1347,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     <div class="card" style="margin-bottom:20px;">
       <div class="card-title">Channel Breakdown <span style="font-weight:400;color:var(--muted);">(Amazon + Walmart, Month to Date)</span></div>
       <table class="data-table" style="width:100%;">
-        <thead><tr><th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>Units</th><th>Orders</th><th>Revenue</th><th>AOV</th></tr></thead>
+        <thead><tr><th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>Units</th><th>Total Orders</th><th>Revenue</th><th>AOV</th></tr></thead>
         <tbody id="ov-channel-breakdown-tbody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">Loading…</td></tr></tbody>
       </table>
     </div>
@@ -3423,51 +3423,48 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
     <!-- Product type tabs -->
     <div class="channel-tabs">
-      <button class="ch-tab active" onclick="showChannel('listing','la-scar',this)">Scar</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-scarplus',this)">Scar+</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-brite',this)">Brite</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-bruise',this)">Bruise</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-arc',this)">ARC</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-bruiserecoveryduo',this)">Bruise Recovery Duo</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-scarkits',this)">Scar Kits</button>
-      <button class="ch-tab" onclick="showChannel('listing','la-bundles',this)">Bundles</button>
+      <button class="ch-tab active" onclick="showChannel('listing','la-heartleaf',this)">Heartleaf Cleanser</button>
+      <button class="ch-tab" onclick="showChannel('listing','la-spicule',this)">Spicule Serum</button>
+      <button class="ch-tab" onclick="showChannel('listing','la-vitcserum',this)">Vitamin C Serum</button>
+      <button class="ch-tab" onclick="showChannel('listing','la-snailserum',this)">Snail Mucin Serum</button>
+      <button class="ch-tab" onclick="showChannel('listing','la-snailcream',this)">Snail Mucin Cream</button>
+      <button class="ch-tab" onclick="showChannel('listing','la-vitccream',this)">Vitamin C Cream</button>
+      <button class="ch-tab" onclick="showChannel('listing','la-coconutmask',this)">Coconut Gel Mask</button>
     </div>
 
     <!-- ── SCAR ── -->
-    <div class="channel-page active" id="la-scar">
-      <div class="insight-grid" id="la-insights-scar"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+    <!-- ── HEARTLEAF FOAMING CLEANSER ── -->
+    <div class="channel-page active" id="la-heartleaf">
+      <div class="insight-grid" id="la-insights-heartleaf"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-scar','la-scar-0001-stickerless',this)">Scar 30 ml (SVA0001-stickerless)</button>
-        <button class="sub-tab" onclick="showSubTab('la-scar','la-scar-0002',this)">Scar 50 ml (SVA0002)</button>
-        <button class="sub-tab" onclick="showSubTab('la-scar','la-scar-0004',this)">Scar 15 ml (SVA0004)</button>
-        <button class="sub-tab" onclick="showSubTab('la-scar','la-scar-0010',this)">Scar 75 ml (SVA0010)</button>
+        <button class="sub-tab active" onclick="showSubTab('la-heartleaf','la-heartleaf-0001',this)">Heartleaf Foaming Cleanser (SSS0001)</button>
       </div>
-      <div class="sub-page active" id="la-scar-0001-stickerless">
+      <div class="sub-page active" id="la-heartleaf-0001">
 <div class="la-hero">
           <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0001-stickerless &nbsp;·&nbsp; ASIN B07RCJDFN4 &nbsp;·&nbsp; Scar 30 ml</div>
-            <div class="la-hero-title">Scar 30 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0001-stickerless"></span><span class="la-hero-tag bsr">BSR —</span></div>
+            <div class="la-hero-meta">SSS0001 &nbsp;&middot;&nbsp; ASIN B0H84G67MF &nbsp;&middot;&nbsp; Heartleaf Foaming Cleanser</div>
+            <div class="la-hero-title">Heartleaf Foaming Cleanser</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0001"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
           </div>
           <div class="la-hero-actives">
             <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0001-stickerless"></div><div class="la-hero-actives-rest" id="la-hero-rest-0001-stickerless"></div>
+            <div class="la-hero-actives-primary" id="la-hero-primary-0001"></div><div class="la-hero-actives-rest" id="la-hero-rest-0001"></div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3475,7 +3472,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 1</div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3483,7 +3480,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 2</div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3491,7 +3488,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 3</div>
           <div class="la-copy-row">
             <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3499,7 +3496,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 4</div>
           <div class="la-copy-row">
             <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3507,29 +3504,37 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 5</div>
           <div class="la-copy-row">
             <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Product Description</div>
           <div class="la-copy-row">
             <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
         </div>
       </div>
-      <div class="sub-page" id="la-scar-0002">
+    </div>
+    <!-- /la-heartleaf -->
+    <!-- ── SPICULE SERUM ── -->
+    <div class="channel-page" id="la-spicule">
+      <div class="insight-grid" id="la-insights-spicule"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+      <div class="sub-tabs">
+        <button class="sub-tab" onclick="showSubTab('la-spicule','la-spicule-0002',this)">Spicule Serum (SSS0002)</button>
+      </div>
+      <div class="sub-page" id="la-spicule-0002">
 <div class="la-hero">
           <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0002 &nbsp;·&nbsp; ASIN B07RCYZWNH &nbsp;·&nbsp; Scar 50 ml</div>
-            <div class="la-hero-title">Scar 50 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0002"></span><span class="la-hero-tag bsr">BSR —</span></div>
+            <div class="la-hero-meta">SSS0002 &nbsp;&middot;&nbsp; ASIN B0H84HF6CQ &nbsp;&middot;&nbsp; Spicule Serum</div>
+            <div class="la-hero-title">Spicule Serum</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0002"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
           </div>
           <div class="la-hero-actives">
             <div class="la-hero-actives-lbl">Hero Actives</div>
@@ -3538,18 +3543,18 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3557,7 +3562,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 1</div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3565,7 +3570,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 2</div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3573,7 +3578,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 3</div>
           <div class="la-copy-row">
             <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3581,7 +3586,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 4</div>
           <div class="la-copy-row">
             <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3589,29 +3594,127 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 5</div>
           <div class="la-copy-row">
             <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Product Description</div>
           <div class="la-copy-row">
             <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
         </div>
       </div>
-      <div class="sub-page" id="la-scar-0004">
+    </div>
+    <!-- /la-spicule -->
+    <!-- ── VITAMIN C SERUM ── -->
+    <div class="channel-page" id="la-vitcserum">
+      <div class="insight-grid" id="la-insights-vitcserum"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+      <div class="sub-tabs">
+        <button class="sub-tab" onclick="showSubTab('la-vitcserum','la-vitcserum-0003',this)">Vitamin C Serum (SSS0003)</button>
+      </div>
+      <div class="sub-page" id="la-vitcserum-0003">
 <div class="la-hero">
           <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0004 &nbsp;·&nbsp; ASIN B09FQJMLPZ &nbsp;·&nbsp; Scar 15 ml</div>
-            <div class="la-hero-title">Scar 15 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0004"></span><span class="la-hero-tag bsr">BSR —</span></div>
+            <div class="la-hero-meta">SSS0003 &nbsp;&middot;&nbsp; ASIN B0H847QS86 &nbsp;&middot;&nbsp; Vitamin C Serum</div>
+            <div class="la-hero-title">Vitamin C Serum</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0003"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
+          </div>
+          <div class="la-hero-actives">
+            <div class="la-hero-actives-lbl">Hero Actives</div>
+            <div class="la-hero-actives-primary" id="la-hero-primary-0003"></div><div class="la-hero-actives-rest" id="la-hero-rest-0003"></div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label">Active Title</div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-copy-row">
+            <div class="la-num">1</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-copy-row">
+            <div class="la-num">2</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label">Active Bullet Points</div>
+          <div class="la-card-sublabel">BULLET 1</div>
+          <div class="la-copy-row">
+            <div class="la-num">1</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label"></div>
+          <div class="la-card-sublabel">BULLET 2</div>
+          <div class="la-copy-row">
+            <div class="la-num">2</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label"></div>
+          <div class="la-card-sublabel">BULLET 3</div>
+          <div class="la-copy-row">
+            <div class="la-num">3</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label"></div>
+          <div class="la-card-sublabel">BULLET 4</div>
+          <div class="la-copy-row">
+            <div class="la-num">4</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label"></div>
+          <div class="la-card-sublabel">BULLET 5</div>
+          <div class="la-copy-row">
+            <div class="la-num">5</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label">Active Product Description</div>
+          <div class="la-copy-row">
+            <div class="la-num">6</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
+          </div>
+        </div>
+        <div class="la-card">
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
+        </div>
+      </div>
+    </div>
+    <!-- /la-vitcserum -->
+    <!-- ── 96% SNAIL MUCIN ESSENCE ── -->
+    <div class="channel-page" id="la-snailserum">
+      <div class="insight-grid" id="la-insights-snailserum"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+      <div class="sub-tabs">
+        <button class="sub-tab" onclick="showSubTab('la-snailserum','la-snailserum-0004',this)">96% Snail Mucin Essence (SSS0004)</button>
+      </div>
+      <div class="sub-page" id="la-snailserum-0004">
+<div class="la-hero">
+          <div class="la-hero-left">
+            <div class="la-hero-meta">SSS0004 &nbsp;&middot;&nbsp; ASIN B0H8462KTR &nbsp;&middot;&nbsp; 96% Snail Mucin Essence</div>
+            <div class="la-hero-title">96% Snail Mucin Essence</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0004"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
           </div>
           <div class="la-hero-actives">
             <div class="la-hero-actives-lbl">Hero Actives</div>
@@ -3620,18 +3723,18 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3639,7 +3742,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 1</div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3647,7 +3750,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 2</div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3655,7 +3758,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 3</div>
           <div class="la-copy-row">
             <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3663,7 +3766,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 4</div>
           <div class="la-copy-row">
             <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -3671,468 +3774,37 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 5</div>
           <div class="la-copy-row">
             <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Product Description</div>
           <div class="la-copy-row">
             <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-      <div class="sub-page" id="la-scar-0010">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0010 &nbsp;·&nbsp; ASIN B0DXVVVVPR &nbsp;·&nbsp; Scar 75 ml</div>
-            <div class="la-hero-title">Scar 75 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0010"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0010"></div><div class="la-hero-actives-rest" id="la-hero-rest-0010"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
         </div>
       </div>
     </div>
-    <!-- /la-scar -->
-
-    <!-- ── SCAR+ ── -->
-    <div class="channel-page" id="la-scarplus">
-      <div class="insight-grid" id="la-insights-scarplus"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+    <!-- /la-snailserum -->
+    <!-- ── 92% SNAIL CREAM ── -->
+    <div class="channel-page" id="la-snailcream">
+      <div class="insight-grid" id="la-insights-snailcream"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-scarplus','la-scarplus-0006',this)">Scar+ 30 ml (SVA0006)</button>
-        <button class="sub-tab" onclick="showSubTab('la-scarplus','la-scarplus-0007',this)">Scar+ 15 ml (SVA0007)</button>
+        <button class="sub-tab" onclick="showSubTab('la-snailcream','la-snailcream-0005',this)">92% Snail Cream (SSS0005)</button>
       </div>
-      <div class="sub-page active" id="la-scarplus-0006">
+      <div class="sub-page" id="la-snailcream-0005">
 <div class="la-hero">
           <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0006 &nbsp;·&nbsp; ASIN B0BRNWSQ8H &nbsp;·&nbsp; Scar+ 30 ml</div>
-            <div class="la-hero-title">Scar+ 30 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0006"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0006"></div><div class="la-hero-actives-rest" id="la-hero-rest-0006"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-      <div class="sub-page" id="la-scarplus-0007">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0007 &nbsp;·&nbsp; ASIN B0BRNVTD7T &nbsp;·&nbsp; Scar+ 15 ml</div>
-            <div class="la-hero-title">Scar+ 15 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0007"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0007"></div><div class="la-hero-actives-rest" id="la-hero-rest-0007"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-    </div>
-    <!-- /la-scarplus -->
-
-    <!-- ── BRITE ── -->
-    <div class="channel-page" id="la-brite">
-      <div class="insight-grid" id="la-insights-brite"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
-      <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-brite','la-brite-0003-stickerless',this)">Brite (SVA0003-stickerless)</button>
-        <button class="sub-tab" onclick="showSubTab('la-brite','la-brite-0003.2pk',this)">Brite 2-pack (SVA0003.2pk)</button>
-      </div>
-      <div class="sub-page active" id="la-brite-0003-stickerless">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0003-stickerless &nbsp;·&nbsp; ASIN B0861CGWLF &nbsp;·&nbsp; Brite</div>
-            <div class="la-hero-title">Brite</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0003-stickerless"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0003-stickerless"></div><div class="la-hero-actives-rest" id="la-hero-rest-0003-stickerless"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-      <div class="sub-page" id="la-brite-0003.2pk">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0003.2pk &nbsp;·&nbsp; ASIN B0D1W1WSFH &nbsp;·&nbsp; Brite 2-pack</div>
-            <div class="la-hero-title">Brite 2-pack</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0003.2pk"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0003.2pk"></div><div class="la-hero-actives-rest" id="la-hero-rest-0003.2pk"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-    </div>
-    <!-- /la-brite -->
-
-    <!-- ── BRUISE ── -->
-    <div class="channel-page" id="la-bruise">
-      <div class="insight-grid" id="la-insights-bruise"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
-      <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-bruise','la-bruise-0005',this)">Bruise (SVA0005)</button>
-      </div>
-      <div class="sub-page active" id="la-bruise-0005">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0005 &nbsp;·&nbsp; ASIN B0B23BB6CB &nbsp;·&nbsp; Bruise</div>
-            <div class="la-hero-title">Bruise</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0005"></span><span class="la-hero-tag bsr">BSR —</span></div>
+            <div class="la-hero-meta">SSS0005 &nbsp;&middot;&nbsp; ASIN B0H84CM6M7 &nbsp;&middot;&nbsp; 92% Snail Cream</div>
+            <div class="la-hero-title">92% Snail Cream</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0005"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
           </div>
           <div class="la-hero-actives">
             <div class="la-hero-actives-lbl">Hero Actives</div>
@@ -4141,18 +3813,18 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4160,7 +3832,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 1</div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4168,7 +3840,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 2</div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4176,7 +3848,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 3</div>
           <div class="la-copy-row">
             <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4184,7 +3856,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 4</div>
           <div class="la-copy-row">
             <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4192,58 +3864,57 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 5</div>
           <div class="la-copy-row">
             <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Product Description</div>
           <div class="la-copy-row">
             <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
         </div>
       </div>
     </div>
-    <!-- /la-bruise -->
-
-    <!-- ── ARC ── -->
-    <div class="channel-page" id="la-arc">
-      <div class="insight-grid" id="la-insights-arc"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+    <!-- /la-snailcream -->
+    <!-- ── VITAMIN C CAPSULE CREAM ── -->
+    <div class="channel-page" id="la-vitccream">
+      <div class="insight-grid" id="la-insights-vitccream"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-arc','la-arc-0011',this)">Advanced Recovery Cream (SVA0011)</button>
+        <button class="sub-tab" onclick="showSubTab('la-vitccream','la-vitccream-0006',this)">Vitamin C Capsule Cream (SSS0006)</button>
       </div>
-      <div class="sub-page active" id="la-arc-0011">
+      <div class="sub-page" id="la-vitccream-0006">
 <div class="la-hero">
           <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0011 &nbsp;·&nbsp; ASIN B0F45BTSB7 &nbsp;·&nbsp; Advanced Recovery Cream</div>
-            <div class="la-hero-title">Advanced Recovery Cream</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0011"></span><span class="la-hero-tag bsr">BSR —</span></div>
+            <div class="la-hero-meta">SSS0006 &nbsp;&middot;&nbsp; ASIN B0H846SWCQ &nbsp;&middot;&nbsp; Vitamin C Capsule Cream</div>
+            <div class="la-hero-title">Vitamin C Capsule Cream</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0006"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
           </div>
           <div class="la-hero-actives">
             <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0011"></div><div class="la-hero-actives-rest" id="la-hero-rest-0011"></div>
+            <div class="la-hero-actives-primary" id="la-hero-primary-0006"></div><div class="la-hero-actives-rest" id="la-hero-rest-0006"></div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4251,7 +3922,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 1</div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4259,7 +3930,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 2</div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4267,7 +3938,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 3</div>
           <div class="la-copy-row">
             <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4275,7 +3946,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 4</div>
           <div class="la-copy-row">
             <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4283,58 +3954,57 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 5</div>
           <div class="la-copy-row">
             <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Product Description</div>
           <div class="la-copy-row">
             <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
         </div>
       </div>
     </div>
-    <!-- /la-arc -->
-
-    <!-- ── BRUISE RECOVERY DUO ── -->
-    <div class="channel-page" id="la-bruiserecoveryduo">
-      <div class="insight-grid" id="la-insights-bruiserecoveryduo"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
+    <!-- /la-vitccream -->
+    <!-- ── BIOCELLULOSE COCONUT GEL MASK (5 PACK) ── -->
+    <div class="channel-page" id="la-coconutmask">
+      <div class="insight-grid" id="la-insights-coconutmask"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-bruiserecoveryduo','la-bruiserecoveryduo-0012',this)">Bruise Recovery Duo (SVA0012)</button>
+        <button class="sub-tab" onclick="showSubTab('la-coconutmask','la-coconutmask-0022',this)">Biocellulose Coconut Gel Mask (5 Pack) (SSS0022)</button>
       </div>
-      <div class="sub-page active" id="la-bruiserecoveryduo-0012">
+      <div class="sub-page" id="la-coconutmask-0022">
 <div class="la-hero">
           <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0012 &nbsp;·&nbsp; ASIN B0FRVVFPM5 &nbsp;·&nbsp; Bruise Recovery Duo</div>
-            <div class="la-hero-title">Bruise Recovery Duo</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0012"></span><span class="la-hero-tag bsr">BSR —</span></div>
+            <div class="la-hero-meta">SSS0022 &nbsp;&middot;&nbsp; ASIN B0H845DQTW &nbsp;&middot;&nbsp; Biocellulose Coconut Gel Mask (5 Pack)</div>
+            <div class="la-hero-title">Biocellulose Coconut Gel Mask (5 Pack)</div>
+            <div class="la-hero-tags"><span id="la-hero-tags-0022"></span><span class="la-hero-tag bsr">BSR &mdash;</span></div>
           </div>
           <div class="la-hero-actives">
             <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0012"></div><div class="la-hero-actives-rest" id="la-hero-rest-0012"></div>
+            <div class="la-hero-actives-primary" id="la-hero-primary-0022"></div><div class="la-hero-actives-rest" id="la-hero-rest-0022"></div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-char-info">&le;200 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW &middot; JUL 27</span></div>
+          <div class="la-card-sublabel">&le;125 CHARS &middot; SEARCHABLE &middot; VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">&le;125 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4342,7 +4012,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 1</div>
           <div class="la-copy-row">
             <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4350,7 +4020,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 2</div>
           <div class="la-copy-row">
             <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4358,7 +4028,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 3</div>
           <div class="la-copy-row">
             <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4366,7 +4036,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 4</div>
           <div class="la-copy-row">
             <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
@@ -4374,209 +4044,25 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div class="la-card-sublabel">BULLET 5</div>
           <div class="la-copy-row">
             <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
           <div class="la-card-label">Active Product Description</div>
           <div class="la-copy-row">
             <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
+            <div class="la-copy-block ok">Loading&hellip;</div>
           </div>
         </div>
         <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
+          <div class="la-card-label">Backend Keywords &mdash; Spaces Only</div>
+          <div class="la-char-info">&le;250 chars &nbsp;&middot;&nbsp; <span class="char-pill ok">0 chars used</span></div>
+          <div class="la-backend-block">Loading&hellip;</div>
+          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">&#128203; Copy Backend Keywords</button>
         </div>
       </div>
     </div>
-    <!-- /la-bruiserecoveryduo -->
-
-    <!-- ── SCAR KITS ── -->
-    <div class="channel-page" id="la-scarkits">
-      <div class="insight-grid" id="la-insights-scarkits"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading insights…</div></div>
-      <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('la-scarkits','la-scarkits-0008',this)">24 HR Scar Kit 30 ml (SVA0008)</button>
-        <button class="sub-tab" onclick="showSubTab('la-scarkits','la-scarkits-0009',this)">24 HR Scar Kit 15 ml (SVA0009)</button>
-      </div>
-      <div class="sub-page active" id="la-scarkits-0008">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0008 &nbsp;·&nbsp; ASIN B0DHYLCML2 &nbsp;·&nbsp; 24 HR Scar Kit 30 ml</div>
-            <div class="la-hero-title">24 HR Scar Kit 30 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0008"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0008"></div><div class="la-hero-actives-rest" id="la-hero-rest-0008"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-      <div class="sub-page" id="la-scarkits-0009">
-<div class="la-hero">
-          <div class="la-hero-left">
-            <div class="la-hero-meta">SVA0009 &nbsp;·&nbsp; ASIN B0DHYJLHW1 &nbsp;·&nbsp; 24 HR Scar Kit 15 ml</div>
-            <div class="la-hero-title">24 HR Scar Kit 15 ml</div>
-            <div class="la-hero-tags"><span id="la-hero-tags-0009"></span><span class="la-hero-tag bsr">BSR —</span></div>
-          </div>
-          <div class="la-hero-actives">
-            <div class="la-hero-actives-lbl">Hero Actives</div>
-            <div class="la-hero-actives-primary" id="la-hero-primary-0009"></div><div class="la-hero-actives-rest" id="la-hero-rest-0009"></div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Title</div>
-          <div class="la-char-info">≤200 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Item Highlights<span class="la-badge new">NEW · JUL 27</span></div>
-          <div class="la-card-sublabel">≤125 CHARS · SEARCHABLE · VISIBLE IN SEARCH RESULTS &amp; PDPS</div><div class="la-char-info">≤125 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Bullet Points</div>
-          <div class="la-card-sublabel">BULLET 1</div>
-          <div class="la-copy-row">
-            <div class="la-num">1</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 2</div>
-          <div class="la-copy-row">
-            <div class="la-num">2</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 3</div>
-          <div class="la-copy-row">
-            <div class="la-num">3</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 4</div>
-          <div class="la-copy-row">
-            <div class="la-num">4</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label"></div>
-          <div class="la-card-sublabel">BULLET 5</div>
-          <div class="la-copy-row">
-            <div class="la-num">5</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Active Product Description</div>
-          <div class="la-copy-row">
-            <div class="la-num">6</div>
-            <div class="la-copy-block ok">Loading…</div>
-          </div>
-        </div>
-        <div class="la-card">
-          <div class="la-card-label">Backend Keywords — Spaces Only</div>
-          <div class="la-char-info">≤250 chars &nbsp;·&nbsp; <span class="char-pill ok">0 chars used</span></div>
-          <div class="la-backend-block">Loading…</div>
-          <button class="la-copy-btn" onclick="navigator.clipboard.writeText(this.parentElement.querySelector('.la-backend-block').textContent)">📋 Copy Backend Keywords</button>
-        </div>
-      </div>
-    </div>
-    <!-- /la-scarkits -->
-
-  <!-- Bundles — deliberately simpler than the 7 categories above: shows
-       CURRENT live listing content only (from Products Cache), NOT a full
-       AI audit — run-listing-audit.js hasn't been confirmed to cover
-       bundle SKUs, so this doesn't fabricate compliance notes it can't
-       back up. Sub-tabs and card shells generated dynamically by
-       renderBundleListingTabs() from Product Short Name's bundle list. -->
-  <div class="channel-page" id="la-bundles">
-    <div id="la-bundles-container"><div style="color:var(--muted);font-size:12px;padding:12px;">Loading…</div></div>
-  </div>
+    <!-- /la-coconutmask -->
   </div><!-- /page-listing -->
 
   <!-- ══ PPC (internal only) ══ -->
@@ -4655,7 +4141,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <thead><tr>
               <th>Channel</th><th>Ad Spend</th><th>Ad Sales</th><th>ACOS</th>
               <th>Total Sales</th><th>TACOS</th><th>Impressions</th><th>Clicks</th>
-              <th>CPC</th><th>Orders</th><th>AOV</th><th>CVR</th>
+              <th>CPC</th><th>Total Orders</th><th>AOV</th><th>CVR</th>
             </tr></thead>
             <tbody id="ppc-channel-breakdown-tbody">
               <tr><td colspan="12" style="text-align:center;color:var(--muted);">Loading…</td></tr>
@@ -4709,39 +4195,35 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
       <!-- Product type tabs -->
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('ppc-strategy','ppc-scar',this)">Scar</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-scarplus',this)">Scar+</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-brite',this)">Brite</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-bruise',this)">Bruise</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-arc',this)">ARC</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-bruiserecoveryduo',this)">Bruise Recovery Duo</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-scarkits',this)">Scar Kits</button>
-        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-bundles',this)">Bundles</button>
+        <button class="sub-tab active" onclick="showSubTab('ppc-strategy','ppc-heartleaf',this)">Heartleaf Cleanser</button>
+        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-spicule',this)">Spicule Serum</button>
+        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-vitcserum',this)">Vitamin C Serum</button>
+        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-snailserum',this)">Snail Mucin Serum</button>
+        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-snailcream',this)">Snail Mucin Cream</button>
+        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-vitccream',this)">Vitamin C Cream</button>
+        <button class="sub-tab" onclick="showSubTab('ppc-strategy','ppc-coconutmask',this)">Coconut Gel Mask</button>
       </div>
 
-      <div class="sub-page active" id="ppc-scar">
-        <div id="ppc-scar-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page active" id="ppc-heartleaf">
+        <div id="ppc-heartleaf-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
-      <div class="sub-page" id="ppc-scarplus">
-        <div id="ppc-scarplus-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page" id="ppc-spicule">
+        <div id="ppc-spicule-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
-      <div class="sub-page" id="ppc-brite">
-        <div id="ppc-brite-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page" id="ppc-vitcserum">
+        <div id="ppc-vitcserum-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
-      <div class="sub-page" id="ppc-bruise">
-        <div id="ppc-bruise-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page" id="ppc-snailserum">
+        <div id="ppc-snailserum-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
-      <div class="sub-page" id="ppc-arc">
-        <div id="ppc-arc-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page" id="ppc-snailcream">
+        <div id="ppc-snailcream-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
-      <div class="sub-page" id="ppc-bruiserecoveryduo">
-        <div id="ppc-bruiserecoveryduo-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page" id="ppc-vitccream">
+        <div id="ppc-vitccream-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
-      <div class="sub-page" id="ppc-scarkits">
-        <div id="ppc-scarkits-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
-      </div>
-      <div class="sub-page" id="ppc-bundles">
-        <div id="ppc-bundles-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+      <div class="sub-page" id="ppc-coconutmask">
+        <div id="ppc-coconutmask-container"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
       </div>
 
     </div><!-- /ppc-strategy -->
@@ -4811,59 +4293,60 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
     <!-- Top-level tabs -->
     <div class="channel-tabs" style="margin-top:20px;">
-      <button class="ch-tab active" onclick="showChannel('organic','org-scar',this)">Scar</button>
-      <button class="ch-tab" onclick="showChannel('organic','org-scarplus',this)">Scar+</button>
-      <button class="ch-tab" onclick="showChannel('organic','org-brite',this)">Brite</button>
-      <button class="ch-tab" onclick="showChannel('organic','org-bruise',this)">Bruise</button>
-      <button class="ch-tab" onclick="showChannel('organic','org-arc',this)">ARC</button>
-      <button class="ch-tab" onclick="showChannel('organic','org-bruiserecoveryduo',this)">Bruise Recovery Duo</button>
-      <button class="ch-tab" onclick="showChannel('organic','org-scarkits',this)">Scar Kits</button>
+      <button class="ch-tab active" onclick="showChannel('organic','org-heartleaf',this)">Heartleaf Cleanser</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-spicule',this)">Spicule Serum</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-vitcserum',this)">Vitamin C Serum</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-snailserum',this)">Snail Mucin Serum</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-snailcream',this)">Snail Mucin Cream</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-vitccream',this)">Vitamin C Cream</button>
+      <button class="ch-tab" onclick="showChannel('organic','org-coconutmask',this)">Coconut Gel Mask</button>
     </div>
 
     <!-- ══ SCAR ══ -->
-    <div class="channel-page active" id="org-scar">
+    <!-- ── HEARTLEAF CLEANSER ── -->
+    <div class="channel-page active" id="org-heartleaf">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-scar','osc-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-scar','osc-ranktracker',this); window.initRankTracker('scar');">Rank Tracker</button>
+        <button class="sub-tab active" onclick="showSubTab('org-heartleaf','ohl-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-heartleaf','ohl-ranktracker',this); window.initRankTracker('heartleaf');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="osc-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page active" id="ohl-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="osc-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="ohl-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="osc-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="ohl-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="osc-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="ohl-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="osc-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="ohl-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — Scar</div>
-        <div class="p1-list" id="osc-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Heartleaf Cleanser</div>
+        <div class="p1-list" id="ohl-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="osc-ranktracker">
-        <div class="org-sqp-alert" id="osc-rt-banner">
-          <span>📈</span>
-          <span id="osc-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="ohl-ranktracker">
+        <div class="org-sqp-alert" id="ohl-rt-banner">
+          <span>&#128200;</span>
+          <span id="ohl-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="osc-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="ohl-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="osc-rt-window" onchange="window.renderRankTracker('scar')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="ohl-rt-window" onchange="window.renderRankTracker('heartleaf')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -4875,66 +4358,65 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="osc-rt-col-older">Earlier</th><th id="osc-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="ohl-rt-col-older">Earlier</th><th id="ohl-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="osc-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="ohl-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-scar -->
-
-    <!-- ══ SCAR+ ══ -->
-    <div class="channel-page" id="org-scarplus">
+    </div><!-- /org-heartleaf -->
+    <!-- ── SPICULE SERUM ── -->
+    <div class="channel-page" id="org-spicule">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-scarplus','oscp-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-scarplus','oscp-ranktracker',this); window.initRankTracker('scarplus');">Rank Tracker</button>
+        <button class="sub-tab" onclick="showSubTab('org-spicule','osp-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-spicule','osp-ranktracker',this); window.initRankTracker('spicule');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="oscp-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page" id="osp-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="oscp-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="osp-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="oscp-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="osp-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="oscp-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="osp-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="oscp-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="osp-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — Scar+</div>
-        <div class="p1-list" id="oscp-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Spicule Serum</div>
+        <div class="p1-list" id="osp-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="oscp-ranktracker">
-        <div class="org-sqp-alert" id="oscp-rt-banner">
-          <span>📈</span>
-          <span id="oscp-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="osp-ranktracker">
+        <div class="org-sqp-alert" id="osp-rt-banner">
+          <span>&#128200;</span>
+          <span id="osp-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="oscp-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="osp-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="oscp-rt-window" onchange="window.renderRankTracker('scarplus')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="osp-rt-window" onchange="window.renderRankTracker('spicule')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -4946,66 +4428,65 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="oscp-rt-col-older">Earlier</th><th id="oscp-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="osp-rt-col-older">Earlier</th><th id="osp-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="oscp-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="osp-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-scarplus -->
-
-    <!-- ══ BRITE ══ -->
-    <div class="channel-page" id="org-brite">
+    </div><!-- /org-spicule -->
+    <!-- ── VITAMIN C SERUM ── -->
+    <div class="channel-page" id="org-vitcserum">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-brite','obr-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-brite','obr-ranktracker',this); window.initRankTracker('brite');">Rank Tracker</button>
+        <button class="sub-tab" onclick="showSubTab('org-vitcserum','ovc-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-vitcserum','ovc-ranktracker',this); window.initRankTracker('vitcserum');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="obr-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page" id="ovc-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="obr-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="ovc-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="obr-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="ovc-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="obr-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="ovc-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="obr-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="ovc-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — Brite</div>
-        <div class="p1-list" id="obr-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Vitamin C Serum</div>
+        <div class="p1-list" id="ovc-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="obr-ranktracker">
-        <div class="org-sqp-alert" id="obr-rt-banner">
-          <span>📈</span>
-          <span id="obr-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="ovc-ranktracker">
+        <div class="org-sqp-alert" id="ovc-rt-banner">
+          <span>&#128200;</span>
+          <span id="ovc-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="obr-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="ovc-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="obr-rt-window" onchange="window.renderRankTracker('brite')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="ovc-rt-window" onchange="window.renderRankTracker('vitcserum')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -5017,66 +4498,65 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="obr-rt-col-older">Earlier</th><th id="obr-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="ovc-rt-col-older">Earlier</th><th id="ovc-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="obr-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="ovc-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-brite -->
-
-    <!-- ══ BRUISE ══ -->
-    <div class="channel-page" id="org-bruise">
+    </div><!-- /org-vitcserum -->
+    <!-- ── SNAIL MUCIN SERUM ── -->
+    <div class="channel-page" id="org-snailserum">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-bruise','obru-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-bruise','obru-ranktracker',this); window.initRankTracker('bruise');">Rank Tracker</button>
+        <button class="sub-tab" onclick="showSubTab('org-snailserum','oss-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-snailserum','oss-ranktracker',this); window.initRankTracker('snailserum');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="obru-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page" id="oss-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="obru-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="oss-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="obru-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="oss-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="obru-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="oss-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="obru-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="oss-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — Bruise</div>
-        <div class="p1-list" id="obru-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Snail Mucin Serum</div>
+        <div class="p1-list" id="oss-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="obru-ranktracker">
-        <div class="org-sqp-alert" id="obru-rt-banner">
-          <span>📈</span>
-          <span id="obru-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="oss-ranktracker">
+        <div class="org-sqp-alert" id="oss-rt-banner">
+          <span>&#128200;</span>
+          <span id="oss-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="obru-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="oss-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="obru-rt-window" onchange="window.renderRankTracker('bruise')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="oss-rt-window" onchange="window.renderRankTracker('snailserum')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -5088,66 +4568,65 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="obru-rt-col-older">Earlier</th><th id="obru-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="oss-rt-col-older">Earlier</th><th id="oss-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="obru-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="oss-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-bruise -->
-
-    <!-- ══ ARC ══ -->
-    <div class="channel-page" id="org-arc">
+    </div><!-- /org-snailserum -->
+    <!-- ── SNAIL MUCIN CREAM ── -->
+    <div class="channel-page" id="org-snailcream">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-arc','oarc-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-arc','oarc-ranktracker',this); window.initRankTracker('arc');">Rank Tracker</button>
+        <button class="sub-tab" onclick="showSubTab('org-snailcream','osn-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-snailcream','osn-ranktracker',this); window.initRankTracker('snailcream');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="oarc-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page" id="osn-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="oarc-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="osn-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="oarc-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="osn-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="oarc-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="osn-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="oarc-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="osn-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — ARC</div>
-        <div class="p1-list" id="oarc-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Snail Mucin Cream</div>
+        <div class="p1-list" id="osn-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="oarc-ranktracker">
-        <div class="org-sqp-alert" id="oarc-rt-banner">
-          <span>📈</span>
-          <span id="oarc-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="osn-ranktracker">
+        <div class="org-sqp-alert" id="osn-rt-banner">
+          <span>&#128200;</span>
+          <span id="osn-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="oarc-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="osn-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="oarc-rt-window" onchange="window.renderRankTracker('arc')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="osn-rt-window" onchange="window.renderRankTracker('snailcream')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -5159,66 +4638,65 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="oarc-rt-col-older">Earlier</th><th id="oarc-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="osn-rt-col-older">Earlier</th><th id="osn-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="oarc-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="osn-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-arc -->
-
-    <!-- ══ BRUISE RECOVERY DUO ══ -->
-    <div class="channel-page" id="org-bruiserecoveryduo">
+    </div><!-- /org-snailcream -->
+    <!-- ── VITAMIN C CREAM ── -->
+    <div class="channel-page" id="org-vitccream">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-bruiserecoveryduo','obrd-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-bruiserecoveryduo','obrd-ranktracker',this); window.initRankTracker('bruiserecoveryduo');">Rank Tracker</button>
+        <button class="sub-tab" onclick="showSubTab('org-vitccream','ovcc-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-vitccream','ovcc-ranktracker',this); window.initRankTracker('vitccream');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="obrd-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page" id="ovcc-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="obrd-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="ovcc-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="obrd-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="ovcc-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="obrd-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="ovcc-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="obrd-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="ovcc-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — Bruise Recovery Duo</div>
-        <div class="p1-list" id="obrd-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Vitamin C Cream</div>
+        <div class="p1-list" id="ovcc-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="obrd-ranktracker">
-        <div class="org-sqp-alert" id="obrd-rt-banner">
-          <span>📈</span>
-          <span id="obrd-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="ovcc-ranktracker">
+        <div class="org-sqp-alert" id="ovcc-rt-banner">
+          <span>&#128200;</span>
+          <span id="ovcc-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="obrd-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="ovcc-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="obrd-rt-window" onchange="window.renderRankTracker('bruiserecoveryduo')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="ovcc-rt-window" onchange="window.renderRankTracker('vitccream')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -5230,66 +4708,65 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="obrd-rt-col-older">Earlier</th><th id="obrd-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="ovcc-rt-col-older">Earlier</th><th id="ovcc-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="obrd-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="ovcc-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-bruiserecoveryduo -->
-
-    <!-- ══ SCAR KITS ══ -->
-    <div class="channel-page" id="org-scarkits">
+    </div><!-- /org-vitccream -->
+    <!-- ── COCONUT GEL MASK ── -->
+    <div class="channel-page" id="org-coconutmask">
       <div class="sub-tabs">
-        <button class="sub-tab active" onclick="showSubTab('org-scarkits','osk-insights',this)">Insights</button>
-        <button class="sub-tab" onclick="showSubTab('org-scarkits','osk-ranktracker',this); window.initRankTracker('scarkits');">Rank Tracker</button>
+        <button class="sub-tab" onclick="showSubTab('org-coconutmask','ocm-insights',this)">Insights</button>
+        <button class="sub-tab" onclick="showSubTab('org-coconutmask','ocm-ranktracker',this); window.initRankTracker('coconutmask');">Rank Tracker</button>
       </div>
-      <div class="sub-page active" id="osk-insights">
-        <!-- 4-card layout matching évolis's own pattern — added 2026-08-11
-             per Jaclyn: ins.organic is one shared, brand-wide analysis (not
-             per-category), so the SAME content is injected into every
-             category's cards below, matching exactly how ins.listing
-             already replicates across every Listing Audit tab. -->
+      <div class="sub-page" id="ocm-insights">
+        <!-- 4-card layout matching évolis's own pattern -- ins.organic is
+             one shared, brand-wide analysis (not per-category), so the
+             SAME content is injected into every category's cards below,
+             matching exactly how ins.listing already replicates across
+             every Listing Audit tab. -->
         <div class="insight-grid">
           <div class="ppc-opp-card summary-type">
             <div class="ppc-opp-hd"><div class="ppc-opp-badge med">SUMMARY</div><div class="ppc-opp-title">This Week</div></div>
-            <div class="ppc-opp-body" id="osk-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-body" id="ocm-insight-summary"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card win-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">✓ WIN</div></div>
-            <div class="ppc-opp-body" id="osk-insight-win"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge win">&#10003; WIN</div></div>
+            <div class="ppc-opp-body" id="ocm-insight-win"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
           </div>
           <div class="ppc-opp-card action-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">⚡ ACTION</div></div>
-            <div class="ppc-opp-body" id="osk-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge urgent">&#9889; ACTION</div></div>
+            <div class="ppc-opp-body" id="ocm-insight-action"><div style="color:var(--muted);font-size:12px;">No AI-generated action items yet &mdash; run analysis, or add manually.</div></div>
           </div>
           <div class="ppc-opp-card opportunity-type">
-            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">💡 OPPORTUNITY</div></div>
-            <div class="ppc-opp-body" id="osk-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet — run analysis, or add manually.</div></div>
+            <div class="ppc-opp-hd"><div class="ppc-opp-badge high">&#128161; OPPORTUNITY</div></div>
+            <div class="ppc-opp-body" id="ocm-insight-opportunity"><div style="color:var(--muted);font-size:12px;">No AI-generated opportunities yet &mdash; run analysis, or add manually.</div></div>
           </div>
         </div>
-        <div class="org-section-title">Fastest Path to Page 1 — Scar Kits</div>
-        <div class="p1-list" id="osk-p1-list"><div style="color:var(--muted);font-size:12px;">Loading…</div></div>
+        <div class="org-section-title">Fastest Path to Page 1 &mdash; Coconut Gel Mask</div>
+        <div class="p1-list" id="ocm-p1-list"><div style="color:var(--muted);font-size:12px;">Loading&hellip;</div></div>
       </div>
-      <div class="sub-page" id="osk-ranktracker">
-        <div class="org-sqp-alert" id="osk-rt-banner">
-          <span>📈</span>
-          <span id="osk-rt-banner-text">Loading…</span>
+      <div class="sub-page" id="ocm-ranktracker">
+        <div class="org-sqp-alert" id="ocm-rt-banner">
+          <span>&#128200;</span>
+          <span id="ocm-rt-banner-text">Loading&hellip;</span>
         </div>
         <div class="org-sqp-card">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:14px;">
-            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="osk-rt-daterange">Loading…</span></div>
+            <div class="org-sqp-title" style="margin-bottom:0;">Rank Changes <span class="org-sqp-badge" id="ocm-rt-daterange">Loading&hellip;</span></div>
             <div style="display:flex;gap:8px;align-items:center;">
               <label style="font-size:11px;color:var(--muted);">Compare to:</label>
-              <select id="osk-rt-window" onchange="window.renderRankTracker('scarkits')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
+              <select id="ocm-rt-window" onchange="window.renderRankTracker('coconutmask')" style="font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--font);">
                 <option value="7">1 week ago</option>
                 <option value="28" selected>~4 weeks ago</option>
                 <option value="84">~12 weeks ago</option>
@@ -5301,21 +4778,21 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <table class="data-table">
               <thead><tr>
                 <th>Product</th><th>Keyword</th><th>Vol/mo</th>
-                <th id="osk-rt-col-older">Earlier</th><th id="osk-rt-col-newer">Latest</th>
-                <th>Change</th><th>Where in Listing</th><th>PPC (Spend · Sales · ACoS)</th><th>Recommended Action</th>
+                <th id="ocm-rt-col-older">Earlier</th><th id="ocm-rt-col-newer">Latest</th>
+                <th>Change</th><th>Where in Listing</th><th>PPC (Spend &middot; Sales &middot; ACoS)</th><th>Recommended Action</th>
               </tr></thead>
-              <tbody id="osk-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
+              <tbody id="ocm-rt-tbody"><tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading&hellip;</td></tr></tbody>
             </table>
           </div>
           <div style="font-size:11px;color:var(--muted);margin-top:12px;line-height:1.6;">
-            Rows are sorted with anything needing immediate attention first (🔴), then best-performing, down to lowest-performing — not alphabetical or by volume.<br>
-            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live — recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) — a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
-            <strong>Recommended Action</strong> shows the ✨ AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword — generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the ✨.<br>
-            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only — it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
+            Rows are sorted with anything needing immediate attention first (&#128308;), then best-performing, down to lowest-performing &mdash; not alphabetical or by volume.<br>
+            <strong>Where in Listing</strong> and <strong>PPC</strong> are always live &mdash; recomputed from the listing-copy and ad-search-terms sheets on every page load. PPC is exact-match only (a keyword tracked as an exact phrase won't catch spend under a slightly different variant) &mdash; a wrong fuzzy match that looks confident is worse than an honest "No spend."<br>
+            <strong>Recommended Action</strong> shows the &#10024; AI-written recommendation (factors in rank change, PPC performance, and listing placement together) whenever one exists for that keyword &mdash; generated by Run Analysis, not on every page load, so it's only as fresh as the last time someone clicked it. Keywords Run Analysis hasn't covered yet fall back to a simpler rank-only rule, shown without the &#10024;.<br>
+            <strong>Where in Listing</strong> reflects the live listing copy as of its last sync only &mdash; it can't show when a keyword was added, since the listings sheet doesn't keep dated history.
           </div>
         </div>
       </div>
-    </div><!-- /org-scarkits -->
+    </div><!-- /org-coconutmask -->
 
   </div><!-- /page-organic -->
 
@@ -5362,7 +4839,7 @@ function showPage(id, btn) {
   // shared keyword tracker data now rather than waiting for someone to
   // click into Rank Tracker first. initRankTracker caches internally, so
   // this is a no-op on subsequent visits to the page.
-  if (id === 'organic' && typeof window.initRankTracker === 'function') window.initRankTracker('scar');
+  if (id === 'organic' && typeof window.initRankTracker === 'function') window.initRankTracker('heartleaf');
 
   // Export PDF Report button — only shown on the three "performance" pages
   // (Sales, Marketing, Events). Hidden everywhere else (Overview, Inventory,
@@ -12400,7 +11877,7 @@ async function initSnsExternal() {
 
   // DOM id prefix per category — matches each tab's own existing
   // "Insights" sub-page naming convention (oa-/osh-/ocd-/omk-/ods-).
-  const RT_ID_PREFIX = { scar: 'osc', scarplus: 'oscp', brite: 'obr', bruise: 'obru', arc: 'oarc', bruiserecoveryduo: 'obrd', scarkits: 'osk' };
+  const RT_ID_PREFIX = { heartleaf: 'ohl', spicule: 'osp', vitcserum: 'ovc', snailserum: 'oss', snailcream: 'osn', vitccream: 'ovcc', coconutmask: 'ocm' };
   const RT_CATEGORY_LABEL = { heartleaf: 'Heartleaf Cleanser', spicule: 'Spicule Serum', vitcserum: 'Vitamin C Serum', snailserum: 'Snail Mucin Serum', snailcream: 'Snail Mucin Cream', vitccream: 'Vitamin C Cream', coconutmask: 'Coconut Gel Mask' };
 
   function csvUrl() {
@@ -16144,7 +15621,16 @@ let _amazonReviewsPromise = null;
 function fetchAmazonReviews() {
   if (_amazonReviewsPromise) return _amazonReviewsPromise;
   _amazonReviewsPromise = (async () => {
-    const csv = await fetch(ovCsvUrl(SHEET_AMAZON_REVIEWS_ID, SHEET_AMAZON_REVIEWS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+    // Added 2026-08-28 — defensive safety net from Skinuva's own
+    // changelog: if SHEET_AMAZON_REVIEWS.gid is ever missing (a
+    // /api/sheet-config gap on any brand), fall back to fetching the
+    // tab by NAME via gviz instead of failing outright on `gid=null`.
+    // Skinside Seoul's gid is confirmed real (360009212) as of
+    // 2026-08-27, so this branch shouldn't normally fire — kept as
+    // insurance, not because it's currently needed.
+    const csv = (SHEET_AMAZON_REVIEWS_GID != null && SHEET_AMAZON_REVIEWS_GID !== '')
+      ? await fetch(ovCsvUrl(SHEET_AMAZON_REVIEWS_ID, SHEET_AMAZON_REVIEWS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '')
+      : await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_AMAZON_REVIEWS_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul')}&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
     const rows = parseCsvToRows(csv);
     console.log('[Reviews][qa] total review rows loaded:', rows.length, '— header keys:', rows.length ? Object.keys(rows[0]).join(' | ') : '(none)');
     return rows;
@@ -16780,27 +16266,15 @@ async function ppcLoadStrategyByProduct() {
 
     Object.keys(REVIEW_CATEGORY_PRODUCTS).forEach(catKey => {
       const containerId = {
-        scar: 'ppc-scar', scarplus: 'ppc-scarplus', brite: 'ppc-brite',
-        bruise: 'ppc-bruise', arc: 'ppc-arc',
-        bruiserecoveryduo: 'ppc-bruiserecoveryduo', scarkits: 'ppc-scarkits',
+        heartleaf: 'ppc-heartleaf', spicule: 'ppc-spicule', vitcserum: 'ppc-vitcserum',
+        snailserum: 'ppc-snailserum', snailcream: 'ppc-snailcream',
+        vitccream: 'ppc-vitccream', coconutmask: 'ppc-coconutmask',
       }[catKey];
       renderIntoContainer(containerId, REVIEW_CATEGORY_PRODUCTS[catKey]);
     });
 
-    // Bundles — product list is dynamic (getBundleProducts(), built from
-    // Product Short Name), not hardcoded like the 7 categories above —
-    // bundle SKUs/ASINs are opaque Amazon-generated codes not worth
-    // hand-copying. Card rendering itself needs no changes: ppc_strategy
-    // rows for bundle SKUs have the exact same shape as any other
-    // product, as long as Business Report and the OOS cross-reference
-    // both cover them.
-    const bundleProducts = await getBundleProducts();
-    if (bundleProducts.length) {
-      renderIntoContainer('ppc-bundles', bundleProducts);
-    } else {
-      const bundlesContainer = document.getElementById('ppc-bundles-container');
-      if (bundlesContainer) bundlesContainer.innerHTML = '<div style="color:var(--muted);font-size:12px;">No bundle SKUs found on Product Short Name.</div>';
-    }
+    // No Bundles tab — none of the 7 confirmed SKUs are BUNDLE type (same
+    // as Insights Products and Listing Audit). Removed 2026-08-28.
   } catch (err) {
     console.warn('[PPC] strategy by product failed:', err.message);
   }
@@ -16937,6 +16411,7 @@ async function ppcLoadBlendedKpis() {
     const [
       amzOrdersCsv, wmtOrdersCsv, webOrdersCsv,
       amzAdCsv, wmtAdCsv, webAdCsv,
+      amzReturnsCsv, wmtReturnsCsv,
     ] = await Promise.all([
       fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_ORDERS.fileId, window.SHEET_CFG.SHEET_ORDERS.gid) + `&_cb=${Date.now()}`),
       fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_WALMART_ORDERS.fileId, window.SHEET_CFG.SHEET_WALMART_ORDERS.gid) + `&_cb=${Date.now()}`),
@@ -16944,6 +16419,18 @@ async function ppcLoadBlendedKpis() {
       fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_ADVERTISING.fileId, window.SHEET_CFG.SHEET_ADVERTISING.gid) + `&_cb=${Date.now()}`),
       fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_WALMART_ADVERTISING.fileId, window.SHEET_CFG.SHEET_WALMART_ADVERTISING.gid) + `&_cb=${Date.now()}`),
       fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_SHOPIFY_ADS.fileId, window.SHEET_CFG.SHEET_SHOPIFY_ADS.gid) + `&_cb=${Date.now()}`),
+      // Returns — added 2026-08-28, same bug/fix as Skinuva's own PPC
+      // Blended page changelog: Total Sales/TACOS here were gross figures
+      // with no returns netted out at all, while Overview already nets
+      // returns from its own KPIs — that mismatch is exactly what
+      // produces a real Total Sales discrepancy between the two pages
+      // for the same period. Amazon has no direct refund-$ column, so
+      // its dollar impact is estimated as returned_qty × that ASIN's own
+      // average item price (buildAsinPriceMap below, same approach
+      // Overview uses); Walmart returns carry a real refund_amount and
+      // are used directly.
+      fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_RETURNS.fileId, window.SHEET_CFG.SHEET_RETURNS.gid) + `&_cb=${Date.now()}`),
+      fetchCsvWithRetry(ovCsvUrl(window.SHEET_CFG.SHEET_WALMART_RETURNS.fileId, window.SHEET_CFG.SHEET_WALMART_RETURNS.gid) + `&_cb=${Date.now()}`),
     ]);
 
 
@@ -16953,6 +16440,45 @@ async function ppcLoadBlendedKpis() {
     const amzAdRows = parseCsvToRows(amzAdCsv);
     const wmtAdRows = parseCsvToRows(wmtAdCsv);
     const webAdRows = parseCsvToRows(webAdCsv);
+    const amzReturnRows = parseCsvToRows(amzReturnsCsv).filter(ppcBlendedIsSkinuvaRow);
+    const wmtReturnRows = parseCsvToRows(wmtReturnsCsv).filter(ppcBlendedIsSkinuvaRow);
+
+    // Per-ASIN average item price, for estimating Amazon's return dollar
+    // impact (no refund_amount column on that sheet) — same method as
+    // Overview's buildAsinPriceMap().
+    const ppcAmzPriceByAsin = (() => {
+      const sums = {}, counts = {};
+      amzOrders.forEach(r => {
+        const asin = (r.asin || '').trim().toUpperCase();
+        const price = parseFloat(String(r.item_price || '').replace(/[$,]/g, '')) || 0;
+        if (!asin || !price) return;
+        sums[asin] = (sums[asin] || 0) + price;
+        counts[asin] = (counts[asin] || 0) + 1;
+      });
+      const avg = {};
+      Object.keys(sums).forEach(k => { avg[k] = sums[k] / counts[k]; });
+      return avg;
+    })();
+
+    // Returns $ netted out per period, by (year, month) key — computed
+    // once up front like everything else here, then looked up inside
+    // computeForPeriod below.
+    function returnsAmtForPeriod(year, month) {
+      const prefix = `${year}-${String(month).padStart(2, '0')}`;
+      let amzAmt = 0;
+      amzReturnRows.forEach(r => {
+        if (ppcBlendedNormalizeDate(r.return_date).substring(0, 7) !== prefix) return;
+        const asin = (r.asin || '').trim().toUpperCase();
+        const qty = parseInt(r.quantity, 10) || 0;
+        amzAmt += qty * (ppcAmzPriceByAsin[asin] || 0);
+      });
+      let wmtAmt = 0;
+      wmtReturnRows.forEach(r => {
+        if (ppcBlendedNormalizeDate(r.return_date).substring(0, 7) !== prefix) return;
+        wmtAmt += parseFloat(String(r.refund_amount || '').replace(/[$,]/g, '')) || 0;
+      });
+      return amzAmt + wmtAmt;
+    }
 
     console.log('[PPCBlended][qa] raw row counts -- amzOrders:', amzOrders.length, 'wmtOrders:', wmtOrders.length, 'webOrders:', webOrders.length, 'amzAd:', amzAdRows.length, 'wmtAd:', wmtAdRows.length, 'webAd:', webAdRows.length);
     console.log('[PPCBlended][qa] amzAd header sample:', amzAdRows[0] || null);
@@ -16976,7 +16502,8 @@ async function ppcLoadBlendedKpis() {
       // just not summed into Ad Spend/Sales/ACOS/Total Sales/TACOS/etc.
       // here anymore.
       const totalOrders = amzO.totalOrders + wmtO.totalOrders;
-      const totalSales = amzO.totalRevenue + wmtO.totalRevenue;
+      const returnsAmt = returnsAmtForPeriod(year, month);
+      const totalSales = Math.max(0, amzO.totalRevenue + wmtO.totalRevenue - returnsAmt);
 
       const amzAdRow = amzAdRows.find(r => parseInt(r.year, 10) === year && parseInt(r.month, 10) === month) || {};
       const wmtAdRow = wmtAdRows.find(r => parseInt(r.year, 10) === year && parseInt(r.month, 10) === month) || {};
@@ -17100,11 +16627,15 @@ function ppcBlendedPct(current, previous) {
   if (!previous) return null;
   return Math.round(((current - previous) / previous) * 100);
 }
-function ppcBlendedSetMom(id, pctVal) {
+function ppcBlendedSetMom(id, pctVal, invert) {
   const mom = document.querySelector(`#${id} .kpi-mom`);
   if (!mom) return;
   if (pctVal == null) { mom.className = 'kpi-mom flat'; mom.textContent = ''; return; }
-  const cls = pctVal === 0 ? 'flat' : pctVal > 0 ? 'up' : 'dn';
+  // invert — added 2026-08-28, same fix as Overview's setKpi(): for a
+  // "lower is better" metric (ACOS, TACOS), a positive pctVal is bad,
+  // not good. Arrow still reflects the raw sign; only the color flips.
+  const isGoodDirection = invert ? pctVal < 0 : pctVal > 0;
+  const cls = pctVal === 0 ? 'flat' : isGoodDirection ? 'up' : 'dn';
   const arrow = pctVal > 0 ? '▲ ' : pctVal < 0 ? '▼ ' : '';
   mom.className = 'kpi-mom ' + cls;
   mom.textContent = `${arrow}${Math.abs(pctVal)}% MOM`;
@@ -17134,9 +16665,9 @@ function renderPpcBlendedKpis() {
 
   ppcBlendedSetMom('ppc-kpi-adspend', prev ? ppcBlendedPct(d.adSpend, prev.adSpend) : null);
   ppcBlendedSetMom('ppc-kpi-adsales', prev ? ppcBlendedPct(d.adSales, prev.adSales) : null);
-  ppcBlendedSetMom('ppc-kpi-acos', prev ? ppcBlendedPct(d.acos, prev.acos) : null);
+  ppcBlendedSetMom('ppc-kpi-acos', prev ? ppcBlendedPct(d.acos, prev.acos) : null, true);
   ppcBlendedSetMom('ppc-kpi-totalsales', prev ? ppcBlendedPct(d.totalSales, prev.totalSales) : null);
-  ppcBlendedSetMom('ppc-kpi-tacos', prev ? ppcBlendedPct(d.tacos, prev.tacos) : null);
+  ppcBlendedSetMom('ppc-kpi-tacos', prev ? ppcBlendedPct(d.tacos, prev.tacos) : null, true);
   ppcBlendedSetMom('ppc-kpi-impressions', prev ? ppcBlendedPct(d.impressions, prev.impressions) : null);
   ppcBlendedSetMom('ppc-kpi-clicks', prev ? ppcBlendedPct(d.clicks, prev.clicks) : null);
   ppcBlendedSetMom('ppc-kpi-ctr', prev ? ppcBlendedPct(d.ctr, prev.ctr) : null);
@@ -17224,9 +16755,18 @@ async function loadInventoryPage() {
   try {
     const [csv, consignmentCsv, statusCsv, wfsCsv] = await Promise.all([
       fetch(ovCsvUrl(OV_PRODUCTS_CACHE_SHEET_ID, OV_PRODUCTS_CACHE_GID)).then(r => r.ok ? r.text() : '').catch(() => ''),
-      // Skinside Seoul's own tab on the shared, multi-brand consignment sheet —
-      // gid confirmed 2026-08-14 per Jaclyn.
-      fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, '250172672')).then(r => r.ok ? r.text() : '').catch(() => ''),
+      // TODO: SHEET_CONSIGNMENT_INVENTORY has no gid for Skinside Seoul yet
+      // (confirmed against the Dashboard Mapping sheet — fileId exists,
+      // gid is blank). FIXED 2026-08-28: this previously hardcoded
+      // '250172672' regardless of brand — that's Skinuva's real
+      // consignment tab, not this brand's, and there was no brand filter
+      // on the resulting rows, so this was silently displaying Skinuva's
+      // consignment data. Now reads the gid dynamically and skips the
+      // fetch entirely when it's not yet configured, degrading to empty
+      // (handled below) instead of pulling in someone else's numbers.
+      (window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY && window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.gid)
+        ? fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.gid)).then(r => r.ok ? r.text() : '').catch(() => '')
+        : Promise.resolve(''),
       // Master Product Short Name sheet's own Status column (LIVE/DELETED)
       // — same sheet/gid as the name lookups used elsewhere, col B=SKU,
       // col H=Status. Used to grey out + sort discontinued SKUs to the
@@ -19089,7 +18629,7 @@ function injectInsightsBoxes(ins) {
   // same rendered HTML is placed into all 5 category tabs' containers —
   // matching Jaclyn's ask that each tab show it, not just Activators.
   if (ins.listing) {
-    ['la-insights-scar','la-insights-scarplus','la-insights-brite','la-insights-bruise','la-insights-arc','la-insights-bruiserecoveryduo','la-insights-scarkits'].forEach(id => {
+    ['la-insights-heartleaf','la-insights-spicule','la-insights-vitcserum','la-insights-snailserum','la-insights-snailcream','la-insights-vitccream','la-insights-coconutmask'].forEach(id => {
       const el = document.getElementById(id);
       if (el) renderListingInsightCards(ins.listing, el);
     });
@@ -19204,25 +18744,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Stores last audit results for historical context in next run
 let _lastAuditResults = [];
 
-const EVOLIS_SKUS = [
-  {id:'la-evo0001',   sku:'EVO0001', name:'Reverse Activator',           travel:false},
-  {id:'la-evo0005',   sku:'EVO0005', name:'Promote Activator',           travel:false},
-  {id:'la-evo0009',   sku:'EVO0009', name:'Prevent Activator',           travel:false},
-  {id:'la-evo0002',   sku:'EVO0002', name:'Reverse Shampoo',             travel:false},
-  {id:'la-evo0006',   sku:'EVO0006', name:'Promote Shampoo',             travel:false},
-  {id:'la-evo0010',   sku:'EVO0010', name:'Prevent Shampoo',             travel:false},
-  {id:'la-evo0014',   sku:'EVO0014', name:'Reverse Shampoo Travel',      travel:true},
-  {id:'la-evo0016',   sku:'EVO0016', name:'Promote Shampoo Travel',      travel:true},
-  {id:'la-cond-evo0003', sku:'EVO0003', name:'Reverse Conditioner',      travel:false},
-  {id:'la-cond-evo0007', sku:'EVO0007', name:'Promote Conditioner',      travel:false},
-  {id:'la-cond-evo0011', sku:'EVO0011', name:'Prevent Conditioner',      travel:false},
-  {id:'la-cond-evo0015', sku:'EVO0015', name:'Reverse Conditioner Travel',travel:true},
-  {id:'la-cond-evo0017', sku:'EVO0017', name:'Promote Conditioner Travel',travel:true},
-  {id:'la-mask-evo0004', sku:'EVO0004', name:'Reverse Mask',             travel:false},
-  {id:'la-mask-evo0008', sku:'EVO0008', name:'Promote Mask',             travel:false},
-  {id:'la-mask-evo0018', sku:'EVO0018', name:'Promote Mask Travel',      travel:true},
-  {id:'la-mask-evo0019', sku:'EVO0019', name:'Reverse Mask Travel',      travel:true},
-  {id:'la-dryshampoo',   sku:'EVO0012', name:'Dry Shampoo',              travel:false},
+const SKINSIDE_SEOUL_SKUS = [
+  // FIXED 2026-08-28 — this list used to be EVOLIS_SKUS, hardcoded to
+  // évolis's own catalog, with `id` values (e.g. 'la-evo0001') that never
+  // matched any real DOM element on this brand's Listing Audit page
+  // (which uses la-{category}-{suffix} ids). extractAllListingCopy()
+  // below was silently finding zero matches as a result. Rebuilt against
+  // this brand's real 7-SKU catalog (confirmed by Jaclyn 2026-08-27) with
+  // ids that actually match the sub-page ids built into this page.
+  {id:'la-heartleaf-0001',   sku:'SSS0001', name:'Heartleaf Foaming Cleanser',          travel:false},
+  {id:'la-spicule-0002',     sku:'SSS0002', name:'Spicule Serum',                       travel:false},
+  {id:'la-vitcserum-0003',   sku:'SSS0003', name:'Vitamin C Serum',                     travel:false},
+  {id:'la-snailserum-0004',  sku:'SSS0004', name:'96% Snail Mucin Essence',             travel:false},
+  {id:'la-snailcream-0005',  sku:'SSS0005', name:'92% Snail Cream',                     travel:false},
+  {id:'la-vitccream-0006',   sku:'SSS0006', name:'Vitamin C Capsule Cream',             travel:false},
+  {id:'la-coconutmask-0022', sku:'SSS0022', name:'Biocellulose Coconut Gel Mask (5 Pack)', travel:false},
 ];
 
 // ── Extract all listing copy from the DOM ─────────────────────────
@@ -19243,7 +18779,7 @@ function cleanCopy(s) {
 }
 function extractAllListingCopy() {
   const catalog = [];
-  for (const skuMeta of EVOLIS_SKUS) {
+  for (const skuMeta of SKINSIDE_SEOUL_SKUS) {
     const el = document.getElementById(skuMeta.id);
     if (!el) continue;
     const copy = { sku: skuMeta.sku, name: skuMeta.name, travel: skuMeta.travel };
@@ -19580,19 +19116,15 @@ function injectAuditResults(results) {
 
 // Maps SKU → sub-page id
 const SKU_TO_PAGE_ID = {
-  'SVA0001-stickerless':'la-scar-0001-stickerless',
-  'SVA0002':'la-scar-0002',
-  'SVA0004':'la-scar-0004',
-  'SVA0010':'la-scar-0010',
-  'SVA0006':'la-scarplus-0006',
-  'SVA0007':'la-scarplus-0007',
-  'SVA0003-stickerless':'la-brite-0003-stickerless',
-  'SVA0003.2pk':'la-brite-0003.2pk',
-  'SVA0005':'la-bruise-0005',
-  'SVA0011':'la-arc-0011',
-  'SVA0012':'la-bruiserecoveryduo-0012',
-  'SVA0008':'la-scarkits-0008',
-  'SVA0009':'la-scarkits-0009',
+  // FIXED 2026-08-28 — rebuilt for this brand's real 7-SKU catalog,
+  // matching the sub-page ids actually built into the Listing Audit page.
+  'SSS0001':'la-heartleaf-0001',
+  'SSS0002':'la-spicule-0002',
+  'SSS0003':'la-vitcserum-0003',
+  'SSS0004':'la-snailserum-0004',
+  'SSS0005':'la-snailcream-0005',
+  'SSS0006':'la-vitccream-0006',
+  'SSS0022':'la-coconutmask-0022',
 };
 
 function sanitizeForId(s) {
@@ -21367,7 +20899,7 @@ async function loadAuditResultsFromSheet() {
     return map;
   }
 
-  function setKpi(cardId, value, pctVal, suffix) {
+  function setKpi(cardId, value, pctVal, suffix, invert) {
     const card = document.getElementById(cardId);
     if (!card) return;
     const valEl = card.querySelector('.kpi-value');
@@ -21375,7 +20907,13 @@ async function loadAuditResultsFromSheet() {
     if (valEl) valEl.textContent = value;
     if (momEl) {
       if (pctVal == null) { momEl.className = 'kpi-mom flat'; momEl.textContent = '\u2014'; return; }
-      const cls = pctVal === 0 ? 'flat' : pctVal > 0 ? 'up' : 'dn';
+      // invert — added 2026-08-28, same fix as Skinuva's Overview page
+      // changelog: for a "lower is better" metric (ACOS), a positive
+      // pctVal (the number went UP) is actually bad, not good. Arrow
+      // direction still reflects the raw sign (up arrow = number rose);
+      // only the color flips.
+      const isGoodDirection = invert ? pctVal < 0 : pctVal > 0;
+      const cls = pctVal === 0 ? 'flat' : isGoodDirection ? 'up' : 'dn';
       const arrow = pctVal === 0 ? '' : pctVal > 0 ? '\u25b2 ' : '\u25bc ';
       momEl.className = 'kpi-mom ' + cls;
       momEl.textContent = `${arrow}${Math.abs(pctVal)}%${suffix || ' vs MTD last month'}`;
@@ -21745,7 +21283,7 @@ async function loadAuditResultsFromSheet() {
         }
       } catch (e) { console.warn('[Skinside Seoul][overview] Walmart ad units (for Ad-Driven Orders) lookup failed:', e.message); }
 
-      setKpiPlain('ov-kpi-ad-orders', (adDrivenOrders + walmartAdUnitsThisMonth).toLocaleString(), 'This month (Amazon orders + Walmart ad units)');
+      setKpiPlain('ov-kpi-ad-orders', (adDrivenOrders + walmartAdUnitsThisMonth).toLocaleString(), 'This month (Amazon + Walmart ad units)');
       // NOTE: this card's own MOM/"Organic Orders" companion logic moved
       // further down — see "MTD Organic Units" below, after per-ASIN net
       // units and ad-attributed units are available. Per Jaclyn
@@ -21821,12 +21359,26 @@ async function loadAuditResultsFromSheet() {
       // pre-aggregated by whole month, not by day, so this reflects the
       // CURRENT month's ad units as tracked so far (same caveat as the
       // Ad Spend/ACOS estimate above) rather than a precise MTD figure.
+      //
+      // FIXED 2026-08-28 — this previously called sheetCsvUrl() with a
+      // hardcoded literal gid ('158578426') instead of reading
+      // window.SHEET_CFG.SHEET_AD_ORDERS.gid like every other fetch of
+      // this same shared file elsewhere in this codebase. That gid did
+      // NOT resolve to Skinside Seoul's own tab on the shared Ad Orders
+      // file — same bug class caught on Skinuva's Overview page per its
+      // own 2026-08-28 changelog ("Organic Units subtraction read from
+      // the wrong brand's tab"). Fixed to use the confirmed real
+      // per-brand gid, with an explicit brand filter added defensively
+      // (same pattern already used a few lines up for adDrivenOrders),
+      // per that changelog's own recommendation to add the filter "even
+      // when the gid looks right."
       let adUnitsByAsin = {};
       let adUnitsByAsinPrev = {};
       try {
-        const adOrdersCsv2 = await fetch(sheetCsvUrl('1N30haUFZkdv9rrvYuWwUhxEm0z7MGp1bz9F462aF-QI', '158578426') + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+        const adOrdersCsv2 = await fetch(sheetCsvUrl(AD_ORDERS_SHEET_ID, AD_ORDERS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
         if (isCsv(adOrdersCsv2)) {
-          const adRows2All = parseCsv(adOrdersCsv2);
+          const brandSlugLower = (window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul').toLowerCase();
+          const adRows2All = parseCsv(adOrdersCsv2).filter(r => (r.brand || '').trim().toLowerCase() === brandSlugLower);
           adRows2All.filter(r => parseInt(r.year, 10) === now.getFullYear() && parseInt(r.month, 10) === now.getMonth() + 1)
             .forEach(r => {
               const asin = (r.asin || '').trim().toUpperCase();
@@ -22059,7 +21611,7 @@ async function loadAuditResultsFromSheet() {
       const acosPrev = blendedSalesPrev > 0 ? (blendedSpendPrev / blendedSalesPrev) * 100 : 0;
 
       setKpi('ov-kpi-adspend', '$' + blendedSpend.toLocaleString(undefined, { maximumFractionDigits: 0 }), pctChange(blendedSpend, blendedSpendPrev), ' vs MTD last month (Est.)');
-      setKpi('ov-kpi-acos', acos.toFixed(1) + '%', pctChange(Math.round(acos * 10), Math.round(acosPrev * 10)), ' vs MTD last month (Est.)');
+      setKpi('ov-kpi-acos', acos.toFixed(1) + '%', pctChange(Math.round(acos * 10), Math.round(acosPrev * 10)), ' vs MTD last month (Est.)', true);
 
       // ADDED 2026-08-25 per Jaclyn -- MTD Ad Sales (the same blended
       // ad-attributed sales figure ACOS above is already built from) and
@@ -22184,7 +21736,15 @@ async function loadHomeConsignmentKpi() {
   const subEl = document.getElementById('home-kpi-units-sub');
   if (!valEl) return;
   try {
-    const csv = await fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, '250172672')).then(r => r.ok ? r.text() : '').catch(() => '');
+    // TODO: SHEET_CONSIGNMENT_INVENTORY has no gid for Skinside Seoul yet.
+    // FIXED 2026-08-28: was hardcoded to '250172672' (Skinuva's real tab)
+    // with no brand filter on the result — silently showed Skinuva's
+    // consignment units on this brand's Home page. Now skips the fetch
+    // when no real gid is configured, same as the Overview page fetch.
+    const gid = window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY && window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.gid;
+    const csv = gid
+      ? await fetch(ovCsvUrl(OV_CONSIGNMENT_SHEET_ID, gid)).then(r => r.ok ? r.text() : '').catch(() => '')
+      : '';
     const rows = parseCsvToRows(csv);
     if (!rows.length) { valEl.textContent = '—'; if (subEl) subEl.textContent = 'No consignment data yet'; return; }
     const total = rows.reduce((sum, r) => sum + (parseFloat(r.available) || 0), 0);
