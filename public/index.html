@@ -13689,7 +13689,20 @@ const LISTING_AUDIT_EVOLIS_GID = window.SHEET_CFG.SHEET_LISTING_AUDIT.gid;
 const OV_SUMMARY_SHEET_ID        = window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.fileId;
 const OV_SUMMARY_GID             = window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.gid;  // evolis tab
 const OV_PRODUCTS_CACHE_SHEET_ID = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.fileId;
-const OV_PRODUCTS_CACHE_GID      = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.gid;  // evolis tab
+const OV_PRODUCTS_CACHE_GID      = window.SHEET_CFG.SHEET_PRODUCT_INVENTORY.gid;
+
+// OOS Log data source — switched 2026-09-01 to read pre-computed incidents
+// from sync-oos-history.js's cache sheet instead of re-deriving OOS streaks
+// client-side from the Products Cache snapshot (see loadOosLog() below for
+// the full port notes/caveats). One spreadsheet shared across every brand,
+// one tab per brand — read via SHEET_CFG like every other sheet on this
+// dashboard (not hardcoded directly here), so this brand's page source
+// doesn't expose gids for every other brand's tab on the same shared file.
+// Confirmed real gid for skinside-seoul: 290280801 (2026-09-01, Jaclyn).
+// Still needs: SHEET_CONFIG env var updated with a SHEET_OOS_HISTORY entry
+// (fileId + this gid) — see chat for the exact JSON to paste into Vercel.
+const OV_OOS_HISTORY_SHEET_ID = window.SHEET_CFG.SHEET_OOS_HISTORY && window.SHEET_CFG.SHEET_OOS_HISTORY.fileId;
+const OV_OOS_HISTORY_GID      = window.SHEET_CFG.SHEET_OOS_HISTORY && window.SHEET_CFG.SHEET_OOS_HISTORY.gid;  // evolis tab
 // Consignment Inventory sheet — ShipStation-sourced brands (miguard,
 // prohibition, high-on-love) have real tabs today. Évolis's own
 // consignment inventory is on Cin7 Core, not yet built (email-based
@@ -17111,68 +17124,87 @@ async function loadOosLog() {
   const body = document.getElementById('oos-log-body');
   if (!body) return;
   try {
-    const csv = await fetch(ovCsvUrl(OV_PRODUCTS_CACHE_SHEET_ID, OV_PRODUCTS_CACHE_GID)).then(r => r.ok ? r.text() : '').catch(() => '');
+    if (!OV_OOS_HISTORY_GID) {
+      body.innerHTML = '<div class="ppc-card" style="color:var(--muted);">No out-of-stock incidents logged.</div>';
+      console.warn('[OOS Log] OV_OOS_HISTORY_GID is blank — Skinside Seoul\'s tab gid on the shared OOS history sheet has not been provided yet.');
+      return;
+    }
+    const csv = await fetch(ovCsvUrl(OV_OOS_HISTORY_SHEET_ID, OV_OOS_HISTORY_GID)).then(r => r.ok ? r.text() : '').catch(() => '');
     const rows = parseCsvToRows(csv);
     if (!rows.length) { body.innerHTML = '<div class="ppc-card" style="color:var(--muted);">No data</div>'; return; }
 
-    const todayStr = rows.reduce((max, r) => ((r.date || '') > max ? r.date : max), '');
+    // Brand filter — defensive, applied only when the row actually has a
+    // brand value (UNCONFIRMED per the porting doc: real column casing
+    // not yet verified against live cron output — assumed lowercase
+    // brand id, e.g. 'skinside-seoul'. Spot-check once real rows exist.)
+    const brandSlug = (window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul').toLowerCase();
+    const brandRows = rows.filter(r => !r.brand || (r.brand || '').trim().toLowerCase() === brandSlug);
 
-    // FIXED 2026-08-14 per Jaclyn — bundle SKUs ("SVA0001+03") and VMP
-    // multi-packs ("VMP_SVA0001-STICKERLESS_2_PK") are virtual products
-    // with no inventory of their own — total_quantity is always 0/blank
-    // for these rows on Products Cache, since they're not real,
-    // separately-stocked items. Without this filter, every bundle shows
-    // up as a permanent, ongoing OOS incident from day one, which isn't
-    // a real stockout — it's just a SKU type that was never supposed to
-    // carry its own stock in the first place.
-    function isCatalogSkuForOos(rawSku) {
-      const upper = (rawSku || '').trim().toUpperCase();
-      if (!upper) return false;
-      if (upper.includes('+')) return false; // bundle, e.g. "SVA0001+03"
-      if (upper.startsWith('VMP_')) return false; // multi-pack
-      return true;
+    // Local SKU -> product name lookup (master Product Short Name sheet —
+    // same one used elsewhere on this dashboard, per the porting doc's
+    // instruction not to copy évolis's own hardcoded sheet here — this
+    // already is Skinside Seoul's, since it's the one shared master list).
+    let nameBySku = {};
+    try {
+      const namesCsv = await fetch(sheetCsvUrl('1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA', '164358627')).then(r => r.ok ? r.text() : '').catch(() => '');
+      if (isCsv(namesCsv)) {
+        const lines = namesCsv.trim().split('\n');
+        for (let i = 1; i < lines.length; i++) {
+          const cols = parseCsvLine(lines[i]);
+          const sku = (cols[1] || '').replace(/^"|"$/g, '').trim().toUpperCase();
+          const name = (cols[2] || '').replace(/^"|"$/g, '').trim();
+          if (sku && name) nameBySku[sku] = name;
+        }
+      }
+    } catch (e) { console.warn('[OOS Log] name lookup failed:', e.message); }
+
+    const todayStr = fmtDateStr(new Date());
+
+    // UNCONFIRMED per the porting doc — real status spelling not yet
+    // verified against live cron output. Anything containing "ongoing"
+    // (case-insensitive) counts; blank status + blank end_date also
+    // falls back to ongoing, same as évolis's version.
+    function isOngoing(r) {
+      const status = (r.status || '').trim().toLowerCase();
+      if (status.includes('ongoing')) return true;
+      if (!r.status && !r.end_date) return true;
+      return false;
     }
 
-    // Group by SKU, sort each group's rows by date ascending
+    // UNCONFIRMED per the porting doc — real "type" literal values (e.g.
+    // "out of FBA" vs "out of all inventory") not yet verified. Displayed
+    // as-is, reformatted (underscores -> spaces, title case) rather than
+    // mapped to fixed labels.
+    function formatType(t) {
+      if (!t) return '';
+      return String(t).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    const dayCount = (start, end) => Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
+
     const bySku = {};
-    rows.filter(r => isCatalogSkuForOos(r.sku)).forEach(r => {
+    brandRows.forEach(r => {
       const sku = (r.sku || '').trim();
       if (!sku) return;
-      if (!bySku[sku]) bySku[sku] = { name: r.name || sku, rows: [] };
-      bySku[sku].rows.push(r);
-      if (r.name) bySku[sku].name = r.name; // keep the most recently seen name
+      if (!bySku[sku]) bySku[sku] = { name: nameBySku[sku.toUpperCase()] || sku, periods: [] };
+      const ongoing = isOngoing(r);
+      const effectiveEnd = ongoing ? todayStr : (r.end_date || r.start_date);
+      bySku[sku].periods.push({
+        start: r.start_date,
+        end: r.end_date,
+        ongoing,
+        type: formatType(r.type),
+        days: dayCount(r.start_date, effectiveEnd),
+      });
     });
 
     const skuLogs = [];
     Object.entries(bySku).forEach(([sku, data]) => {
-      const sorted = [...data.rows].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-      const periods = [];
-      let streakStart = null, streakLastDate = null;
-
-      sorted.forEach(r => {
-        const avail = r.total_quantity === '' || r.total_quantity === null || r.total_quantity === undefined
-          ? NaN : parseFloat(r.total_quantity);
-        const isOos = avail === 0;
-
-        if (isOos) {
-          if (!streakStart) streakStart = r.date;
-          streakLastDate = r.date;
-        } else if (streakStart) {
-          periods.push({ start: streakStart, end: streakLastDate, ongoing: false });
-          streakStart = null; streakLastDate = null;
-        }
-      });
-      if (streakStart) periods.push({ start: streakStart, end: streakLastDate, ongoing: streakLastDate === todayStr });
-
-      if (!periods.length) return; // never OOS — not part of this log
-
-      const dayCount = (start, end) => Math.round((new Date(end) - new Date(start)) / 86400000) + 1;
-      periods.forEach(p => { p.days = dayCount(p.start, p.ongoing ? todayStr : p.end); });
-
-      const totalDays = periods.reduce((s, p) => s + p.days, 0);
-      const isOngoing = periods.some(p => p.ongoing);
-
-      skuLogs.push({ sku, name: data.name, periods: periods.reverse(), totalDays, isOngoing });
+      if (!data.periods.length) return;
+      const sorted = data.periods.sort((a, b) => (b.start || '').localeCompare(a.start || '')); // most recent first
+      const totalDays = sorted.reduce((s, p) => s + p.days, 0);
+      const isOngoingSku = sorted.some(p => p.ongoing);
+      skuLogs.push({ sku, name: data.name, periods: sorted, totalDays, isOngoing: isOngoingSku });
     });
 
     // Ongoing (worst first by days) surface above fully-resolved history
@@ -17202,7 +17234,7 @@ async function loadOosLog() {
           </div>
         </div>
         <div class="oos-sku-periods">
-          ${log.periods.map(p => `<div class="oos-period-row"><span>${p.start} → ${p.ongoing ? 'today' : p.end}</span><span>${p.days} day${p.days === 1 ? '' : 's'}${p.ongoing ? ' <span class="oos-pill ongoing" style="margin-left:6px;">Ongoing</span>' : ''}</span></div>`).join('')}
+          ${log.periods.map(p => `<div class="oos-period-row"><span>${p.start} → ${p.ongoing ? 'today' : p.end}${p.type ? ` <span class="oos-pill" style="margin-left:6px;">${p.type}</span>` : ''}</span><span>${p.days} day${p.days === 1 ? '' : 's'}${p.ongoing ? ' <span class="oos-pill ongoing" style="margin-left:6px;">Ongoing</span>' : ''}</span></div>`).join('')}
         </div>
       </div>
     `).join('');
