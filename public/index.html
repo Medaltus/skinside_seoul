@@ -1059,6 +1059,30 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
   .asn-grid{grid-template-columns:1fr;}
   .asn-meta-form-grid{grid-template-columns:1fr;}
 }
+
+/* ══════════════════════ Reviews & Ratings (Amazon Sales) ══════════════════════
+   Ported from Vivian Valenty Skincare's "Reviews & Ratings" tab, 2026-09-02
+   per Jaclyn. One scrollable tab, all products stacked. */
+.review-section{margin-bottom:28px;}
+.review-hd{background:var(--navy);border-radius:8px 8px 0 0;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;color:#fff;}
+.review-hd-title{font-size:13px;font-weight:700;}
+.review-hd-right{display:flex;align-items:center;gap:14px;font-size:11px;color:rgba(255,255,255,.7);}
+.review-stars{color:#f5a623;letter-spacing:1px;}
+.review-avg{font-size:14px;font-weight:700;color:var(--green);}
+.review-avg-of{font-size:10px;color:rgba(255,255,255,.55);}
+.review-bars{background:var(--white);border:1px solid var(--border);border-top:none;padding:14px 18px;}
+.review-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.review-bar-row:last-child{margin-bottom:0;}
+.review-bar-label{width:26px;flex-shrink:0;font-size:11px;color:var(--muted);font-weight:600;}
+.review-bar-track{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;}
+.review-bar-fill{height:100%;background:var(--green);border-radius:4px;}
+.review-bar-count{width:32px;flex-shrink:0;font-size:11px;color:var(--muted);text-align:right;font-family:var(--mono);}
+.review-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:14px 18px;}
+.review-card{background:var(--bg);border-left:3px solid var(--green);border-radius:0 6px 6px 0;padding:14px 16px;}
+.review-card-stars{color:#f5a623;font-size:12px;letter-spacing:1px;margin-bottom:6px;}
+.review-card-title{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.review-card-text{font-size:11.5px;color:var(--muted);line-height:1.6;}
+.review-pending{color:var(--muted);font-size:12px;padding:20px;text-align:center;}
 </style>
 <link rel="icon" type="image/png" href="/favicon_skinside.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1581,6 +1605,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div class="channel-tabs">
         <button class="ch-tab active" onclick="showChannel('sales','s-overview',this)">Overview</button>
         <button class="ch-tab" onclick="showChannel('sales','s-amazon',this)">Amazon</button>
+        <button class="ch-tab" onclick="showChannel('sales','s-reviews',this)">Reviews</button>
         <!-- Walmart hidden from nav for now (coming later, per Jaclyn) — button
              removed from the tab bar, but the s-walmart page/JS below stays
              intact and ready to re-enable. Website removed entirely below,
@@ -1689,6 +1714,15 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
 
     <!-- Website channel removed entirely 2026-08-27 per Jaclyn — Skinside Seoul has no Website/DTC channel, unlike Skinuva/évolis. -->
+
+    <div class="channel-page" id="s-reviews">
+      <div class="page-hd" style="margin-bottom:16px;">
+        <div><div class="page-title" style="font-size:18px;">Reviews &amp; Ratings</div><div class="page-sub">Amazon customer reviews, curated monthly per product</div></div>
+      </div>
+      <div id="ssr-reviews-container">
+        <div class="review-pending">Loading…</div>
+      </div>
+    </div>
 
     <div class="channel-page" id="s-walmart">
       <div class="channel-hdr">
@@ -4890,6 +4924,7 @@ function showChannel(page, channelId, btn) {
     // own in-flight promise), so calling it again on repeat tab visits is
     // just a cheap early-return, not a duplicate fetch.
     if (channelId === 's-amazon')        initAmazonLive();
+    if (channelId === 's-reviews')       loadSalesReviews();
     if (channelId === 's-website')       initWebLive();
     if (channelId === 's-walmart')       initWalmartLive();
 
@@ -15655,6 +15690,137 @@ function fetchAmazonReviews() {
     return rows;
   })();
   return _amazonReviewsPromise;
+}
+
+/* ══════════════════════ Sales → Reviews & Ratings ══════════════════════
+   Ported from Vivian Valenty Skincare's "Reviews & Ratings" tab, 2026-09-02
+   per Jaclyn. Reuses fetchAmazonReviews() (already fetches
+   SHEET_AMAZON_REVIEWS for the Insights > Reviews tab) rather than a
+   second fetch of the same sheet — this is a different presentation of
+   the same data, not a different data source.
+
+   Gated on YEAR and MONTH columns the same way VVS's version is — on
+   VVS's sheet those didn't exist yet as of this port (proposed cols N/O,
+   2026-08-26) and the tab shows a clear "waiting on columns" state until
+   they're added and populated. NOT CONFIRMED whether Skinside Seoul's
+   own tab already has these columns — this degrades the same way if not.
+
+   Two different data scopes, deliberately not conflated (same as VVS):
+   - Overall stats (review count, average, star distribution) are computed
+     from EVERY row for a product, regardless of YEAR/MONTH.
+   - The featured review CARDS are only rows tagged with the target
+     YEAR/MONTH — the curated monthly sample.
+   Column names below (star_rating, review_title, review_text, product_name)
+   match VVS's sheet on the same shared spreadsheet file — NOT verified
+   against Skinside Seoul's actual tab headers. ssrFindKey() below does a
+   case-insensitive lookup so small naming differences (e.g. "rating" vs
+   "star_rating") won't silently break this — but an entirely different
+   column layout would still need a real check against live data. */
+function ssrEscapeHtml(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+function ssrStarsHtml(rating) {
+  const r = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+  return '★'.repeat(r) + '☆'.repeat(5 - r);
+}
+function ssrFindKey(row, name) {
+  const target = name.toLowerCase();
+  return Object.keys(row).find(k => k.toLowerCase() === target);
+}
+const SSR_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+let _ssrReviewsLoaded = false;
+async function loadSalesReviews() {
+  if (_ssrReviewsLoaded) return; // cheap no-op on repeat tab visits
+  _ssrReviewsLoaded = true;
+  const container = document.getElementById('ssr-reviews-container');
+  try {
+    const rows = await fetchAmazonReviews();
+    if (!rows.length) throw new Error('Empty sheet');
+
+    const yearKey = ssrFindKey(rows[0], 'year');
+    const monthKey = ssrFindKey(rows[0], 'month');
+    if (!yearKey || !monthKey) {
+      if (container) container.innerHTML = '<div class="review-pending">Waiting on YEAR and MONTH columns in the reviews sheet — once added and populated, this tab activates automatically.</div>';
+      return;
+    }
+    const nameKey = ssrFindKey(rows[0], 'product_name') || 'product_name';
+    const ratingKey = ssrFindKey(rows[0], 'star_rating') || ssrFindKey(rows[0], 'rating') || 'star_rating';
+    const titleKey = ssrFindKey(rows[0], 'review_title') || 'review_title';
+    const textKey = ssrFindKey(rows[0], 'review_text') || 'review_text';
+
+    // Target the last FULL month — reviews are tagged by month after the
+    // month closes, so the current (open) month never has tagged reviews
+    // yet. Same reasoning as VVS's version.
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const targetYear = String(lastMonth.getFullYear());
+    const targetMonth = String(lastMonth.getMonth() + 1); // 1-indexed
+
+    // All-time stats per product (count, average, 1-5 distribution).
+    const statsByProduct = {};
+    rows.forEach(r => {
+      const name = (r[nameKey] || '').trim();
+      if (!name) return;
+      const rating = Math.round(Number(r[ratingKey]) || 0);
+      if (!statsByProduct[name]) statsByProduct[name] = { count: 0, sum: 0, dist: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
+      const s = statsByProduct[name];
+      s.count++;
+      s.sum += (Number(r[ratingKey]) || 0);
+      if (rating >= 1 && rating <= 5) s.dist[rating]++;
+    });
+
+    // Featured (YEAR/MONTH-tagged) reviews for the target period, grouped
+    // by product, preserving sheet order.
+    const featuredByProduct = {};
+    const productOrder = [];
+    rows.forEach(r => {
+      if (String(r[yearKey] || '').trim() !== targetYear) return;
+      if (String(Number(r[monthKey]) || '') !== String(Number(targetMonth))) return;
+      const name = (r[nameKey] || '').trim();
+      if (!name) return;
+      if (!featuredByProduct[name]) { featuredByProduct[name] = []; productOrder.push(name); }
+      featuredByProduct[name].push(r);
+    });
+
+    if (!productOrder.length) {
+      if (container) container.innerHTML = `<div class="review-pending">No reviews tagged for ${SSR_MONTH_NAMES[Number(targetMonth) - 1]} ${targetYear} yet — tag rows in the sheet with YEAR=${targetYear} and MONTH=${targetMonth} to feature them here.</div>`;
+      return;
+    }
+
+    if (container) container.innerHTML = productOrder.map(name => {
+      const stats = statsByProduct[name] || { count: 0, sum: 0, dist: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
+      const avg = stats.count ? (stats.sum / stats.count) : 0;
+      const maxDist = Math.max(1, ...Object.values(stats.dist));
+      const barsHtml = [5, 4, 3, 2, 1].map(n => {
+        const c = stats.dist[n] || 0;
+        const pct = Math.round((c / maxDist) * 100);
+        return `<div class="review-bar-row"><div class="review-bar-label">${n}★</div><div class="review-bar-track"><div class="review-bar-fill" style="width:${pct}%"></div></div><div class="review-bar-count">${c}</div></div>`;
+      }).join('');
+      const cardsHtml = featuredByProduct[name].map(r => `
+        <div class="review-card">
+          <div class="review-card-stars">${ssrStarsHtml(r[ratingKey])}</div>
+          <div class="review-card-title">${ssrEscapeHtml((r[titleKey] || '').trim())}</div>
+          <div class="review-card-text">${ssrEscapeHtml((r[textKey] || '').trim())}</div>
+        </div>`).join('');
+      return `<div class="review-section">
+        <div class="review-hd">
+          <div class="review-hd-title">${ssrEscapeHtml(name)}</div>
+          <div class="review-hd-right">
+            <span>${stats.count.toLocaleString()} Reviews</span>
+            <span class="review-stars">${ssrStarsHtml(avg)}</span>
+            <span class="review-avg">${avg.toFixed(1)}<span class="review-avg-of"> /5</span></span>
+          </div>
+        </div>
+        <div class="review-bars">${barsHtml}</div>
+        <div class="review-cards">${cardsHtml}</div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    console.error('[Sales Reviews]', err);
+    _ssrReviewsLoaded = false; // allow retry
+    if (container) container.innerHTML = '<div class="review-pending">Could not load — ' + ssrEscapeHtml(err.message || '') + '</div>';
+  }
 }
 
 async function renderReviewsTab() {
