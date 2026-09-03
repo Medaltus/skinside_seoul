@@ -1200,7 +1200,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-amazon" checked style="margin:0;"> Amazon</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-reviews" checked style="margin:0;"> Reviews</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-momentum" checked style="margin:0;"> Brand Momentum</label>
-        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-website" style="margin:0;"> Website (Customer)</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-walmart" style="margin:0;"> Walmart</label>
         <!-- Marketing pages — Fulfillment & CS default UNCHECKED 2026-08-28
              per Jaclyn, same reasoning (Skinside Seoul doesn't use 3PL
@@ -2057,6 +2056,23 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
     <div class="channel-page" id="m-opportunities">
 
+      <div class="card" style="margin-bottom:18px;padding:12px 20px;">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <span style="font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;">Show sections:</span>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
+            <input type="checkbox" id="m-opp-cb-subsave" checked style="margin:0;"
+              onchange="(function(cb){var s=document.getElementById('m-opp-subsave-section');if(s)s.style.display=cb.checked?'':'none';})(this)">
+            Subscribe &amp; Save
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
+            <input type="checkbox" id="m-opp-cb-future" checked style="margin:0;"
+              onchange="(function(cb){var s=document.getElementById('m-opp-future-section');if(s)s.style.display=cb.checked?'':'none';})(this)">
+            Future Opportunities
+          </label>
+        </div>
+      </div>
+
+      <div id="m-opp-subsave-section">
       <div class="section-label">Subscribe &amp; Save</div>
       <div class="kpi-row" style="margin-bottom:20px;">
         <div class="kpi-card" id="kpi-active-subs"><div class="kpi-label">Active Subscriptions</div><div class="kpi-value" style="font-size:36px;">—</div><div class="kpi-mom flat">Loading…</div></div>
@@ -2069,7 +2085,9 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
         <div style="position:relative;height:320px;"><canvas id="chart-sns"></canvas></div>
       </div>
+      </div>
 
+      <div id="m-opp-future-section">
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
           <div style="display:inline-block;background:rgba(36,233,163,.12);border:1px solid rgba(36,233,163,.3);border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green);">Future Opportunities</div>
@@ -2098,6 +2116,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
         </div>
         <div id="opp-empty-state" style="display:none;color:var(--muted);font-size:12px;padding:8px 0;">No opportunities added yet — click Edit to add up to 4.</div>
+      </div>
       </div>
       <div class="insight-editor" id="opp-editor">
         <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Up to 4 opportunity cards. Leave a card's Title blank to leave it out of the report entirely. Subtitle is optional — if left blank, the body text sits directly under the title.</div>
@@ -21126,15 +21145,25 @@ async function loadAuditResultsFromSheet() {
   }
 
   function buildOpportunitiesPage(monthYear) {
+    // Show sections — added 2026-09-03 per Jaclyn, same "checkboxes on the
+    // live tab, read at PDF-build time" pattern as Brand Momentum. Primary
+    // driver: opting out of Subscribe & Save, whose chart-sns chart has a
+    // separately-flagged, unrelated data-source bug — this at least lets
+    // it be left out of exports while that gets sorted out.
+    const showSubsave = !!(document.getElementById('m-opp-cb-subsave') && document.getElementById('m-opp-cb-subsave').checked);
+    const showFuture  = !!(document.getElementById('m-opp-cb-future')  && document.getElementById('m-opp-cb-future').checked);
     const kpis = ['kpi-active-subs', 'kpi-retention'].map(pdfxKpi);
+    const subsaveHtml = showSubsave
+      ? '<div class="pdfx-chlabel">Subscribe &amp; Save</div>' +
+        '<div class="pdfx-kpis n2" style="margin-top:6px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
+        '<div class="pdfx-card"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>'
+      : '';
+    const futureHtml = showFuture ? pdfxFutureOpportunitiesBlock() : '';
     return '' +
       '<div class="pdfx-page">' +
         '<div class="pdfx-inner">' +
           pdfxHeaderBand(monthYear, 'Opportunities') +
-          '<div class="pdfx-chlabel">Subscribe &amp; Save</div>' +
-          '<div class="pdfx-kpis n2" style="margin-top:6px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
-          '<div class="pdfx-card"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>' +
-          pdfxFutureOpportunitiesBlock() +
+          subsaveHtml + futureHtml +
           pdfxFooter(monthYear) +
         '</div>' +
       '</div>';
@@ -21305,7 +21334,6 @@ async function loadAuditResultsFromSheet() {
         amazon:        !!document.getElementById('pdf-include-amazon')        && document.getElementById('pdf-include-amazon').checked,
         reviews:       !!document.getElementById('pdf-include-reviews')       && document.getElementById('pdf-include-reviews').checked,
         momentum:      !!document.getElementById('pdf-include-momentum')      && document.getElementById('pdf-include-momentum').checked,
-        website:       !!document.getElementById('pdf-include-website')       && document.getElementById('pdf-include-website').checked,
         walmart:       !!document.getElementById('pdf-include-walmart')       && document.getElementById('pdf-include-walmart').checked,
         fulfillment:   !!document.getElementById('pdf-include-fulfillment')   && document.getElementById('pdf-include-fulfillment').checked,
         stewardship:   !!document.getElementById('pdf-include-stewardship')   && document.getElementById('pdf-include-stewardship').checked,
@@ -21333,11 +21361,14 @@ async function loadAuditResultsFromSheet() {
         // directly) exist and window._ssMomentumData is populated, even
         // if the person exporting never opened this tab this session.
         (includeSections.momentum && typeof window.loadSkinsideMomentum === 'function') ? window.loadSkinsideMomentum() : null,
-        (includeSections.website       && typeof window.initWebLive === 'function')                ? window.initWebLive()                : null,
         (includeSections.walmart       && typeof window.initWalmartLive === 'function')            ? window.initWalmartLive()            : null,
         (includeSections.stewardship   && typeof window.initStewardshipLive === 'function')        ? window.initStewardshipLive()        : null,
         (includeSections.fulfillment   && typeof window.initMarketingFulfillmentCS === 'function')  ? window.initMarketingFulfillmentCS() : null,
-        (includeSections.opportunities && !window._snsChart && typeof initSns === 'function')       ? initSns()                           : null,
+        // Subscribe & Save sub-toggle checked here too — no point calling
+        // a (separately flagged as buggy) fetch for a section that's
+        // being excluded from this export anyway.
+        (includeSections.opportunities && !window._snsChart && typeof initSns === 'function'
+          && !!(document.getElementById('m-opp-cb-subsave') && document.getElementById('m-opp-cb-subsave').checked)) ? initSns() : null,
         // Prime Day's KPIs/chart are lazy-loaded on tab click — if it's
         // checked for inclusion but the tab was never opened this session,
         // this is what actually builds the chart before capture below.
@@ -21370,14 +21401,9 @@ async function loadAuditResultsFromSheet() {
         console.log('[pdf-export] forcing Walmart to Last Full Month for capture (was:', _pdfPriorWalmartPeriod, ')');
         window.renderWalmartPeriod('lastFull');
       }
-      // Same fix for Website — Customer tab only, since PDF export only
-      // ever reads Customer's element IDs (#web-hdr-date etc), never
-      // Physician/International/Samples.
-      _pdfPriorWebPeriod = (window._webActivePeriodByType && window._webActivePeriodByType.customer) || 'lastFull';
-      if (includeSections.website && typeof window.renderWebPeriod === 'function' && _pdfPriorWebPeriod !== 'lastFull') {
-        console.log('[pdf-export] forcing Website Customer to Last Full Month for capture (was:', _pdfPriorWebPeriod, ')');
-        window.renderWebPeriod('customer', 'lastFull');
-      }
+      // Website removed entirely from PDF export 2026-09-03 per Jaclyn —
+      // no Website channel exists for this brand at all, so there was
+      // never a real reason to force a period-switch here.
 
       // Defensive backstop only at this point — the real fix is the promise
       // caching above. Raised from 4s to 12s: 4s was tuned for "already
@@ -21392,7 +21418,13 @@ async function loadAuditResultsFromSheet() {
       };
       const expectedCharts = Object.keys(chartsBySection)
         .filter(sec => includeSections[sec])
-        .reduce((arr, sec) => arr.concat(chartsBySection[sec]), []);
+        .reduce((arr, sec) => arr.concat(chartsBySection[sec]), [])
+        // Subscribe & Save's own sub-toggle (separate from the overall
+        // Opportunities checkbox, added 2026-09-03) means _snsChart might
+        // be legitimately excluded even with Opportunities checked —
+        // don't waste up to 12s waiting on a chart that was never going
+        // to render because its section got unchecked.
+        .filter(v => v !== '_snsChart' || !!(document.getElementById('m-opp-cb-subsave') && document.getElementById('m-opp-cb-subsave').checked));
       const pollStart = Date.now();
       while (Date.now() - pollStart < 12000 && expectedCharts.some(v => !window[v])) {
         await new Promise(r => setTimeout(r, 150));
@@ -21424,7 +21456,6 @@ async function loadAuditResultsFromSheet() {
         includeSections.amazon        ? buildAmazonPage(monthYear)        : '',
         includeSections.reviews       ? buildReviewsPages(monthYear)      : '',
         includeSections.momentum      ? buildMomentumPages(monthYear)     : '',
-        includeSections.website       ? buildWebsitePage(monthYear)       : '',
         includeSections.walmart       ? buildWalmartPage(monthYear)       : '',
         includeSections.fulfillment   ? buildFulfillmentCsPage(monthYear) : '',
         includeSections.stewardship   ? buildStewardshipPage(monthYear)   : '',
@@ -21595,9 +21626,6 @@ async function loadAuditResultsFromSheet() {
       }
       if (includeSections.walmart && typeof window.renderWalmartPeriod === 'function' && _pdfPriorWalmartPeriod !== 'lastFull') {
         window.renderWalmartPeriod(_pdfPriorWalmartPeriod);
-      }
-      if (includeSections.website && typeof window.renderWebPeriod === 'function' && _pdfPriorWebPeriod !== 'lastFull') {
-        window.renderWebPeriod('customer', _pdfPriorWebPeriod);
       }
       if (btn) { btn.disabled = false; btn.classList.remove('pdfx-loading'); }
     } catch (err) {
