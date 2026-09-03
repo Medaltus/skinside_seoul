@@ -1191,6 +1191,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
              contract status is still being worked out) — checkboxes stay
              available so they're one click away once that's resolved. -->
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-amazon" checked style="margin:0;"> Amazon</label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-reviews" checked style="margin:0;"> Reviews</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-website" style="margin:0;"> Website (Customer)</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-walmart" style="margin:0;"> Walmart</label>
         <!-- Marketing pages — Fulfillment & CS default UNCHECKED 2026-08-28
@@ -20205,6 +20206,62 @@ async function loadAuditResultsFromSheet() {
     return full + ' ' + m[2];
   }
 
+  // Reviews & Ratings PDF data prep — mirrors loadSalesReviews()'s grouping
+  // logic (same YEAR/MONTH-gated featured-review pattern, same all-time
+  // stats scope) but builds plain data instead of live DOM, so
+  // buildReviewsPages() below can chunk it into pages synchronously.
+  // Deliberately a separate copy rather than refactoring loadSalesReviews()
+  // to share this — lower risk than touching already-working live-tab code.
+  let PDFX_REVIEWS_DATA = null; // { productOrder, statsByProduct, featuredByProduct } | 'no-data' | null (not yet run)
+  async function pdfxPrepareReviewsData() {
+    try {
+      const rows = await fetchAmazonReviews();
+      if (!rows.length) { PDFX_REVIEWS_DATA = 'no-data'; return; }
+      const yearKey = ssrFindKey(rows[0], 'year');
+      const monthKey = ssrFindKey(rows[0], 'month');
+      if (!yearKey || !monthKey) { PDFX_REVIEWS_DATA = 'no-data'; return; }
+      const nameKey = ssrFindKey(rows[0], 'product_name') || 'product_name';
+      const ratingKey = ssrFindKey(rows[0], 'star_rating') || ssrFindKey(rows[0], 'rating') || 'star_rating';
+      const titleKey = ssrFindKey(rows[0], 'review_title') || 'review_title';
+      const textKey = ssrFindKey(rows[0], 'review_text') || 'review_text';
+
+      const now = new Date();
+      const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const targetYear = String(lastMonth.getFullYear());
+      const targetMonth = String(lastMonth.getMonth() + 1);
+
+      const statsByProduct = {};
+      rows.forEach(r => {
+        const name = (r[nameKey] || '').trim();
+        if (!name) return;
+        const rating = Math.round(Number(r[ratingKey]) || 0);
+        if (!statsByProduct[name]) statsByProduct[name] = { count: 0, sum: 0, dist: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
+        const s = statsByProduct[name];
+        s.count++;
+        s.sum += (Number(r[ratingKey]) || 0);
+        if (rating >= 1 && rating <= 5) s.dist[rating]++;
+      });
+
+      const featuredByProduct = {};
+      const productOrder = [];
+      rows.forEach(r => {
+        if (String(r[yearKey] || '').trim() !== targetYear) return;
+        if (String(Number(r[monthKey]) || '') !== String(Number(targetMonth))) return;
+        const name = (r[nameKey] || '').trim();
+        if (!name) return;
+        if (!featuredByProduct[name]) { featuredByProduct[name] = []; productOrder.push(name); }
+        featuredByProduct[name].push({ rating: r[ratingKey], title: r[titleKey], text: r[textKey] });
+      });
+
+      PDFX_REVIEWS_DATA = productOrder.length
+        ? { productOrder, statsByProduct, featuredByProduct }
+        : 'no-data';
+    } catch (err) {
+      console.warn('[pdf-export] reviews data prep failed:', err.message);
+      PDFX_REVIEWS_DATA = 'no-data';
+    }
+  }
+
   function pdfxHeaderBand(monthYear, activeTab) {
     const tabs = ['Sales', 'Fulfillment & Customer Service', 'Brand Stewardship', 'Opportunities', 'Events'];
     const tabsHtml = tabs.map(function (t) {
@@ -20255,6 +20312,69 @@ async function loadAuditResultsFromSheet() {
           '</div>' +
         '</div>' +
       '</div>';
+  }
+
+  // Reviews & Ratings — 2 products' review content per PDF page, per
+  // Jaclyn 2026-09-02 (same reasoning as the debugging playbook's Case 6:
+  // stay well under the ~2112px rendered-height threshold rather than let
+  // one page grow tall and risk the whole-page distortion that threshold
+  // causes — a fixed 2-per-page budget is simpler and safer than trying
+  // to compute real rendered height per product ahead of capture). May
+  // produce zero, one, or several PDF pages depending on how many
+  // products have featured reviews this month — genuinely variable, not
+  // a fixed page count like every other section.
+  function pdfxReviewSectionHtml(name, stats, featured) {
+    const avg = stats.count ? (stats.sum / stats.count) : 0;
+    const maxDist = Math.max(1, ...Object.values(stats.dist));
+    const barsHtml = [5, 4, 3, 2, 1].map(n => {
+      const c = stats.dist[n] || 0;
+      const pct = Math.round((c / maxDist) * 100);
+      return '<div class="review-bar-row"><div class="review-bar-label">' + n + '\u2605</div><div class="review-bar-track"><div class="review-bar-fill" style="width:' + pct + '%"></div></div><div class="review-bar-count">' + c + '</div></div>';
+    }).join('');
+    const cardsHtml = featured.map(r =>
+      '<div class="review-card">' +
+        '<div class="review-card-stars">' + ssrStarsHtml(r.rating) + '</div>' +
+        '<div class="review-card-title">' + pdfxEscape((r.title || '').trim()) + '</div>' +
+        '<div class="review-card-text">' + pdfxEscape((r.text || '').trim()) + '</div>' +
+      '</div>').join('');
+    return '<div class="review-section">' +
+      '<div class="review-hd">' +
+        '<div class="review-hd-title">' + pdfxEscape(name) + '</div>' +
+        '<div class="review-hd-right">' +
+          '<span>' + stats.count.toLocaleString() + ' Reviews</span>' +
+          '<span class="review-stars">' + ssrStarsHtml(avg) + '</span>' +
+          '<span class="review-avg">' + avg.toFixed(1) + '<span class="review-avg-of"> /5</span></span>' +
+        '</div>' +
+      '</div>' +
+      '<div class="review-bars">' + barsHtml + '</div>' +
+      '<div class="review-cards">' + cardsHtml + '</div>' +
+    '</div>';
+  }
+
+  function buildReviewsPages(monthYear) {
+    if (!PDFX_REVIEWS_DATA || PDFX_REVIEWS_DATA === 'no-data') {
+      return '<div class="pdfx-page"><div class="pdfx-inner">' +
+        pdfxHeaderBand(monthYear, 'Sales') +
+        '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
+        '<div class="pdfx-card" style="color:var(--muted);">No reviews tagged for this period yet.</div>' +
+        pdfxFooter(monthYear) +
+        '</div></div>';
+    }
+    const { productOrder, statsByProduct, featuredByProduct } = PDFX_REVIEWS_DATA;
+    const pages = [];
+    for (let i = 0; i < productOrder.length; i += 2) {
+      const namesThisPage = productOrder.slice(i, i + 2);
+      const sectionsHtml = namesThisPage.map(name =>
+        pdfxReviewSectionHtml(name, statsByProduct[name] || { count: 0, sum: 0, dist: {} }, featuredByProduct[name] || [])
+      ).join('');
+      pages.push('<div class="pdfx-page"><div class="pdfx-inner">' +
+        pdfxHeaderBand(monthYear, 'Sales') +
+        '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
+        sectionsHtml +
+        pdfxFooter(monthYear) +
+        '</div></div>');
+    }
+    return pages.join('');
   }
 
   function buildAmazonPage(monthYear) {
@@ -20664,6 +20784,7 @@ async function loadAuditResultsFromSheet() {
       // behavior; Events keys still default unchecked, unchanged.
       const includeSections = {
         amazon:        !!document.getElementById('pdf-include-amazon')        && document.getElementById('pdf-include-amazon').checked,
+        reviews:       !!document.getElementById('pdf-include-reviews')       && document.getElementById('pdf-include-reviews').checked,
         website:       !!document.getElementById('pdf-include-website')       && document.getElementById('pdf-include-website').checked,
         walmart:       !!document.getElementById('pdf-include-walmart')       && document.getElementById('pdf-include-walmart').checked,
         fulfillment:   !!document.getElementById('pdf-include-fulfillment')   && document.getElementById('pdf-include-fulfillment').checked,
@@ -20681,6 +20802,12 @@ async function loadAuditResultsFromSheet() {
         // these ran unconditionally on every export regardless of what was
         // actually going into the PDF.
         (includeSections.amazon        && typeof window.initAmazonLive === 'function')            ? window.initAmazonLive()            : null,
+        // Reviews — pre-fetches + groups the same review data the live
+        // Sales > Reviews tab uses, into PDFX_REVIEWS_DATA, so
+        // buildReviewsPages() below can build its (possibly multi-page)
+        // output synchronously rather than needing the live tab to have
+        // been opened first this session.
+        (includeSections.reviews) ? pdfxPrepareReviewsData() : null,
         (includeSections.website       && typeof window.initWebLive === 'function')                ? window.initWebLive()                : null,
         (includeSections.walmart       && typeof window.initWalmartLive === 'function')            ? window.initWalmartLive()            : null,
         (includeSections.stewardship   && typeof window.initStewardshipLive === 'function')        ? window.initStewardshipLive()        : null,
@@ -20770,6 +20897,7 @@ async function loadAuditResultsFromSheet() {
       // checkbox pattern as the 5 event pages below.
       const salesMarketingPages = [
         includeSections.amazon        ? buildAmazonPage(monthYear)        : '',
+        includeSections.reviews       ? buildReviewsPages(monthYear)      : '',
         includeSections.website       ? buildWebsitePage(monthYear)       : '',
         includeSections.walmart       ? buildWalmartPage(monthYear)       : '',
         includeSections.fulfillment   ? buildFulfillmentCsPage(monthYear) : '',
@@ -20903,9 +21031,19 @@ async function loadAuditResultsFromSheet() {
         // not noise, that's this. ignoreElements tells html2canvas to skip
         // every live-dashboard canvas entirely — it only ever needs to see
         // our own <img>-only #pdfx-root content anyway. Confirmed 2026-07-14.
+        // windowWidth/windowHeight — added 2026-09-02, applying the PDF
+        // export debugging playbook's "off-screen element mis-measurement"
+        // guidance to the tee: #pdfx-root sits at left:-99999px during
+        // capture (a few lines up), and html2canvas doesn't reliably
+        // measure off-screen-positioned elements on its own without being
+        // told the real dimensions explicitly. Matters most for Reviews,
+        // whose page count (and therefore each page's real content) is
+        // genuinely variable rather than fixed like every other section.
         const canvas = await html2canvas(el, {
           scale: 2,
           backgroundColor: '#ffffff',
+          windowWidth: el.scrollWidth,
+          windowHeight: el.scrollHeight,
           ignoreElements: (node) => node.tagName === 'CANVAS' && !node.closest('#pdfx-root')
         });
         console.log('[pdf-export] page', i + 1, 'canvas size:', canvas.width, 'x', canvas.height);
