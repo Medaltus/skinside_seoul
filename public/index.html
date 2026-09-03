@@ -1083,6 +1083,13 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .review-card-title{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;}
 .review-card-text{font-size:11.5px;color:var(--muted);line-height:1.6;}
 .review-pending{color:var(--muted);font-size:12px;padding:20px;text-align:center;}
+.momentum-pending{color:var(--muted);font-size:12px;padding:12px 0;}
+.momentum-warn-box{padding:12px 16px;background:rgba(200,125,47,.08);border:1px solid rgba(200,125,47,.2);border-radius:var(--radius-sm);font-size:12px;color:var(--navy);line-height:1.6;}
+/* Momentum PDF KPI cards need a variable column count (3/7/7/7 depending
+   on section) — .pdfx-kpis is fixed to 5 columns, so this is a separate,
+   auto-fit variant reusing the same .pdfx-kpi/.pdfx-kpi-lbl/.pdfx-kpi-val
+   card markup rather than a new card style. */
+.pdfx-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0;margin-bottom:14px;}
 </style>
 <link rel="icon" type="image/png" href="/favicon_skinside.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -1192,6 +1199,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
              available so they're one click away once that's resolved. -->
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-amazon" checked style="margin:0;"> Amazon</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-reviews" checked style="margin:0;"> Reviews</label>
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-momentum" checked style="margin:0;"> Brand Momentum</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-website" style="margin:0;"> Website (Customer)</label>
         <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-walmart" style="margin:0;"> Walmart</label>
         <!-- Marketing pages — Fulfillment & CS default UNCHECKED 2026-08-28
@@ -1607,6 +1615,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <button class="ch-tab active" onclick="showChannel('sales','s-overview',this)">Overview</button>
         <button class="ch-tab" onclick="showChannel('sales','s-amazon',this)">Amazon</button>
         <button class="ch-tab" onclick="showChannel('sales','s-reviews',this)">Reviews</button>
+        <button class="ch-tab" onclick="showChannel('sales','s-momentum',this)">Brand Momentum</button>
         <!-- Walmart hidden from nav for now (coming later, per Jaclyn) — button
              removed from the tab bar, but the s-walmart page/JS below stays
              intact and ready to re-enable. Website removed entirely below,
@@ -1723,6 +1732,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div id="ssr-reviews-container">
         <div class="review-pending">Loading…</div>
       </div>
+    </div>
+
+    <div class="channel-page" id="s-momentum">
+      <div class="momentum-pending">Loading…</div>
     </div>
 
     <div class="channel-page" id="s-walmart">
@@ -4926,6 +4939,7 @@ function showChannel(page, channelId, btn) {
     // just a cheap early-return, not a duplicate fetch.
     if (channelId === 's-amazon')        initAmazonLive();
     if (channelId === 's-reviews')       loadSalesReviews();
+    if (channelId === 's-momentum')      loadSkinsideMomentum();
     if (channelId === 's-website')       initWebLive();
     if (channelId === 's-walmart')       initWalmartLive();
 
@@ -15824,6 +15838,355 @@ async function loadSalesReviews() {
   }
 }
 
+/* ══════════════════════ Sales → Brand Momentum ══════════════════════
+   Ported from Vivian Valenty Skincare's "Brand Momentum" tab, 2026-09-03
+   per Jaclyn. Real adaptations, not a straight copy:
+   - VVS's ASIN map used their own "1.1 Cleanse"/"2.1 Refine" routine-step
+     naming convention — that's VVS's own brand storytelling, not
+     established anywhere for Skinside Seoul, so this just uses real
+     product names instead.
+   - VVS's live-tab Review Velocity card had a hardcoded competitive
+     paragraph naming TATCHA and GOONGBE with specific review counts —
+     that's VVS's own researched claims about VVS's own competitors.
+     Dropped entirely rather than copied — Skinside Seoul has real
+     competitive intel for SSS0004 specifically (COSRX benchmark, from
+     the launch notes) but not a verified, current number for every
+     product, so no fabricated comparison replaces it.
+   - Data source mapping to what's actually confirmed populated for this
+     brand: Business Report (Sessions) has real data.  Keyword Tracker
+     (organic rank) does NOT have a gid yet — degrades to the same
+     "not accessible" state VVS's own tab shows when its sheet fails.
+     Subcategory BSR: VVS's source was a "Summary" tab on the same file
+     as their Keyword Tracker — Skinside Seoul doesn't have an equivalent
+     confirmed sheet, so this is a BEST-GUESS mapping to
+     SHEET_STEWARDSHIP_SUMMARY (closest "brand health" sheet that's
+     actually populated) — NOT verified to have subcategory_bsr columns.
+     If it doesn't, this section just shows "No data" per product
+     (already handled defensively below), not an error. */
+const SS_MOMENTUM_ASIN_MAP = {
+  'B0H84G67MF': 'Heartleaf Foaming Cleanser',
+  'B0H84HF6CQ': 'Spicule Serum',
+  'B0H847QS86': 'Vitamin C Serum',
+  'B0H8462KTR': '96% Snail Mucin Essence',
+  'B0H84CM6M7': '92% Snail Cream',
+  'B0H846SWCQ': 'Vitamin C Capsule Cream',
+  'B0H845DQTW': 'Biocellulose Coconut Gel Mask',
+};
+
+function ssMoStars(avg) {
+  const full = Math.floor(avg); const half = (avg - full) >= 0.5;
+  const empty = 5 - full - (half ? 1 : 0);
+  return `<span style="color:#f5a623">${'★'.repeat(full)}</span>`
+       + (half ? `<span style="color:#f5a623">½</span>` : '')
+       + `<span style="color:var(--border2)">${'☆'.repeat(empty)}</span>`;
+}
+
+async function ssFetchCsvRows(url) {
+  const text = await fetch(url).then(r => r.ok ? r.text() : '').catch(() => '');
+  return parseCsvToRows(text);
+}
+
+function buildMomentumHTML({ skuSessions, latestMoName, totalLatest, totalPct, momPct,
+    rankedKws, kwColsFound, kwFetchError, bsrData, revProducts, totalReviews, avgRating }) {
+
+  const momStr = momPct != null ? `${momPct > 0 ? '+' : ''}${momPct}%` : '—';
+  const momCls = momPct > 0 ? 'up' : momPct < 0 ? 'dn' : 'flat';
+  const kwCount = rankedKws.length;
+  const kwUpCount = rankedKws.filter(k => k.change > 0).length;
+
+  const cbLabel = (id, label) =>
+    `<label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">` +
+    `<input type="checkbox" id="${id}" checked style="margin:0;"` +
+    ` onchange="(function(cb){var s=document.getElementById('${id}-section');if(s)s.style.display=cb.checked?'':'none';})(this)">` +
+    ` ${label}</label>`;
+  const checkboxRow = `<div class="card" style="margin-bottom:18px;padding:12px 20px;">
+    <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <span style="font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;">Show sections:</span>
+      ${cbLabel('ss-mo-cb-sessions', 'Sessions')}
+      ${cbLabel('ss-mo-cb-keywords', 'Keyword Rankings')}
+      ${cbLabel('ss-mo-cb-bsr', 'Subcategory BSR')}
+      ${cbLabel('ss-mo-cb-reviews', 'Review Velocity')}
+      ${cbLabel('ss-mo-cb-next', "What We're Tracking")}
+    </div>
+  </div>`;
+
+  const top3 = `<div class="kpi-row" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+    <div class="kpi-card">
+      <div class="kpi-label">Reviews collected</div>
+      <div class="kpi-value">${totalReviews}</div>
+      <div class="kpi-mom up">${avgRating.toFixed(1)}★ avg across ${Object.keys(SS_MOMENTUM_ASIN_MAP).length} SKUs</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Keywords with organic rank</div>
+      <div class="kpi-value">${kwCount || '—'}</div>
+      <div class="kpi-mom ${kwCount > 0 ? 'up' : 'flat'}">${kwCount > 0 ? `${kwUpCount} improving rank` : 'Tracker data pending'}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Sessions</div>
+      <div class="kpi-value">${totalLatest}</div>
+      <div class="kpi-mom ${momCls}">${momStr} MoM</div>
+    </div>
+  </div>`;
+
+  const skuCards = skuSessions.map(({ name, latest, pct }) => {
+    const pctStr = pct != null ? `${pct > 0 ? '▲' : '▼'} ${Math.abs(pct)}% vs launch` : 'New SKU';
+    const cls = pct != null ? (pct > 0 ? 'up' : 'dn') : 'flat';
+    return `<div class="kpi-card">
+      <div class="kpi-label">${ssrEscapeHtml(name)}</div>
+      <div class="kpi-value" style="font-size:22px;">${latest !== undefined ? latest : '—'}</div>
+      <div class="kpi-mom ${cls}">${pctStr}</div>
+    </div>`;
+  }).join('');
+  const skuSection = `<div id="ss-mo-cb-sessions-section" class="card" style="margin-bottom:18px;">
+    <div class="card-title">Sessions by Product</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px;">Session growth since launch.</div>
+    <div class="kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));">${skuCards}</div>
+  </div>`;
+
+  let kwBody;
+  if (kwFetchError) {
+    kwBody = `<div class="momentum-warn-box"><strong>Keyword tracker sheet not accessible yet.</strong> SHEET_KEYWORD_TRACKER has no gid configured for Skinside Seoul yet — this activates once that's set up.</div>`;
+  } else if (!rankedKws.length) {
+    kwBody = `<div class="momentum-pending">No ranked keyword data found. Columns detected: ${ssrEscapeHtml((kwColsFound || []).join(', ')) || 'none'}.</div>`;
+  } else {
+    const hasVol = rankedKws.some(k => k.vol);
+    const rows = rankedKws.slice(0, 20).map(({ kw, rank, change, vol, prod }) => {
+      const chStr = change != null ? (change > 0 ? `▲ +${change}` : change < 0 ? `▼ ${Math.abs(change)}` : '') : '';
+      const chCls = change > 0 ? 'color:var(--success)' : change < 0 ? 'color:var(--danger)' : 'color:var(--muted)';
+      return `<tr>
+        <td style="font-weight:600;">${ssrEscapeHtml(kw)}</td>
+        <td style="color:var(--muted);font-weight:400;">${ssrEscapeHtml(prod)}</td>
+        <td style="font-weight:700;">#${rank}${chStr ? ` <span style="${chCls};font-size:11px;font-weight:600;">${chStr}</span>` : ''}</td>
+        ${hasVol ? `<td style="color:var(--muted);font-weight:400;">${vol ? vol.toLocaleString() : '—'}</td>` : ''}
+      </tr>`;
+    }).join('');
+    kwBody = `<table class="data-table" style="width:100%;"><thead><tr>
+      <th>Keyword</th><th>Product</th><th>Organic Rank</th>${hasVol ? '<th>Search Volume</th>' : ''}
+    </tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  const kwSection = `<div id="ss-mo-cb-keywords-section" class="card" style="margin-bottom:18px;">
+    <div class="card-title">Targeted Keyword Indexing Progress</div>
+    <div style="font-size:11px;color:var(--muted);margin-top:-8px;margin-bottom:14px;">Organic rankings signal algorithm traction — new brands typically take 3–12 months to index.</div>${kwBody}
+  </div>`;
+
+  const bsrCards = Object.keys(SS_MOMENTUM_ASIN_MAP).map(asin => {
+    const name = SS_MOMENTUM_ASIN_MAP[asin];
+    const d = bsrData ? bsrData[asin] : null;
+    if (!d || !d.latest) return `<div class="kpi-card"><div class="kpi-label">${ssrEscapeHtml(name)}</div><div class="kpi-value" style="font-size:22px;">—</div><div class="kpi-mom flat">No data</div></div>`;
+    const { latest, earliest, subcat } = d;
+    const change = (earliest.date !== latest.date) ? (earliest.bsr - latest.bsr) : null;
+    const chStr = change != null && change !== 0 ? (change > 0 ? `▲ ${Math.abs(change).toLocaleString()}` : `▼ ${Math.abs(change).toLocaleString()}`) : null;
+    const chCls = change > 0 ? 'up' : change < 0 ? 'dn' : 'flat';
+    return `<div class="kpi-card">
+      <div class="kpi-label">${ssrEscapeHtml(name)}</div>
+      <div class="kpi-value" style="font-size:22px;">#${latest.bsr.toLocaleString()}</div>
+      <div class="kpi-mom ${chCls}">${chStr || '—'}${subcat ? ` <span style="font-size:9px;font-weight:400;color:var(--muted);">· ${ssrEscapeHtml(subcat)}</span>` : ''}</div>
+    </div>`;
+  }).join('');
+  const bsrSection = `<div id="ss-mo-cb-bsr-section" class="card" style="margin-bottom:18px;">
+    <div class="card-title">Subcategory BSR by Product</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Best Sellers Rank within each product's subcategory — lower is better. Change reflects total movement since first recorded.</div>
+    <div class="kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));">${bsrCards}</div>
+  </div>`;
+
+  const revCards = revProducts.map(({ name, count, avg }) => `<div class="kpi-card">
+    <div class="kpi-label">${ssrEscapeHtml(name)}</div>
+    <div class="kpi-value" style="font-size:22px;">${count}</div>
+    <div class="kpi-mom up">${ssMoStars(avg)} ${avg.toFixed(1)}</div>
+  </div>`).join('');
+  const revSection = `<div id="ss-mo-cb-reviews-section" class="card" style="margin-bottom:18px;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:4px;">
+      <div class="card-title" style="margin-bottom:0;">Review Velocity &amp; Quality</div>
+      <span style="font-size:11px;color:var(--muted);">${totalReviews} total · ${avgRating.toFixed(1)}★ avg</span>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">All-time review count and average rating per product.</div>
+    <div class="kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));">${revCards}</div>
+  </div>`;
+
+  const nextSection = `<div id="ss-mo-cb-next-section" class="card" style="background:var(--navy);border-color:var(--navy);">
+    <div class="card-title" style="color:var(--green);margin-bottom:16px;">What We're Tracking Next</div>
+    <div class="insight-grid" style="grid-template-columns:repeat(3,1fr);">
+      <div class="opp-card" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);">
+        <div class="opp-card-title" style="color:var(--green);">Keyword Rank Movement</div>
+        <div class="opp-card-body" style="color:rgba(255,255,255,0.65);">Weekly snapshots show which terms are climbing toward page 1 and where to activate PPC for maximum rank acceleration.</div>
+      </div>
+      <div class="opp-card" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);">
+        <div class="opp-card-title" style="color:var(--green);">Review Velocity</div>
+        <div class="opp-card-body" style="color:rgba(255,255,255,0.65);">50+ reviews is the milestone where conversion rates reliably improve. We track month-over-month review count per SKU to measure progress toward that threshold across the line.</div>
+      </div>
+      <div class="opp-card" style="background:rgba(255,255,255,0.07);border-color:rgba(255,255,255,0.12);">
+        <div class="opp-card-title" style="color:var(--green);">Session Trends</div>
+        <div class="opp-card-body" style="color:rgba(255,255,255,0.65);">Organic session growth is the clearest signal that the catalog is gaining discoverability. We track month-over-month changes per SKU to identify which products are building momentum and where to focus next.</div>
+      </div>
+    </div>
+  </div>`;
+
+  return checkboxRow + top3 + skuSection + kwSection + bsrSection + revSection + nextSection;
+}
+
+async function loadSkinsideMomentum() {
+  if (window._ssMomentumLoaded) return;
+  window._ssMomentumLoaded = true;
+  const container = document.getElementById('s-momentum');
+  try {
+    const bizRows = await ssFetchCsvRows(ovCsvUrl(window.SHEET_CFG.SHEET_BUSINESS_REPORT.fileId, window.SHEET_CFG.SHEET_BUSINESS_REPORT.gid));
+
+    let kwRows = [], kwFetchError = null;
+    if (window.SHEET_CFG.SHEET_KEYWORD_TRACKER && window.SHEET_CFG.SHEET_KEYWORD_TRACKER.gid) {
+      try { kwRows = await ssFetchCsvRows(ovCsvUrl(window.SHEET_CFG.SHEET_KEYWORD_TRACKER.fileId, window.SHEET_CFG.SHEET_KEYWORD_TRACKER.gid)); }
+      catch (kwErr) { kwFetchError = kwErr.message || 'Failed to fetch'; }
+    } else {
+      kwFetchError = 'SHEET_KEYWORD_TRACKER has no gid configured yet';
+    }
+
+    // BEST-GUESS mapping — see file header comment above. Empty gid guard
+    // means this just never fetches (graceful "No data" per product)
+    // rather than erroring if the guess is wrong.
+    let summaryRows = [];
+    try {
+      if (window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY && window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.gid) {
+        summaryRows = await ssFetchCsvRows(ovCsvUrl(window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.fileId, window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.gid));
+      }
+    } catch (sumErr) { console.warn('[Momentum] Summary/BSR source unavailable:', sumErr.message); }
+
+    const reviewRows = await fetchAmazonReviews();
+
+    // ── Sessions ──────────────────────────────────────────────────────
+    const monthKey = ssrFindKey(bizRows[0] || {}, 'month');
+    const yearKey = ssrFindKey(bizRows[0] || {}, 'year');
+    const asinKey = ssrFindKey(bizRows[0] || {}, 'asin');
+    const sessKey = ssrFindKey(bizRows[0] || {}, 'sessions');
+
+    const sessByAsin = {};
+    bizRows.forEach(r => {
+      const asin = (r[asinKey] || '').trim().toUpperCase();
+      const mo = parseInt(r[monthKey] || 0, 10);
+      const yr = parseInt(r[yearKey] || 0, 10);
+      const sess = parseInt(r[sessKey] || 0, 10);
+      if (!asin || !mo || !yr) return;
+      if (!sessByAsin[asin]) sessByAsin[asin] = {};
+      sessByAsin[asin][`${yr}-${mo}`] = sess;
+    });
+
+    const now = new Date();
+    const latestMo = now.getMonth() || 12;
+    const latestYr = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
+    const MONTH_NAMES = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const latestMoName = MONTH_NAMES[latestMo] || 'Last Month';
+    const latestKey = `${latestYr}-${latestMo}`;
+
+    const skuSessions = Object.keys(SS_MOMENTUM_ASIN_MAP).map(asin => {
+      const d = sessByAsin[asin] || {};
+      const allKeys = Object.keys(d).sort();
+      const baseKey = allKeys.length ? allKeys[0] : null;
+      const earliest = baseKey !== null ? d[baseKey] : undefined;
+      const latest = d[latestKey];
+      const pct = (earliest !== undefined && earliest > 0 && latest !== undefined)
+        ? Math.round(((latest - earliest) / earliest) * 100) : null;
+      return { asin, name: SS_MOMENTUM_ASIN_MAP[asin], earliest, latest, pct };
+    });
+    const totalEarliest = skuSessions.reduce((s, d) => s + (d.earliest !== undefined ? d.earliest : 0), 0);
+    const totalLatest = skuSessions.reduce((s, d) => s + (d.latest !== undefined ? d.latest : 0), 0);
+    const totalPct = totalEarliest ? Math.round(((totalLatest - totalEarliest) / totalEarliest) * 100) : null;
+
+    let prevMo = latestMo - 1, prevYr = latestYr;
+    if (prevMo === 0) { prevMo = 12; prevYr--; }
+    const prevKey = `${prevYr}-${prevMo}`;
+    const totalPrevMo = Object.keys(SS_MOMENTUM_ASIN_MAP).reduce((s, asin) => s + ((sessByAsin[asin] || {})[prevKey] || 0), 0);
+    const momPct = totalPrevMo ? Math.round(((totalLatest - totalPrevMo) / totalPrevMo) * 100) : null;
+
+    // ── Keywords ──────────────────────────────────────────────────────
+    const kwColsFound = kwRows[0] ? Object.keys(kwRows[0]) : [];
+    function kwFindCol(row, ...names) { for (const n of names) { const k = ssrFindKey(row, n); if (k) return k; } return null; }
+    const sample = kwRows[0] || {};
+    const kwCol = kwFindCol(sample, 'keyword', 'search term', 'phrase', 'term');
+    const rankCol = kwFindCol(sample, 'organic_rank', 'organic rank', 'rank', 'position');
+    const volCol = kwFindCol(sample, 'search_volume', 'search volume', 'volume');
+    const kwAsinCol = kwFindCol(sample, 'asin', 'product asin');
+    const dateCol = kwFindCol(sample, 'date', 'last_synced', 'last synced');
+
+    const SS_ASINS = new Set(Object.keys(SS_MOMENTUM_ASIN_MAP));
+    const kwByKey = {};
+    kwRows.forEach(r => {
+      const asin = kwAsinCol ? (r[kwAsinCol] || '').trim().toUpperCase() : '';
+      if (!asin || !SS_ASINS.has(asin)) return;
+      const kw = kwCol ? (r[kwCol] || '').trim() : '';
+      if (!kw) return;
+      const rank = parseInt(r[rankCol] || '', 10);
+      const vol = parseInt((r[volCol] || '').replace(/,/g, ''), 10);
+      const dateStr = dateCol ? (r[dateCol] || '') : '';
+      const key = asin + '|||' + kw;
+      if (!kwByKey[key]) kwByKey[key] = { kw, asin, vol: null, entries: [] };
+      kwByKey[key].entries.push({ date: dateStr, rank: (!isNaN(rank) && rank > 0) ? rank : null });
+      if (!isNaN(vol) && vol > 0) kwByKey[key].vol = vol;
+    });
+
+    const rankedKws = Object.values(kwByKey)
+      .filter(({ entries }) => {
+        if (!entries.length) return false;
+        entries.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+        return entries[entries.length - 1].rank !== null;
+      })
+      .map(({ kw, asin, vol, entries }) => {
+        entries.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+        const latestEntry = entries[entries.length - 1];
+        const rankedEntries = entries.filter(e => e.rank !== null);
+        const worstRank = rankedEntries.length > 1 ? Math.max(...rankedEntries.map(e => e.rank)) : null;
+        const change = (worstRank !== null && worstRank !== latestEntry.rank) ? (worstRank - latestEntry.rank) : null;
+        return { kw, rank: latestEntry.rank, change, vol, prod: SS_MOMENTUM_ASIN_MAP[asin] || asin };
+      })
+      .sort((a, b) => a.rank - b.rank);
+
+    // ── Subcategory BSR (best-guess source — see header comment) ────────
+    const bsrAsinCol = ssrFindKey(summaryRows[0] || {}, 'asin');
+    const bsrDateCol = ssrFindKey(summaryRows[0] || {}, 'date');
+    const bsrValCol = ssrFindKey(summaryRows[0] || {}, 'subcategory_bsr');
+    const bsrSubcatCol = ssrFindKey(summaryRows[0] || {}, 'subcategory');
+    const bsrByAsin = {};
+    summaryRows.forEach(r => {
+      const asin = bsrAsinCol ? (r[bsrAsinCol] || '').trim().toUpperCase() : '';
+      if (!asin || !SS_ASINS.has(asin)) return;
+      const bsr = parseInt((r[bsrValCol] || '').replace(/,/g, ''), 10);
+      if (isNaN(bsr) || bsr <= 0) return;
+      const dateStr = bsrDateCol ? (r[bsrDateCol] || '') : '';
+      const subcat = bsrSubcatCol ? (r[bsrSubcatCol] || '').trim() : '';
+      if (!bsrByAsin[asin]) bsrByAsin[asin] = { entries: [], subcat };
+      bsrByAsin[asin].entries.push({ date: dateStr, bsr });
+      if (subcat) bsrByAsin[asin].subcat = subcat;
+    });
+    const bsrData = {};
+    Object.entries(bsrByAsin).forEach(([asin, { entries, subcat }]) => {
+      entries.sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+      bsrData[asin] = { latest: entries[entries.length - 1], earliest: entries[0], subcat };
+    });
+
+    // ── Reviews (reuse cache) ────────────────────────────────────────
+    const rNameKey = ssrFindKey(reviewRows[0] || {}, 'product_name') || 'product_name';
+    const rRatKey = ssrFindKey(reviewRows[0] || {}, 'star_rating') || ssrFindKey(reviewRows[0] || {}, 'rating') || 'star_rating';
+    const revByP = {};
+    reviewRows.forEach(r => {
+      const name = (r[rNameKey] || '').trim(); const rat = parseFloat(r[rRatKey] || 0) || 0;
+      if (!name) return;
+      if (!revByP[name]) revByP[name] = { count: 0, sum: 0 };
+      revByP[name].count++; revByP[name].sum += rat;
+    });
+    const revProducts = Object.entries(revByP).map(([name, { count, sum }]) => ({ name, count, avg: count ? sum / count : 0 })).sort((a, b) => b.count - a.count);
+    const totalReviews = revProducts.reduce((s, p) => s + p.count, 0);
+    const avgRating = totalReviews ? revProducts.reduce((s, p) => s + p.avg * p.count, 0) / totalReviews : 0;
+
+    window._ssMomentumData = { skuSessions, latestMoName, totalLatest, totalPct, momPct, rankedKws, bsrData, revProducts, totalReviews, avgRating };
+
+    container.innerHTML = buildMomentumHTML({
+      skuSessions, latestMoName, totalLatest, totalPct, momPct,
+      rankedKws, kwColsFound, kwFetchError, bsrData, revProducts, totalReviews, avgRating,
+    });
+  } catch (err) {
+    console.error('[Momentum]', err);
+    window._ssMomentumLoaded = false;
+    if (container) container.innerHTML = '<div class="momentum-pending">Could not load — ' + ssrEscapeHtml(err.message || '') + '</div>';
+  }
+}
+
 async function renderReviewsTab() {
   try {
     const allReviews = await fetchAmazonReviews();
@@ -20382,6 +20745,97 @@ async function loadAuditResultsFromSheet() {
     return pages.join('');
   }
 
+  // Brand Momentum — 2 pages, each section gated by the SAME checkboxes
+  // shown on the live tab (ss-mo-cb-*), same "respect what's toggled off
+  // live" pattern as everywhere else in this export. Page 1: top-3 KPIs +
+  // Sessions + Keyword Indexing. Page 2: Subcategory BSR + Review
+  // Velocity + What We're Tracking Next.
+  function buildMomentumPages(monthYear) {
+    const d = window._ssMomentumData;
+    if (!d) return '';
+    const mch = id => { const el = document.getElementById(id); return !!(el && el.checked); };
+    const show = {
+      sessions: mch('ss-mo-cb-sessions'), keywords: mch('ss-mo-cb-keywords'),
+      bsr: mch('ss-mo-cb-bsr'), reviews: mch('ss-mo-cb-reviews'), next: mch('ss-mo-cb-next'),
+    };
+    const { skuSessions, latestMoName, totalLatest, momPct, rankedKws, bsrData, revProducts, totalReviews, avgRating } = d;
+    const momStr = momPct != null ? `${momPct > 0 ? '+' : ''}${momPct}% MoM` : '—';
+    const momCls = momPct > 0 ? 'up' : momPct < 0 ? 'dn' : 'flat';
+    const kwCount = rankedKws.length;
+    const kwUpCount = rankedKws.filter(k => k.change > 0).length;
+
+    const top3Html = '<div class="pdfx-kpi-row">' + [
+      { label: 'Reviews Collected', value: String(totalReviews), mom: `${avgRating.toFixed(1)}★ avg`, momClass: 'up' },
+      { label: 'Keywords with Organic Rank', value: kwCount ? String(kwCount) : '—', mom: kwCount > 0 ? `${kwUpCount} improving` : 'Pending', momClass: kwCount > 0 ? 'up' : 'flat' },
+      { label: `Sessions (${latestMoName})`, value: String(totalLatest), mom: momStr, momClass: momCls },
+    ].map(pdfxKpiCardHtml).join('') + '</div>';
+
+    let sessHtml = '';
+    if (show.sessions) {
+      const cards = skuSessions.map(({ name, latest, pct }) => ({
+        label: name, value: latest !== undefined ? String(latest) : '—',
+        mom: pct != null ? `${pct > 0 ? '▲' : '▼'} ${Math.abs(pct)}% vs launch` : 'New SKU',
+        momClass: pct > 0 ? 'up' : pct < 0 ? 'dn' : 'flat',
+      })).map(pdfxKpiCardHtml).join('');
+      sessHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Sessions by Product</div><div class="pdfx-kpi-row">' + cards + '</div>';
+    }
+
+    let kwHtml = '';
+    if (show.keywords && rankedKws.length) {
+      const rows = rankedKws.slice(0, 15).map(({ kw, rank, change, prod }) => {
+        const chStr = change != null && change !== 0 ? (change > 0 ? `▲ +${change}` : `▼ ${Math.abs(change)}`) : '';
+        const chColor = change > 0 ? 'var(--success)' : change < 0 ? 'var(--danger)' : 'var(--muted)';
+        return '<tr><td style="font-weight:600;">' + pdfxEscape(kw) + '</td><td style="color:var(--muted);">' + pdfxEscape(prod) + '</td>' +
+          '<td style="font-weight:700;">#' + rank + (chStr ? ' <span style="color:' + chColor + ';font-size:10px;font-weight:600;">' + chStr + '</span>' : '') + '</td></tr>';
+      }).join('');
+      kwHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Targeted Keyword Indexing</div>' +
+        '<table class="data-table" style="width:100%;font-size:11px;"><thead><tr><th>Keyword</th><th>Product</th><th>Organic Rank</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    }
+
+    const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
+      pdfxHeaderBand(monthYear, 'Sales') +
+      '<div class="pdfx-chlabel">Brand Momentum</div>' +
+      top3Html + sessHtml + kwHtml +
+      '</div></div>';
+
+    let bsrHtml = '';
+    if (show.bsr && bsrData) {
+      const cards = Object.keys(SS_MOMENTUM_ASIN_MAP).map(asin => {
+        const name = SS_MOMENTUM_ASIN_MAP[asin];
+        const bd = bsrData[asin];
+        if (!bd || !bd.latest) return { label: name, value: '—', mom: 'No data', momClass: 'flat' };
+        const { latest, earliest, subcat } = bd;
+        const change = earliest.date !== latest.date ? (earliest.bsr - latest.bsr) : null;
+        const chStr = change && change !== 0 ? (change > 0 ? `▲ ${Math.abs(change).toLocaleString()}` : `▼ ${Math.abs(change).toLocaleString()}`) : '—';
+        return { label: name, value: '#' + latest.bsr.toLocaleString(), mom: chStr + (subcat ? ' · ' + subcat : ''), momClass: change > 0 ? 'up' : change < 0 ? 'dn' : 'flat' };
+      }).map(pdfxKpiCardHtml).join('');
+      bsrHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Subcategory BSR by Product</div><div class="pdfx-kpi-row">' + cards + '</div>';
+    }
+
+    let revHtml = '';
+    if (show.reviews && revProducts.length) {
+      const cards = revProducts.map(({ name, count, avg }) => ({ label: name, value: String(count), mom: avg.toFixed(1) + '★', momClass: 'up' })).map(pdfxKpiCardHtml).join('');
+      revHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Review Velocity &amp; Quality</div><div class="pdfx-kpi-row">' + cards + '</div>';
+    }
+
+    let nextHtml = '';
+    if (show.next) {
+      const items = [
+        ['Keyword Rank Movement', 'Weekly snapshots show which terms are climbing toward page 1 and where to focus next.'],
+        ['Review Velocity', '50+ reviews is the milestone where conversion rates reliably improve — tracking progress per SKU.'],
+        ['Session Trends', 'Month-over-month organic session growth per SKU shows which products are building discoverability.'],
+      ].map(([t, b]) => '<div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:10px;"><div style="font-size:10px;font-weight:700;color:#24e9a3;margin-bottom:5px;">' + t + '</div><div style="font-size:9px;color:rgba(255,255,255,0.65);line-height:1.55;">' + b + '</div></div>').join('');
+      nextHtml = '<div style="background:#001f60;border-radius:8px;padding:14px 18px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#24e9a3;margin-bottom:10px;">What We\'re Tracking Next</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">' + items + '</div></div>';
+    }
+
+    const page2 = (bsrHtml || revHtml || nextHtml) ? '<div class="pdfx-page"><div class="pdfx-inner">' +
+      pdfxHeaderBand(monthYear, 'Sales') +
+      bsrHtml + revHtml + nextHtml +
+      '</div></div>' : '';
+
+    return page1 + page2;
+  }
+
   function buildAmazonPage(monthYear) {
     const dateRange = pdfxText('#amazon-hdr-date').replace('📅', '').trim();
     const kpis = ['kpi-total-units', 'kpi-total-orders', 'kpi-avg-order', 'kpi-units-ads', 'kpi-units-organic'].map(pdfxKpi);
@@ -20790,6 +21244,7 @@ async function loadAuditResultsFromSheet() {
       const includeSections = {
         amazon:        !!document.getElementById('pdf-include-amazon')        && document.getElementById('pdf-include-amazon').checked,
         reviews:       !!document.getElementById('pdf-include-reviews')       && document.getElementById('pdf-include-reviews').checked,
+        momentum:      !!document.getElementById('pdf-include-momentum')      && document.getElementById('pdf-include-momentum').checked,
         website:       !!document.getElementById('pdf-include-website')       && document.getElementById('pdf-include-website').checked,
         walmart:       !!document.getElementById('pdf-include-walmart')       && document.getElementById('pdf-include-walmart').checked,
         fulfillment:   !!document.getElementById('pdf-include-fulfillment')   && document.getElementById('pdf-include-fulfillment').checked,
@@ -20813,6 +21268,11 @@ async function loadAuditResultsFromSheet() {
         // output synchronously rather than needing the live tab to have
         // been opened first this session.
         (includeSections.reviews) ? pdfxPrepareReviewsData() : null,
+        // Momentum — same reasoning as Reviews above: pre-load so the
+        // checkboxes on the live tab (which the PDF page-builder reads
+        // directly) exist and window._ssMomentumData is populated, even
+        // if the person exporting never opened this tab this session.
+        (includeSections.momentum && typeof window.loadSkinsideMomentum === 'function') ? window.loadSkinsideMomentum() : null,
         (includeSections.website       && typeof window.initWebLive === 'function')                ? window.initWebLive()                : null,
         (includeSections.walmart       && typeof window.initWalmartLive === 'function')            ? window.initWalmartLive()            : null,
         (includeSections.stewardship   && typeof window.initStewardshipLive === 'function')        ? window.initStewardshipLive()        : null,
@@ -20903,6 +21363,7 @@ async function loadAuditResultsFromSheet() {
       const salesMarketingPages = [
         includeSections.amazon        ? buildAmazonPage(monthYear)        : '',
         includeSections.reviews       ? buildReviewsPages(monthYear)      : '',
+        includeSections.momentum      ? buildMomentumPages(monthYear)     : '',
         includeSections.website       ? buildWebsitePage(monthYear)       : '',
         includeSections.walmart       ? buildWalmartPage(monthYear)       : '',
         includeSections.fulfillment   ? buildFulfillmentCsPage(monthYear) : '',
