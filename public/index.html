@@ -20357,7 +20357,6 @@ async function loadAuditResultsFromSheet() {
         pdfxHeaderBand(monthYear, 'Sales') +
         '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
         '<div class="pdfx-card" style="color:var(--muted);">No reviews tagged for this period yet.</div>' +
-        pdfxFooter(monthYear) +
         '</div></div>';
     }
     const { productOrder, statsByProduct, featuredByProduct } = PDFX_REVIEWS_DATA;
@@ -20367,11 +20366,17 @@ async function loadAuditResultsFromSheet() {
       const sectionsHtml = namesThisPage.map(name =>
         pdfxReviewSectionHtml(name, statsByProduct[name] || { count: 0, sum: 0, dist: {} }, featuredByProduct[name] || [])
       ).join('');
+      // Footer removed 2026-09-02 per Jaclyn — long review text was
+      // pushing total page height past what fits on one printed page,
+      // and the whole page was getting squeezed/distorted to compensate
+      // (Case 6 in the debugging playbook: exceeding the page-height
+      // budget distorts everything, not just the overflowing element).
+      // Dropping the footer first, as a quick win, before reaching for
+      // a character-count cap on review text (deferred for now).
       pages.push('<div class="pdfx-page"><div class="pdfx-inner">' +
         pdfxHeaderBand(monthYear, 'Sales') +
         '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
         sectionsHtml +
-        pdfxFooter(monthYear) +
         '</div></div>');
     }
     return pages.join('');
