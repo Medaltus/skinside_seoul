@@ -15853,16 +15853,13 @@ async function loadSalesReviews() {
      the launch notes) but not a verified, current number for every
      product, so no fabricated comparison replaces it.
    - Data source mapping to what's actually confirmed populated for this
-     brand: Business Report (Sessions) has real data.  Keyword Tracker
-     (organic rank) does NOT have a gid yet — degrades to the same
-     "not accessible" state VVS's own tab shows when its sheet fails.
-     Subcategory BSR: VVS's source was a "Summary" tab on the same file
-     as their Keyword Tracker — Skinside Seoul doesn't have an equivalent
-     confirmed sheet, so this is a BEST-GUESS mapping to
-     SHEET_STEWARDSHIP_SUMMARY (closest "brand health" sheet that's
-     actually populated) — NOT verified to have subcategory_bsr columns.
-     If it doesn't, this section just shows "No data" per product
-     (already handled defensively below), not an error. */
+     brand: Business Report (Sessions) has real data. Keyword Tracker
+     (organic rank) is confirmed live on the 'skinside-seoul' tab of the
+     shared keyword tracker file. Subcategory BSR reads a second tab on
+     that SAME file (SHEET_KEYWORD_SUMMARY) — confirmed by Jaclyn
+     2026-09-03, correcting an earlier best-guess mapping to
+     SHEET_STEWARDSHIP_SUMMARY that was flagged unconfirmed at the time
+     and turned out wrong. */
 const SS_MOMENTUM_ASIN_MAP = {
   'B0H84G67MF': 'Heartleaf Foaming Cleanser',
   'B0H84HF6CQ': 'Spicule Serum',
@@ -15977,14 +15974,28 @@ function buildMomentumHTML({ skuSessions, latestMoName, totalLatest, totalPct, m
     const change = (earliest.date !== latest.date) ? (earliest.bsr - latest.bsr) : null;
     const chStr = change != null && change !== 0 ? (change > 0 ? `▲ ${Math.abs(change).toLocaleString()}` : `▼ ${Math.abs(change).toLocaleString()}`) : null;
     const chCls = change > 0 ? 'up' : change < 0 ? 'dn' : 'flat';
+    // data-bsr-neg on just the change SPAN (not the whole card, not the
+    // subcat label) — per Jaclyn 2026-09-03: "the box stays and the
+    // number [BSR value] stays but I hide the change metric for just the
+    // negative ones." The "Hide negative changes" checkbox below toggles
+    // visibility of only these spans.
+    const chSpan = '<span class="bsr-chg-val"' + (change < 0 ? ' data-bsr-neg="true"' : '') + '>' + (chStr || '—') + '</span>';
+    const subcatSpan = subcat ? ` <span style="font-size:9px;font-weight:400;color:var(--muted);">· ${ssrEscapeHtml(subcat)}</span>` : '';
     return `<div class="kpi-card">
       <div class="kpi-label">${ssrEscapeHtml(name)}</div>
       <div class="kpi-value" style="font-size:22px;">#${latest.bsr.toLocaleString()}</div>
-      <div class="kpi-mom ${chCls}">${chStr || '—'}${subcat ? ` <span style="font-size:9px;font-weight:400;color:var(--muted);">· ${ssrEscapeHtml(subcat)}</span>` : ''}</div>
+      <div class="kpi-mom ${chCls}">${chSpan}${subcatSpan}</div>
     </div>`;
   }).join('');
   const bsrSection = `<div id="ss-mo-cb-bsr-section" class="card" style="margin-bottom:18px;">
-    <div class="card-title">Subcategory BSR by Product</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div class="card-title" style="margin-bottom:0;">Subcategory BSR by Product</div>
+      <label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);cursor:pointer;flex-shrink:0;">
+        <input type="checkbox" id="ss-mo-bsr-hide-neg" style="margin:0;"
+          onchange="Array.from(document.querySelectorAll('[data-bsr-neg]')).forEach(el=>el.style.display=this.checked?'none':'')">
+        Hide negative changes
+      </label>
+    </div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Best Sellers Rank within each product's subcategory — lower is better. Change reflects total movement since first recorded.</div>
     <div class="kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));">${bsrCards}</div>
   </div>`;
@@ -16039,13 +16050,18 @@ async function loadSkinsideMomentum() {
       kwFetchError = 'SHEET_KEYWORD_TRACKER has no gid configured yet';
     }
 
-    // BEST-GUESS mapping — see file header comment above. Empty gid guard
-    // means this just never fetches (graceful "No data" per product)
-    // rather than erroring if the guess is wrong.
+    // BSR/keyword-summary source — confirmed by Jaclyn 2026-09-03: same
+    // file as SHEET_KEYWORD_TRACKER, different tab/gid. Corrected from an
+    // earlier best-guess mapping to SHEET_STEWARDSHIP_SUMMARY (flagged as
+    // unconfirmed at the time) — that guess was wrong, this is the real
+    // source. Confirmed real headers include: date, brand, asin, sku,
+    // total_tracked_keywords, top50_organic_count, avg_organic_rank,
+    // boosted_count, last_synced, bsr, subcategory_bsr, review_count,
+    // rating, category, subcategory.
     let summaryRows = [];
     try {
-      if (window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY && window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.gid) {
-        summaryRows = await ssFetchCsvRows(ovCsvUrl(window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.fileId, window.SHEET_CFG.SHEET_STEWARDSHIP_SUMMARY.gid));
+      if (window.SHEET_CFG.SHEET_KEYWORD_SUMMARY && window.SHEET_CFG.SHEET_KEYWORD_SUMMARY.gid) {
+        summaryRows = await ssFetchCsvRows(ovCsvUrl(window.SHEET_CFG.SHEET_KEYWORD_SUMMARY.fileId, window.SHEET_CFG.SHEET_KEYWORD_SUMMARY.gid));
       }
     } catch (sumErr) { console.warn('[Momentum] Summary/BSR source unavailable:', sumErr.message); }
 
@@ -16161,12 +16177,31 @@ async function loadSkinsideMomentum() {
     });
 
     // ── Reviews (reuse cache) ────────────────────────────────────────
-    const rNameKey = ssrFindKey(reviewRows[0] || {}, 'product_name') || 'product_name';
+    // Product name comes from the master Product Short Name sheet (keyed
+    // by SKU), not the reviews sheet's own product_name column — per
+    // Jaclyn 2026-09-03, so this matches the canonical names used
+    // everywhere else on the dashboard rather than whatever's in the
+    // reviews sheet, which may not exactly match.
+    let ssNameBySku = {};
+    try {
+      const namesRows = await ssFetchCsvRows(ovCsvUrl('1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA', '164358627'));
+      const skuKey2 = ssrFindKey(namesRows[0] || {}, 'sku');
+      const nameKey2 = ssrFindKey(namesRows[0] || {}, 'product short name') || ssrFindKey(namesRows[0] || {}, 'product_short_name');
+      namesRows.forEach(row => {
+        const sku = (row[skuKey2] || '').trim().toUpperCase();
+        const nm = (row[nameKey2] || '').trim();
+        if (sku && nm) ssNameBySku[sku] = nm;
+      });
+    } catch (e) { console.warn('[Momentum] product name lookup failed:', e.message); }
+
+    const rSkuKey = ssrFindKey(reviewRows[0] || {}, 'sku');
     const rRatKey = ssrFindKey(reviewRows[0] || {}, 'star_rating') || ssrFindKey(reviewRows[0] || {}, 'rating') || 'star_rating';
     const revByP = {};
     reviewRows.forEach(r => {
-      const name = (r[rNameKey] || '').trim(); const rat = parseFloat(r[rRatKey] || 0) || 0;
-      if (!name) return;
+      const sku = (r[rSkuKey] || '').trim().toUpperCase();
+      if (!sku) return;
+      const name = ssNameBySku[sku] || sku;
+      const rat = parseFloat(r[rRatKey] || 0) || 0;
       if (!revByP[name]) revByP[name] = { count: 0, sum: 0 };
       revByP[name].count++; revByP[name].sum += rat;
     });
@@ -17676,16 +17711,23 @@ async function loadOosLog() {
     // already is Skinside Seoul's, since it's the one shared master list).
     let nameBySku = {};
     try {
-      const namesCsv = await fetch(sheetCsvUrl('1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA', '164358627')).then(r => r.ok ? r.text() : '').catch(() => '');
-      if (isCsv(namesCsv)) {
-        const lines = namesCsv.trim().split('\n');
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCsvLine(lines[i]);
-          const sku = (cols[1] || '').replace(/^"|"$/g, '').trim().toUpperCase();
-          const name = (cols[2] || '').replace(/^"|"$/g, '').trim();
-          if (sku && name) nameBySku[sku] = name;
-        }
-      }
+      // FIXED 2026-09-03 — this originally called sheetCsvUrl()/isCsv()/
+      // parseCsvLine(), none of which are actually globally accessible
+      // (only defined inside other, unrelated IIFEs elsewhere in this
+      // file) — this would have thrown a ReferenceError at runtime the
+      // first time this ran, caught by the surrounding try/catch, so the
+      // OOS Log's product names would have silently always fallen back
+      // to raw SKUs. Caught while fixing the same bug in the newer
+      // Momentum feature — same fix applied here: ovCsvUrl/parseCsvToRows
+      // are confirmed global.
+      const namesRows = await ssFetchCsvRows(ovCsvUrl('1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA', '164358627'));
+      const skuKey2 = ssrFindKey(namesRows[0] || {}, 'sku');
+      const nameKey2 = ssrFindKey(namesRows[0] || {}, 'product short name') || ssrFindKey(namesRows[0] || {}, 'product_short_name');
+      namesRows.forEach(row => {
+        const sku = (row[skuKey2] || '').trim().toUpperCase();
+        const name = (row[nameKey2] || '').trim();
+        if (sku && name) nameBySku[sku] = name;
+      });
     } catch (e) { console.warn('[OOS Log] name lookup failed:', e.message); }
 
     const todayStr = fmtDateStr(new Date());
@@ -20800,14 +20842,21 @@ async function loadAuditResultsFromSheet() {
 
     let bsrHtml = '';
     if (show.bsr && bsrData) {
+      const hideNeg = mch('ss-mo-bsr-hide-neg');
       const cards = Object.keys(SS_MOMENTUM_ASIN_MAP).map(asin => {
         const name = SS_MOMENTUM_ASIN_MAP[asin];
         const bd = bsrData[asin];
         if (!bd || !bd.latest) return { label: name, value: '—', mom: 'No data', momClass: 'flat' };
         const { latest, earliest, subcat } = bd;
         const change = earliest.date !== latest.date ? (earliest.bsr - latest.bsr) : null;
-        const chStr = change && change !== 0 ? (change > 0 ? `▲ ${Math.abs(change).toLocaleString()}` : `▼ ${Math.abs(change).toLocaleString()}`) : '—';
-        return { label: name, value: '#' + latest.bsr.toLocaleString(), mom: chStr + (subcat ? ' · ' + subcat : ''), momClass: change > 0 ? 'up' : change < 0 ? 'dn' : 'flat' };
+        // Same "hide negative changes" checkbox as the live tab, respected
+        // here at build time since the PDF is static — per Jaclyn
+        // 2026-09-03, the BSR value itself always stays, only the change
+        // number gets omitted for negatives when this is checked.
+        const chStr = (change && change !== 0)
+          ? (change < 0 && hideNeg ? '' : (change > 0 ? `▲ ${Math.abs(change).toLocaleString()}` : `▼ ${Math.abs(change).toLocaleString()}`))
+          : '—';
+        return { label: name, value: '#' + latest.bsr.toLocaleString(), mom: (chStr || '—') + (subcat ? ' · ' + subcat : ''), momClass: change > 0 ? 'up' : change < 0 ? 'dn' : 'flat' };
       }).map(pdfxKpiCardHtml).join('');
       bsrHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Subcategory BSR by Product</div><div class="pdfx-kpi-row">' + cards + '</div>';
     }
