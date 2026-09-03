@@ -926,6 +926,12 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
 /* Interior page header band */
 .pdfx-inner{padding:34px 46px 40px;}
+/* Reviews pages specifically — reduced side/bottom padding, per Jaclyn
+   2026-09-03: long review text was pushing total page height past the
+   ~2112px distortion threshold (playbook Case 6), and every bit of
+   reclaimed space helps alongside the footer already having been
+   removed. Top padding left unchanged. */
+.pdfx-inner-reviews{padding:34px 28px 18px;}
 .pdfx-topband{display:block;background:var(--navy);margin:-34px -46px 0 -46px;padding:24px 46px 0;}
 .pdfx-logo-navy{font-family:Georgia,'Times New Roman',serif;font-size:19px;font-style:italic;color:var(--navy);}
 .pdfx-tagright{text-align:right;}
@@ -1090,6 +1096,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
    auto-fit variant reusing the same .pdfx-kpi/.pdfx-kpi-lbl/.pdfx-kpi-val
    card markup rather than a new card style. */
 .pdfx-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0;margin-bottom:14px;}
+/* Fixed 4-column variant — Sessions/BSR/Reviews sections specifically
+   (7 products = 4 top row + 3 second row), per Jaclyn 2026-09-03. The
+   top-3 summary row keeps the auto-fit .pdfx-kpi-row above, unchanged. */
+.pdfx-kpi-row-4{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:14px;}
 </style>
 <link rel="icon" type="image/png" href="/favicon_skinside.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -20786,7 +20796,7 @@ async function loadAuditResultsFromSheet() {
 
   function buildReviewsPages(monthYear) {
     if (!PDFX_REVIEWS_DATA || PDFX_REVIEWS_DATA === 'no-data') {
-      return '<div class="pdfx-page"><div class="pdfx-inner">' +
+      return '<div class="pdfx-page"><div class="pdfx-inner pdfx-inner-reviews">' +
         pdfxHeaderBand(monthYear, 'Sales') +
         '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
         '<div class="pdfx-card" style="color:var(--muted);">No reviews tagged for this period yet.</div>' +
@@ -20799,14 +20809,11 @@ async function loadAuditResultsFromSheet() {
       const sectionsHtml = namesThisPage.map(name =>
         pdfxReviewSectionHtml(name, statsByProduct[name] || { count: 0, sum: 0, dist: {} }, featuredByProduct[name] || [])
       ).join('');
-      // Footer removed 2026-09-02 per Jaclyn — long review text was
-      // pushing total page height past what fits on one printed page,
-      // and the whole page was getting squeezed/distorted to compensate
-      // (Case 6 in the debugging playbook: exceeding the page-height
-      // budget distorts everything, not just the overflowing element).
-      // Dropping the footer first, as a quick win, before reaching for
-      // a character-count cap on review text (deferred for now).
-      pages.push('<div class="pdfx-page"><div class="pdfx-inner">' +
+      // Footer removed 2026-09-02, side/bottom padding reduced 2026-09-03
+      // (pdfx-inner-reviews, see CSS) — both per Jaclyn, both aimed at the
+      // same problem: long review text pushing total page height past
+      // the ~2112px distortion threshold (playbook Case 6).
+      pages.push('<div class="pdfx-page"><div class="pdfx-inner pdfx-inner-reviews">' +
         pdfxHeaderBand(monthYear, 'Sales') +
         '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
         sectionsHtml +
@@ -20847,7 +20854,7 @@ async function loadAuditResultsFromSheet() {
         mom: pct != null ? `${pct > 0 ? '▲' : '▼'} ${Math.abs(pct)}% vs launch` : 'New SKU',
         momClass: pct > 0 ? 'up' : pct < 0 ? 'dn' : 'flat',
       })).map(pdfxKpiCardHtml).join('');
-      sessHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Sessions by Product</div><div class="pdfx-kpi-row">' + cards + '</div>';
+      sessHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Sessions by Product</div><div class="pdfx-kpi-row-4">' + cards + '</div>';
     }
 
     let kwHtml = '';
@@ -20888,13 +20895,13 @@ async function loadAuditResultsFromSheet() {
           : '—';
         return { label: name, value: '#' + latest.bsr.toLocaleString(), mom: (chStr || '—') + (subcat ? ' · ' + subcat : ''), momClass: change > 0 ? 'up' : change < 0 ? 'dn' : 'flat' };
       }).map(pdfxKpiCardHtml).join('');
-      bsrHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Subcategory BSR by Product</div><div class="pdfx-kpi-row">' + cards + '</div>';
+      bsrHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Subcategory BSR by Product</div><div class="pdfx-kpi-row-4">' + cards + '</div>';
     }
 
     let revHtml = '';
     if (show.reviews && revProducts.length) {
       const cards = revProducts.map(({ name, count, avg }) => ({ label: name, value: String(count), mom: avg.toFixed(1) + '★', momClass: 'up' })).map(pdfxKpiCardHtml).join('');
-      revHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Review Velocity &amp; Quality</div><div class="pdfx-kpi-row">' + cards + '</div>';
+      revHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Review Velocity &amp; Quality</div><div class="pdfx-kpi-row-4">' + cards + '</div>';
     }
 
     let nextHtml = '';
