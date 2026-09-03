@@ -22,6 +22,20 @@ async function getSheetsToken() {
   }
 
   const email = process.env.GOOGLE_CLIENT_EMAIL;
+  // FIXED 2026-09-03 — this previously read process.env.GOOGLE_PRIVATE_KEY
+  // .replace(...) with no guard, so a missing env var threw the exact
+  // cryptic "Cannot read properties of undefined (reading 'replace')"
+  // surfaced to the person clicking Save on the dashboard, with nothing
+  // pointing at the real cause. Confirmed this is what's happening on
+  // Skinside Seoul's Vercel project — GOOGLE_CLIENT_EMAIL/
+  // GOOGLE_PRIVATE_KEY aren't set there yet (same shared service account
+  // env vars every other brand's repo needs). This guard doesn't fix
+  // that — the real fix is adding those two env vars in Vercel — but it
+  // turns any future instance of this into a readable error instead of a
+  // stack trace pointing at .replace().
+  if (!email || !process.env.GOOGLE_PRIVATE_KEY) {
+    throw new Error('GOOGLE_CLIENT_EMAIL/GOOGLE_PRIVATE_KEY not set in this Vercel project\'s environment variables.');
+  }
   const rawKey = process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n');
 
   const header  = base64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
