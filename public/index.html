@@ -16151,7 +16151,16 @@ async function loadSkinsideMomentum() {
         const change = (worstRank !== null && worstRank !== latestEntry.rank) ? (worstRank - latestEntry.rank) : null;
         return { kw, rank: latestEntry.rank, change, vol, prod: SS_MOMENTUM_ASIN_MAP[asin] || asin };
       })
-      .sort((a, b) => a.rank - b.rank);
+      .sort((a, b) => {
+        // Keywords with a rank CHANGE (real movement to report on) sort
+        // first as a group — per Jaclyn 2026-09-03 — then within each
+        // group (has-change vs no-change), still sorted by organic rank
+        // ascending. Applies to both the live tab and the PDF export
+        // since both read this same cached, already-sorted list.
+        const aHasChange = a.change !== null, bHasChange = b.change !== null;
+        if (aHasChange !== bHasChange) return aHasChange ? -1 : 1;
+        return a.rank - b.rank;
+      });
 
     // ── Subcategory BSR (best-guess source — see header comment) ────────
     const bsrAsinCol = ssrFindKey(summaryRows[0] || {}, 'asin');
@@ -20824,14 +20833,16 @@ async function loadAuditResultsFromSheet() {
 
     let kwHtml = '';
     if (show.keywords && rankedKws.length) {
-      const rows = rankedKws.slice(0, 15).map(({ kw, rank, change, prod }) => {
+      const hasVol = rankedKws.some(k => k.vol);
+      const rows = rankedKws.slice(0, 15).map(({ kw, rank, change, prod, vol }) => {
         const chStr = change != null && change !== 0 ? (change > 0 ? `▲ +${change}` : `▼ ${Math.abs(change)}`) : '';
         const chColor = change > 0 ? 'var(--success)' : change < 0 ? 'var(--danger)' : 'var(--muted)';
         return '<tr><td style="font-weight:600;">' + pdfxEscape(kw) + '</td><td style="color:var(--muted);">' + pdfxEscape(prod) + '</td>' +
-          '<td style="font-weight:700;">#' + rank + (chStr ? ' <span style="color:' + chColor + ';font-size:10px;font-weight:600;">' + chStr + '</span>' : '') + '</td></tr>';
+          '<td style="font-weight:700;">#' + rank + (chStr ? ' <span style="color:' + chColor + ';font-size:10px;font-weight:600;">' + chStr + '</span>' : '') + '</td>' +
+          (hasVol ? '<td style="color:var(--muted);">' + (vol ? vol.toLocaleString() : '—') + '</td>' : '') + '</tr>';
       }).join('');
       kwHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Targeted Keyword Indexing</div>' +
-        '<table class="data-table" style="width:100%;font-size:11px;"><thead><tr><th>Keyword</th><th>Product</th><th>Organic Rank</th></tr></thead><tbody>' + rows + '</tbody></table>';
+        '<table class="data-table" style="width:100%;font-size:11px;"><thead><tr><th>Keyword</th><th>Product</th><th>Organic Rank</th>' + (hasVol ? '<th>Search Volume</th>' : '') + '</tr></thead><tbody>' + rows + '</tbody></table>';
     }
 
     const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
