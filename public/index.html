@@ -978,6 +978,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .pdfx-ltd-val{font-size:19px;font-weight:700;color:var(--navy);font-family:var(--font-subheader);}
 .pdfx-ltd-lbl{font-size:9.5px;color:var(--muted);}
 .pdfx-footer{display:flex;justify-content:space-between;align-items:center;margin-top:36px;padding-top:16px;border-top:1px solid var(--border);}
+/* Pin-to-bottom variant — 2026-09-04 per Jaclyn, used on the Opportunities
+   page's footer and Momentum's "What We're Tracking Next" card, so each
+   sits flush against the physical page bottom rather than flowing right
+   after whatever content happens to precede it. .pdfx-page is already
+   position:relative with a fixed min-height, so this anchors correctly;
+   left/right match .pdfx-inner's own 46px side padding for alignment. */
+.pdfx-pin-bottom{position:absolute;left:46px;right:46px;bottom:24px;margin-top:0;}
+.pdfx-pin-bottom .pdfx-footer{margin-top:0;}
 .pdfx-footer-brand{font-size:13px;font-weight:700;color:var(--navy);}
 .pdfx-footer-tag{font-size:9.5px;color:var(--muted);}
 .pdfx-footer-right{text-align:right;font-size:10px;color:var(--muted);}
@@ -1069,30 +1077,57 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 /* ══════════════════════ Reviews & Ratings (Amazon Sales) ══════════════════════
    Ported from Vivian Valenty Skincare's "Reviews & Ratings" tab, 2026-09-02
    per Jaclyn. One scrollable tab, all products stacked. */
-.review-section{margin-bottom:12px;}
-.review-hd{background:var(--navy);border-radius:8px 8px 0 0;padding:7px 14px;display:flex;align-items:center;justify-content:space-between;color:#fff;}
-.review-hd-title{font-size:12px;font-weight:700;}
-.review-hd-right{display:flex;align-items:center;gap:10px;font-size:10px;color:rgba(255,255,255,.7);}
+.review-section{margin-bottom:28px;}
+.review-hd{background:var(--navy);border-radius:8px 8px 0 0;padding:12px 18px;display:flex;align-items:center;justify-content:space-between;color:#fff;}
+.review-hd-title{font-size:13px;font-weight:700;}
+.review-hd-right{display:flex;align-items:center;gap:14px;font-size:11px;color:rgba(255,255,255,.7);}
 .review-stars{color:#f5a623;letter-spacing:1px;}
-.review-avg{font-size:12px;font-weight:700;color:var(--green);}
-.review-avg-of{font-size:9px;color:rgba(255,255,255,.55);}
-/* No bottom border here — this used to close its own box with a
-   border-bottom, which sat directly above .review-cards' own top edge
-   and read as a visible divider line "below the rating rows." Side
-   borders only now; .review-cards below carries the bottom border/
-   corners so the whole hd+bars+cards stack reads as one continuous box. */
-.review-bars{background:var(--white);border-left:1px solid var(--border);border-right:1px solid var(--border);padding:6px 14px 4px;}
-.review-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:0;line-height:1.1;}
-.review-bar-label{width:16px;flex-shrink:0;font-size:8px;color:var(--muted);font-weight:600;}
-.review-bar-track{flex:1;height:4px;background:var(--bg2);border-radius:3px;overflow:hidden;}
-.review-bar-fill{height:100%;background:var(--green);border-radius:3px;}
-.review-bar-count{width:20px;flex-shrink:0;font-size:8px;color:var(--muted);text-align:right;font-family:var(--mono);}
-.review-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:8px 14px 10px;}
-.review-card{background:var(--bg);border-left:3px solid var(--green);border-radius:0 6px 6px 0;padding:8px 10px;}
-.review-card-stars{color:#f5a623;font-size:11px;letter-spacing:1px;margin-bottom:3px;}
-.review-card-title{font-size:11.5px;font-weight:700;color:var(--navy);margin-bottom:4px;}
-.review-card-text{font-size:11px;color:var(--muted);line-height:1.35;}
+.review-avg{font-size:14px;font-weight:700;color:var(--green);}
+.review-avg-of{font-size:10px;color:rgba(255,255,255,.55);}
+.review-bars{background:var(--white);border:1px solid var(--border);border-top:none;padding:14px 18px;}
+.review-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.review-bar-row:last-child{margin-bottom:0;}
+.review-bar-label{width:26px;flex-shrink:0;font-size:11px;color:var(--muted);font-weight:600;}
+.review-bar-track{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;}
+.review-bar-fill{height:100%;background:var(--green);border-radius:4px;}
+.review-bar-count{width:32px;flex-shrink:0;font-size:11px;color:var(--muted);text-align:right;font-family:var(--mono);}
+.review-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;background:var(--white);border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;padding:14px 18px;}
+.review-card{background:var(--bg);border-left:3px solid var(--green);border-radius:0 6px 6px 0;padding:14px 16px;}
+.review-card-stars{color:#f5a623;font-size:12px;letter-spacing:1px;margin-bottom:6px;}
+.review-card-title{font-size:12.5px;font-weight:700;color:var(--navy);margin-bottom:8px;}
+.review-card-text{font-size:11.5px;color:var(--muted);line-height:1.6;}
 .review-pending{color:var(--muted);font-size:12px;padding:20px;text-align:center;}
+
+/* ══ PDF-export-only overrides ══ — 2026-09-04 per Jaclyn: the live
+   dashboard tab and the PDF export share the same .review-* classes
+   above, but the tightening below was only ever meant for the PDF
+   (which needs to fit within a fixed printed page height) — the live
+   tab should stay at its original, comfortable spacing. Scoped under
+   .pdfx-inner-reviews (already the PDF review-page wrapper class) so
+   only the exported version is affected. */
+.pdfx-inner-reviews .review-section{margin-bottom:12px;}
+.pdfx-inner-reviews .review-hd{padding:7px 14px;}
+.pdfx-inner-reviews .review-hd-title{font-size:12px;}
+.pdfx-inner-reviews .review-hd-right{gap:10px;font-size:10px;}
+.pdfx-inner-reviews .review-avg{font-size:12px;}
+.pdfx-inner-reviews .review-avg-of{font-size:9px;}
+/* No bottom border — this used to close its own box with a border-bottom
+   that sat directly above .review-cards' own top edge and read as a
+   visible divider line "below the rating rows." Side borders only;
+   .review-cards carries the bottom border/corners so hd+bars+cards reads
+   as one continuous box. */
+.pdfx-inner-reviews .review-bars{border-left:1px solid var(--border);border-right:1px solid var(--border);border-top:none;border-bottom:none;padding:6px 14px 4px;}
+.pdfx-inner-reviews .review-bar-row{gap:6px;margin-bottom:0;line-height:1.2;}
+/* Font bumped back up from an earlier pass that went too small — per
+   Jaclyn 2026-09-04, keep every other tightening but make these readable. */
+.pdfx-inner-reviews .review-bar-label{width:20px;font-size:10px;}
+.pdfx-inner-reviews .review-bar-track{height:4px;}
+.pdfx-inner-reviews .review-bar-count{width:24px;font-size:10px;}
+.pdfx-inner-reviews .review-cards{gap:8px;padding:8px 14px 10px;}
+.pdfx-inner-reviews .review-card{padding:8px 10px;}
+.pdfx-inner-reviews .review-card-stars{font-size:11px;margin-bottom:3px;}
+.pdfx-inner-reviews .review-card-title{font-size:11.5px;margin-bottom:4px;}
+.pdfx-inner-reviews .review-card-text{font-size:11px;line-height:1.35;}
 .momentum-pending{color:var(--muted);font-size:12px;padding:12px 0;}
 .momentum-warn-box{padding:12px 16px;background:rgba(200,125,47,.08);border:1px solid rgba(200,125,47,.2);border-radius:var(--radius-sm);font-size:12px;color:var(--navy);line-height:1.6;}
 /* Momentum PDF KPI cards need a variable column count (3/7/7/7 depending
@@ -20904,7 +20939,7 @@ async function loadAuditResultsFromSheet() {
     let kwHtml = '';
     if (show.keywords && rankedKws.length) {
       const hasVol = rankedKws.some(k => k.vol);
-      const rows = rankedKws.slice(0, 15).map(({ kw, rank, change, prod, vol }) => {
+      const rows = rankedKws.slice(0, 10).map(({ kw, rank, change, prod, vol }) => {
         const chStr = change != null && change !== 0 ? (change > 0 ? `▲ +${change}` : `▼ ${Math.abs(change)}`) : '';
         const chColor = change > 0 ? 'var(--success)' : change < 0 ? 'var(--danger)' : 'var(--muted)';
         return '<tr><td style="font-weight:600;">' + pdfxEscape(kw) + '</td><td style="color:var(--muted);">' + pdfxEscape(prod) + '</td>' +
@@ -20955,7 +20990,7 @@ async function loadAuditResultsFromSheet() {
         ['Review Velocity', '50+ reviews is the milestone where conversion rates reliably improve — tracking progress per SKU.'],
         ['Session Trends', 'Month-over-month organic session growth per SKU shows which products are building discoverability.'],
       ].map(([t, b]) => '<div style="background:rgba(255,255,255,0.08);border-radius:6px;padding:10px;"><div style="font-size:10px;font-weight:700;color:#24e9a3;margin-bottom:5px;">' + t + '</div><div style="font-size:9px;color:rgba(255,255,255,0.65);line-height:1.55;">' + b + '</div></div>').join('');
-      nextHtml = '<div style="background:#001f60;border-radius:8px;padding:14px 18px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#24e9a3;margin-bottom:10px;">What We\'re Tracking Next</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">' + items + '</div></div>';
+      nextHtml = '<div class="pdfx-pin-bottom" style="background:#001f60;border-radius:8px;padding:14px 18px;"><div style="font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#24e9a3;margin-bottom:10px;">What We\'re Tracking Next</div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">' + items + '</div></div>';
     }
 
     const page2 = (bsrHtml || revHtml || nextHtml) ? '<div class="pdfx-page"><div class="pdfx-inner">' +
@@ -21215,7 +21250,7 @@ async function loadAuditResultsFromSheet() {
         '<div class="pdfx-inner">' +
           pdfxHeaderBand(monthYear, 'Opportunities') +
           subsaveHtml + futureHtml +
-          pdfxFooter(monthYear) +
+          '<div class="pdfx-pin-bottom">' + pdfxFooter(monthYear) + '</div>' +
         '</div>' +
       '</div>';
   }
