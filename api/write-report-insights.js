@@ -28,27 +28,22 @@
  * Dry / Vivian Valenty Skincare example this was adapted from, which had
  * a live-checked confirmation). Needs the same read-only check before
  * this is trusted: confirm a "skinside-seoul" (or however it's actually
- * named) tab and "skinside-seoul_events" tab exist, with Évolis's
- * original 26-column (monthly) / 9-column (events) header row already in
- * place, no data rows yet.
+ * named) tab and "skinside-seoul_events" tab exist, no data rows yet.
  *
- * MONTHLY_HEADERS below intentionally starts with Évolis's ORIGINAL 26
- * columns, in their EXACT existing order, UNCHANGED — including
- * website_key_insight/walmart_key_insight/ad_impressions_note, which this
- * brand's dashboard doesn't currently write to either. They stay because
- * the physical sheet already has them in these exact column positions;
- * dropping or reordering them here would desync this file's column
- * mapping from the sheet's real layout. This brand's one addition —
- * What's Been Accomplished (4 cards, images on cards 1-2) — is appended
- * at the end, same rule Évolis's own file documents: a new field ALWAYS
- * goes at the end, never interspersed, or replaceRows() silently shifts
- * every existing row's data into the wrong columns on the next save.
- * NOT added here, unlike the Dazzle Dry / Vivian Valenty Skincare example
- * this was adapted from: category_key_insight and opp5/opp6 — those exist
- * on that brand's dashboard, not on Skinside Seoul's (which still has the
- * original 4 Opportunity cards, opp1-4, already covered by Évolis's
- * original columns). Adding schema fields with no corresponding UI would
- * just be dead columns no save path ever populates.
+ * MONTHLY_HEADERS below is NOT "Évolis's 26 columns + this brand's own
+ * addition at the end" the way the first version of this file was —
+ * that was wrong. FIXED 2026-09-04: Jaclyn's actual physical sheet has
+ * category_key_insight and opp5/opp6 columns too (copied from the same
+ * Dazzle Dry / Vivian Valenty Skincare reference this whole file was
+ * adapted from, even though Skinside Seoul's dashboard doesn't have UI
+ * for those fields yet). Since replaceRows() writes positionally against
+ * this array, having a shorter schema than the real sheet meant every
+ * field from accomplished1_title onward was landing 2 columns off from
+ * where it actually belongs — exactly why saved Accomplished content
+ * never showed up on load. The array below now matches the real sheet's
+ * column order exactly, confirmed against Jaclyn's own header list. A
+ * new field ALWAYS goes at the end and ALWAYS gets added to the real
+ * sheet's header row at the same time, or this breaks again the same way.
  *
  * ⚠ ASSUMES config/_sheets_client.js (ensureTab/readRows/replaceRows,
  * same (sheetId, tabName, headers, rows, token) signature already
@@ -87,18 +82,23 @@ const MONTHLY_HEADERS = [
   'status', 'approved_by', 'approved_at', 'last_updated', 'last_updated_by',
   'ad_impressions_note',
 
-  // ── Skinside Seoul's one addition, appended 2026-09-04 — MUST stay at
-  // the end. What's Been Accomplished — 4 cards. Cards 1-2 support up to
-  // 3/2 image URLs respectively — stored as plain URL strings for now
-  // (paste a hosted link); a real upload feature is a planned future
-  // replacement for how these URLs get populated, not for how they're
-  // stored or displayed. ──
+  // ── Confirmed present on the real physical sheet (2026-09-04, from
+  // Jaclyn's own header list) — this dashboard doesn't currently read/
+  // write category_key_insight or opp5/opp6, but the columns exist on
+  // the sheet and everything after them has to count them to land in
+  // the right position. Do not remove just because nothing uses them
+  // yet. ──
+  'category_key_insight',
+
   'accomplished1_title', 'accomplished1_subtitle', 'accomplished1_body',
   'accomplished1_image1', 'accomplished1_image2', 'accomplished1_image3',
   'accomplished2_title', 'accomplished2_subtitle', 'accomplished2_body',
   'accomplished2_image1', 'accomplished2_image2',
   'accomplished3_title', 'accomplished3_subtitle', 'accomplished3_body',
   'accomplished4_title', 'accomplished4_subtitle', 'accomplished4_body',
+
+  'opp5_title', 'opp5_subtitle', 'opp5_body',
+  'opp6_title', 'opp6_subtitle', 'opp6_body',
 ];
 
 const EVENT_HEADERS = [
