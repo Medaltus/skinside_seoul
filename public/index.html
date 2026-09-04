@@ -1077,7 +1077,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .review-avg{font-size:14px;font-weight:700;color:var(--green);}
 .review-avg-of{font-size:10px;color:rgba(255,255,255,.55);}
 .review-bars{background:var(--white);border:1px solid var(--border);border-top:none;padding:14px 18px;}
-.review-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.review-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:2px;}
 .review-bar-row:last-child{margin-bottom:0;}
 .review-bar-label{width:26px;flex-shrink:0;font-size:11px;color:var(--muted);font-weight:600;}
 .review-bar-track{flex:1;height:8px;background:var(--bg2);border-radius:4px;overflow:hidden;}
@@ -15771,6 +15771,32 @@ function ssrFindKey(row, name) {
   const target = name.toLowerCase();
   return Object.keys(row).find(k => k.toLowerCase() === target);
 }
+
+// Shared, cached SKU -> canonical product name lookup (Product Short Name
+// master sheet). Added 2026-09-04 per Jaclyn so Reviews (live tab + PDF)
+// use the same canonical names Momentum's Review Velocity already uses,
+// instead of the reviews sheet's own product_name column (which mirrors
+// whatever the live Amazon listing title says — can be long/SEO-heavy and
+// drift from the short name used everywhere else on this dashboard).
+let _ssNameBySkuPromise = null;
+function ssrGetProductNameMap() {
+  if (_ssNameBySkuPromise) return _ssNameBySkuPromise;
+  _ssNameBySkuPromise = (async () => {
+    const map = {};
+    try {
+      const namesRows = await ssFetchCsvRows(ovCsvUrl('1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA', '164358627'));
+      const skuKey = ssrFindKey(namesRows[0] || {}, 'sku');
+      const nameKey = ssrFindKey(namesRows[0] || {}, 'product short name') || ssrFindKey(namesRows[0] || {}, 'product_short_name');
+      namesRows.forEach(row => {
+        const sku = (row[skuKey] || '').trim().toUpperCase();
+        const nm = (row[nameKey] || '').trim();
+        if (sku && nm) map[sku] = nm;
+      });
+    } catch (e) { console.warn('[Product Name Lookup] failed:', e.message); }
+    return map;
+  })();
+  return _ssNameBySkuPromise;
+}
 const SSR_MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
 let _ssrReviewsLoaded = false;
@@ -15788,7 +15814,12 @@ async function loadSalesReviews() {
       if (container) container.innerHTML = '<div class="review-pending">Waiting on YEAR and MONTH columns in the reviews sheet — once added and populated, this tab activates automatically.</div>';
       return;
     }
-    const nameKey = ssrFindKey(rows[0], 'product_name') || 'product_name';
+    // Canonical name comes from the Product Short Name sheet, keyed by
+    // SKU — not the reviews sheet's own product_name column, which
+    // mirrors the live Amazon title (can be long/SEO-heavy). Same fix
+    // already applied to Momentum's Review Velocity section.
+    const skuKey = ssrFindKey(rows[0], 'sku');
+    const nameBySku = await ssrGetProductNameMap();
     const ratingKey = ssrFindKey(rows[0], 'star_rating') || ssrFindKey(rows[0], 'rating') || 'star_rating';
     const titleKey = ssrFindKey(rows[0], 'review_title') || 'review_title';
     const textKey = ssrFindKey(rows[0], 'review_text') || 'review_text';
@@ -15804,8 +15835,9 @@ async function loadSalesReviews() {
     // All-time stats per product (count, average, 1-5 distribution).
     const statsByProduct = {};
     rows.forEach(r => {
-      const name = (r[nameKey] || '').trim();
-      if (!name) return;
+      const sku = (r[skuKey] || '').trim().toUpperCase();
+      if (!sku) return;
+      const name = nameBySku[sku] || sku;
       const rating = Math.round(Number(r[ratingKey]) || 0);
       if (!statsByProduct[name]) statsByProduct[name] = { count: 0, sum: 0, dist: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
       const s = statsByProduct[name];
@@ -15821,8 +15853,9 @@ async function loadSalesReviews() {
     rows.forEach(r => {
       if (String(r[yearKey] || '').trim() !== targetYear) return;
       if (String(Number(r[monthKey]) || '') !== String(Number(targetMonth))) return;
-      const name = (r[nameKey] || '').trim();
-      if (!name) return;
+      const sku = (r[skuKey] || '').trim().toUpperCase();
+      if (!sku) return;
+      const name = nameBySku[sku] || sku;
       if (!featuredByProduct[name]) { featuredByProduct[name] = []; productOrder.push(name); }
       featuredByProduct[name].push(r);
     });
@@ -20663,7 +20696,12 @@ async function loadAuditResultsFromSheet() {
       const yearKey = ssrFindKey(rows[0], 'year');
       const monthKey = ssrFindKey(rows[0], 'month');
       if (!yearKey || !monthKey) { PDFX_REVIEWS_DATA = 'no-data'; return; }
-      const nameKey = ssrFindKey(rows[0], 'product_name') || 'product_name';
+      // Canonical name from the Product Short Name sheet, keyed by SKU —
+      // same fix as loadSalesReviews() and Momentum's Review Velocity,
+      // not the reviews sheet's own product_name (mirrors the live
+      // Amazon title).
+      const skuKey = ssrFindKey(rows[0], 'sku');
+      const nameBySku = await ssrGetProductNameMap();
       const ratingKey = ssrFindKey(rows[0], 'star_rating') || ssrFindKey(rows[0], 'rating') || 'star_rating';
       const titleKey = ssrFindKey(rows[0], 'review_title') || 'review_title';
       const textKey = ssrFindKey(rows[0], 'review_text') || 'review_text';
@@ -20675,8 +20713,9 @@ async function loadAuditResultsFromSheet() {
 
       const statsByProduct = {};
       rows.forEach(r => {
-        const name = (r[nameKey] || '').trim();
-        if (!name) return;
+        const sku = (r[skuKey] || '').trim().toUpperCase();
+        if (!sku) return;
+        const name = nameBySku[sku] || sku;
         const rating = Math.round(Number(r[ratingKey]) || 0);
         if (!statsByProduct[name]) statsByProduct[name] = { count: 0, sum: 0, dist: { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 } };
         const s = statsByProduct[name];
@@ -20690,8 +20729,9 @@ async function loadAuditResultsFromSheet() {
       rows.forEach(r => {
         if (String(r[yearKey] || '').trim() !== targetYear) return;
         if (String(Number(r[monthKey]) || '') !== String(Number(targetMonth))) return;
-        const name = (r[nameKey] || '').trim();
-        if (!name) return;
+        const sku = (r[skuKey] || '').trim().toUpperCase();
+        if (!sku) return;
+        const name = nameBySku[sku] || sku;
         if (!featuredByProduct[name]) { featuredByProduct[name] = []; productOrder.push(name); }
         featuredByProduct[name].push({ rating: r[ratingKey], title: r[titleKey], text: r[textKey] });
       });
