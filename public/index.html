@@ -919,6 +919,9 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 /* flex:1 fills all remaining vertical space below the navy block (up to the full 11in page); justify-content:center vertically centers the pill/headline/columns within that remaining space, per the request to justify this content to the middle of the space below the navy area. */
 .pdfx-cover-white{padding:40px 60px;flex:1;display:flex;flex-direction:column;justify-content:center;}
 .pdfx-pill{display:inline-block;align-self:flex-start;background:rgba(36,233,163,.14);border:1px solid rgba(36,233,163,.35);border-radius:20px;padding:5px 16px;font-size:11.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--green);margin-bottom:24px;}
+.pdfx-pill-sand{background:var(--sand);border:1px solid rgba(200,125,47,.35);color:var(--warn);}
+.pdfx-opp-images{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;}
+.pdfx-opp-img{width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);}
 .pdfx-cover-headline{font-family:var(--font-subheader);font-size:20px;font-weight:600;color:var(--navy);line-height:1.35;margin-bottom:28px;}
 .pdfx-cover-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:8px;}
 .pdfx-cover-col{font-size:12px;color:#48557a;line-height:1.75;}
@@ -2114,6 +2117,11 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             Subscribe &amp; Save
           </label>
           <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
+            <input type="checkbox" id="m-opp-cb-accomplished" checked style="margin:0;"
+              onchange="(function(cb){var s=document.getElementById('m-opp-accomplished-section');if(s)s.style.display=cb.checked?'':'none';})(this)">
+            What's Been Accomplished
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
             <input type="checkbox" id="m-opp-cb-future" checked style="margin:0;"
               onchange="(function(cb){var s=document.getElementById('m-opp-future-section');if(s)s.style.display=cb.checked?'':'none';})(this)">
             Future Opportunities
@@ -2133,6 +2141,48 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           <div id="legend-sns" style="display:flex;align-items:center;"></div>
         </div>
         <div style="position:relative;height:320px;"><canvas id="chart-sns"></canvas></div>
+      </div>
+      </div>
+
+      <div id="m-opp-accomplished-section">
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="display:inline-block;background:var(--sand);border:1px solid rgba(200,125,47,.35);border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--warn);">What's Been Accomplished</div>
+          <button class="btn-edit" id="acc-edit-btn">✏️ Edit</button>
+        </div>
+        <div class="opp-grid" id="acc-grid" style="grid-template-columns:1fr 1fr;">
+          <div class="opp-card" id="acc-card-1" style="display:none;">
+            <div class="opp-title" id="acc-title-1"></div>
+            <div class="opp-subtitle" id="acc-subtitle-1"></div>
+            <div class="opp-body" id="acc-body-1"></div>
+            <div id="acc-images-1" style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"></div>
+          </div>
+          <div class="opp-card" id="acc-card-2" style="display:none;">
+            <div class="opp-title" id="acc-title-2"></div>
+            <div class="opp-subtitle" id="acc-subtitle-2"></div>
+            <div class="opp-body" id="acc-body-2"></div>
+            <div id="acc-images-2" style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"></div>
+          </div>
+          <div class="opp-card" id="acc-card-3" style="display:none;">
+            <div class="opp-title" id="acc-title-3"></div>
+            <div class="opp-subtitle" id="acc-subtitle-3"></div>
+            <div class="opp-body" id="acc-body-3"></div>
+          </div>
+          <div class="opp-card" id="acc-card-4" style="display:none;">
+            <div class="opp-title" id="acc-title-4"></div>
+            <div class="opp-subtitle" id="acc-subtitle-4"></div>
+            <div class="opp-body" id="acc-body-4"></div>
+          </div>
+        </div>
+        <div id="acc-empty-state" style="display:none;color:var(--muted);font-size:12px;padding:8px 0;">No accomplishments added yet — click Edit to add up to 4.</div>
+
+        <div id="acc-editor" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+          <div id="acc-editor-slots"></div>
+          <div style="display:flex;gap:10px;margin-top:16px;">
+            <button class="btn-edit" id="acc-save-btn" style="background:var(--navy);color:#fff;">Save</button>
+            <button class="btn-edit" id="acc-cancel-btn">Cancel</button>
+          </div>
+        </div>
       </div>
       </div>
 
@@ -13729,6 +13779,127 @@ document.addEventListener('DOMContentLoaded', function() {
     load();
   })();
 
+  // ── What's Been Accomplished: up to 4 cards, cards 1-2 also support
+  // up to 3/2 images respectively (plain hosted URLs for now — pasting a
+  // link, not a real upload, per write-report-insights.js's own notes on
+  // this being a planned future replacement). Mirrors wireOpportunities()
+  // above exactly, since it's the same underlying pattern (editable cards
+  // on the same monthly report_insights row) — just a different field
+  // prefix and the extra image inputs on cards 1-2.
+  (function wireAccomplished() {
+    const BRAND = (window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul');
+    const editBtn = document.getElementById('acc-edit-btn');
+    const saveBtn = document.getElementById('acc-save-btn');
+    const cancelBtn = document.getElementById('acc-cancel-btn');
+    const editorEl = document.getElementById('acc-editor');
+    const slotsEl = document.getElementById('acc-editor-slots');
+    if (!editBtn || !saveBtn || !editorEl || !slotsEl) return;
+
+    const IMAGE_COUNTS = { 1: 3, 2: 2, 3: 0, 4: 0 };
+
+    slotsEl.innerHTML = [1, 2, 3, 4].map(n => {
+      const imgInputs = IMAGE_COUNTS[n]
+        ? Array.from({ length: IMAGE_COUNTS[n] }, (_, i) => i + 1).map(i => `
+        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">Image ${i} URL <span style="font-weight:400;">(optional — paste a hosted link)</span></div>
+        <input type="text" id="textarea-acc${n}-image${i}" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:11px;color:var(--navy);margin-bottom:8px;">`).join('')
+        : '';
+      return `
+      <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px;">
+        <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;">Accomplished ${n} — Title</div>
+        <textarea id="textarea-acc${n}-title" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--navy);resize:none;height:40px;margin-bottom:8px;"></textarea>
+        <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;">Subtitle <span style="font-weight:400;color:var(--muted);">(optional)</span></div>
+        <textarea id="textarea-acc${n}-subtitle" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--navy);resize:none;height:40px;margin-bottom:8px;"></textarea>
+        <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;">Body</div>
+        <textarea id="textarea-acc${n}-body" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--navy);resize:vertical;min-height:60px;margin-bottom:8px;"></textarea>
+        ${imgInputs}
+      </div>`;
+    }).join('');
+
+    function getLastFullMonthLocalAcc() {
+      const now = new Date();
+      let year = now.getFullYear(), month = now.getMonth();
+      if (month === 0) { month = 12; year--; }
+      return { year, month };
+    }
+
+    async function load() {
+      const { year, month } = getLastFullMonthLocalAcc();
+      const row = await window.reportInsightsFetchRow(BRAND, { year: String(year), month: String(month) });
+      let anyVisible = false;
+      [1, 2, 3, 4].forEach(n => {
+        const title    = row ? (row[`accomplished${n}_title`]    || '') : '';
+        const subtitle = row ? (row[`accomplished${n}_subtitle`] || '') : '';
+        const body     = row ? (row[`accomplished${n}_body`]     || '') : '';
+        const card = document.getElementById(`acc-card-${n}`);
+        if (title) {
+          anyVisible = true;
+          card.style.display = '';
+          document.getElementById(`acc-title-${n}`).textContent = title;
+          const subEl = document.getElementById(`acc-subtitle-${n}`);
+          if (subtitle) { subEl.textContent = subtitle; subEl.style.display = ''; }
+          else { subEl.textContent = ''; subEl.style.display = 'none'; }
+          document.getElementById(`acc-body-${n}`).textContent = body;
+        } else {
+          card.style.display = 'none';
+        }
+        const taTitle = document.getElementById(`textarea-acc${n}-title`);
+        const taSub   = document.getElementById(`textarea-acc${n}-subtitle`);
+        const taBody  = document.getElementById(`textarea-acc${n}-body`);
+        if (taTitle) taTitle.value = title;
+        if (taSub)   taSub.value = subtitle;
+        if (taBody)  taBody.value = body;
+
+        const imgCount = IMAGE_COUNTS[n] || 0;
+        const imagesEl = document.getElementById(`acc-images-${n}`);
+        if (imagesEl) {
+          const urls = [];
+          for (let i = 1; i <= imgCount; i++) {
+            const url = row ? (row[`accomplished${n}_image${i}`] || '') : '';
+            const taImg = document.getElementById(`textarea-acc${n}-image${i}`);
+            if (taImg) taImg.value = url;
+            if (url) urls.push(url);
+          }
+          imagesEl.innerHTML = urls.map(u => `<img src="${u}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">`).join('');
+        }
+      });
+      document.getElementById('acc-empty-state').style.display = anyVisible ? 'none' : 'block';
+      return row;
+    }
+
+    editBtn.addEventListener('click', () => {
+      editorEl.style.display = editorEl.style.display === 'none' ? 'block' : 'none';
+    });
+    cancelBtn.addEventListener('click', () => { editorEl.style.display = 'none'; });
+
+    saveBtn.addEventListener('click', async () => {
+      const origLabel = saveBtn.textContent;
+      saveBtn.disabled = true; saveBtn.textContent = 'Saving…';
+      try {
+        const { year, month } = getLastFullMonthLocalAcc();
+        const fields = {};
+        [1, 2, 3, 4].forEach(n => {
+          fields[`accomplished${n}_title`]    = (document.getElementById(`textarea-acc${n}-title`).value || '').trim();
+          fields[`accomplished${n}_subtitle`] = (document.getElementById(`textarea-acc${n}-subtitle`).value || '').trim();
+          fields[`accomplished${n}_body`]     = (document.getElementById(`textarea-acc${n}-body`).value || '').trim();
+          const imgCount = IMAGE_COUNTS[n] || 0;
+          for (let i = 1; i <= imgCount; i++) {
+            const taImg = document.getElementById(`textarea-acc${n}-image${i}`);
+            if (taImg) fields[`accomplished${n}_image${i}`] = (taImg.value || '').trim();
+          }
+        });
+        await window.reportInsightsSaveFields({ scope: 'monthly', year, month, fields, action: 'save' });
+        await load();
+        editorEl.style.display = 'none';
+      } catch (e) {
+        alert('Save failed: ' + e.message);
+      } finally {
+        saveBtn.disabled = false; saveBtn.textContent = origLabel;
+      }
+    });
+
+    load();
+  })();
+
   // ── Overview hero date — real root cause found ───────────────────────────
   // #topbar-date (the global topbar element) was already being set correctly
   // by initAmazonLive() — but the Overview hero block had a SEPARATE element
@@ -20784,14 +20955,34 @@ async function loadAuditResultsFromSheet() {
     }
   }
 
-  function pdfxHeaderBand(monthYear, activeTab) {
-    const tabs = ['Sales', 'Fulfillment & Customer Service', 'Brand Stewardship', 'Opportunities', 'Events'];
+  function pdfxHeaderBand(monthYear, activeTab, isReviewsPage) {
+    // Tabs — 2026-09-04 per Jaclyn: dropped "Fulfillment & Customer
+    // Service" from this nav band entirely (its own PDF page/checkbox
+    // still exists, just no longer represented here). Added "Reviews".
+    // "Strategy" and "Events" are conditional — only shown if their
+    // respective checkbox is checked for this export, so the band
+    // reflects what's actually in THIS PDF, not a fixed list.
+    const tabs = ['Sales', 'Reviews', 'Brand Stewardship', 'Opportunities'];
+    const strategyEl = document.getElementById('pdf-include-strategy');
+    if (strategyEl && strategyEl.checked) tabs.push('Strategy');
+    const anyEventChecked = ['pdf-include-bss', 'pdf-include-pd', 'pdf-include-pbdd', 'pdf-include-bfcm']
+      .some(id => { const el = document.getElementById(id); return el && el.checked; });
+    if (anyEventChecked) tabs.push('Events');
     const tabsHtml = tabs.map(function (t) {
       return '<span class="pdfx-tab' + (t === activeTab ? ' on' : '') + '">' + t + '</span>';
     }).join('');
-    return '<div class="pdfx-topband">' +
+    // Reviews pages use .pdfx-inner-reviews (22px/20px padding), not the
+    // standard .pdfx-inner (34px/46px) — the topband's negative margin
+    // below has to cancel whichever padding is actually active, or the
+    // navy band's bleed-to-edge math is wrong and the logo/tabs sit
+    // shifted from where they should be. Also removed an erroneous
+    // -30.5px logo margin that was never correctly aligning it to the
+    // tabs' own left edge in the first place — with no extra margin, the
+    // logo sits inside the same padded box as the tabs, so their left
+    // edges line up naturally.
+    return '<div class="pdfx-topband"' + (isReviewsPage ? ' style="margin:-22px -20px 0 -20px;padding:24px 20px 0;"' : '') + '>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
-        '<span class="pdfx-logo-navy" style="margin-left:-30.5px;display:inline-block;">' + pdfxLogoHtml('height:40px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
+        '<span class="pdfx-logo-navy" style="display:inline-block;">' + pdfxLogoHtml('height:40px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
         '<div class="pdfx-tagright"><div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div></div>' +
       '</div>' +
       '<div class="pdfx-tabs">' + tabsHtml + '</div>' +
@@ -20815,9 +21006,9 @@ async function loadAuditResultsFromSheet() {
     return '' +
       '<div class="pdfx-page pdfx-cover">' +
         '<div class="pdfx-cover-navy">' +
-          (PDFX_WATERMARK_SRC ? '<img src="' + PDFX_WATERMARK_SRC + '" alt="" style="position:absolute;right:-60px;top:-30px;width:640px;height:auto;opacity:0.16;pointer-events:none;">' : '') +
+          (PDFX_WATERMARK_SRC ? '<img src="' + PDFX_WATERMARK_SRC + '" alt="" style="position:absolute;right:20px;top:20px;width:320px;height:auto;opacity:0.16;pointer-events:none;">' : '') +
           '<div class="pdfx-cover-toprow">' +
-            '<span class="pdfx-logo-white" style="margin-left:-36.5px;display:inline-block;">' + pdfxLogoHtml('height:48px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
+            '<span class="pdfx-logo-white" style="display:inline-block;">' + pdfxLogoHtml('height:48px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
             '<div class="pdfx-hdr-right"><div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div></div>' +
           '</div>' +
           '<div class="pdfx-cover-eyebrow">Monthly Overview</div>' +
@@ -20876,7 +21067,7 @@ async function loadAuditResultsFromSheet() {
   function buildReviewsPages(monthYear) {
     if (!PDFX_REVIEWS_DATA || PDFX_REVIEWS_DATA === 'no-data') {
       return '<div class="pdfx-page"><div class="pdfx-inner pdfx-inner-reviews">' +
-        pdfxHeaderBand(monthYear, 'Sales') +
+        pdfxHeaderBand(monthYear, 'Reviews', true) +
         '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
         '<div class="pdfx-card" style="color:var(--muted);">No reviews tagged for this period yet.</div>' +
         '</div></div>';
@@ -20893,7 +21084,7 @@ async function loadAuditResultsFromSheet() {
       // same problem: long review text pushing total page height past
       // the ~2112px distortion threshold (playbook Case 6).
       pages.push('<div class="pdfx-page"><div class="pdfx-inner pdfx-inner-reviews">' +
-        pdfxHeaderBand(monthYear, 'Sales') +
+        pdfxHeaderBand(monthYear, 'Reviews', true) +
         '<div class="pdfx-chlabel">Reviews &amp; Ratings</div>' +
         sectionsHtml +
         '</div></div>');
@@ -21114,6 +21305,34 @@ async function loadAuditResultsFromSheet() {
       '</div>';
   }
 
+  function pdfxAccomplishedBlock() {
+    const cards = [1, 2, 3, 4].map(function (n) {
+      const cardEl = document.getElementById('acc-card-' + n);
+      const title = cardEl ? pdfxText('.opp-title', cardEl) : '';
+      if (!title) return '';
+      const subtitle = pdfxText('.opp-subtitle', cardEl);
+      const body = pdfxText('.opp-body', cardEl);
+      const imagesEl = cardEl.querySelector('#acc-images-' + n);
+      const imgUrls = imagesEl ? Array.prototype.map.call(imagesEl.querySelectorAll('img'), function (img) { return img.getAttribute('src'); }) : [];
+      const imagesHtml = imgUrls.length
+        ? '<div class="pdfx-opp-images">' + imgUrls.map(function (u) { return '<img src="' + u + '" class="pdfx-opp-img">'; }).join('') + '</div>'
+        : '';
+      return '<div>' +
+        '<div style="font-size:13px;font-weight:700;color:var(--navy);margin-bottom:4px;">' + pdfxEscape(title) + '</div>' +
+        (subtitle ? '<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px;">' + pdfxEscape(subtitle) + '</div>' : '') +
+        '<div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + pdfxEscape(body) + '</div>' +
+        imagesHtml +
+        '</div>';
+    }).join('');
+    if (!cards) return '';
+    // No box — border:none/padding:0 override on .pdfx-card, matching the
+    // Executive Summary / Future Opportunities pill pattern exactly.
+    return '<div class="pdfx-card" style="border:none;padding:0;margin-bottom:14px;">' +
+      '<span class="pdfx-pill pdfx-pill-sand" style="margin-bottom:16px;">What\'s Been Accomplished</span>' +
+      '<div class="pdfx-cover-cols">' + cards + '</div>' +
+      '</div>';
+  }
+
   function pdfxFutureOpportunitiesBlock() {
     const cards = Array.prototype.map.call(document.querySelectorAll('#m-opportunities .opp-card'), function (card) {
       const title = pdfxText('.opp-title', card);
@@ -21127,10 +21346,13 @@ async function loadAuditResultsFromSheet() {
         '</div>';
     }).join('');
     if (!cards) return '';
-    // Same pill-badge + headline pattern as Executive Summary on the cover
-    // page (.pdfx-pill / .pdfx-cover-cols), so the two sections match
-    // exactly as designed on the live dashboard. Per Jaclyn 2026-07-14.
-    return '<div class="pdfx-card" style="margin-top:14px;">' +
+    // FIXED 2026-09-04 per Jaclyn — this claimed to match the Executive
+    // Summary pill pattern but never actually stripped .pdfx-card's own
+    // border/padding, so it still rendered as a boxed card. border:none/
+    // padding:0 here is the actual fix; border-top adds back a plain
+    // divider line when this section follows Accomplished, without
+    // reintroducing the full box.
+    return '<div class="pdfx-card" style="border:none;padding:0;border-top:1px solid var(--border);padding-top:12px;">' +
       '<span class="pdfx-pill" style="margin-bottom:16px;">Future Opportunities</span>' +
       '<div class="pdfx-cover-cols">' + cards + '</div>' +
       '</div>';
@@ -21237,6 +21459,7 @@ async function loadAuditResultsFromSheet() {
     // separately-flagged, unrelated data-source bug — this at least lets
     // it be left out of exports while that gets sorted out.
     const showSubsave = !!(document.getElementById('m-opp-cb-subsave') && document.getElementById('m-opp-cb-subsave').checked);
+    const showAccomplished = !!(document.getElementById('m-opp-cb-accomplished') && document.getElementById('m-opp-cb-accomplished').checked);
     const showFuture  = !!(document.getElementById('m-opp-cb-future')  && document.getElementById('m-opp-cb-future').checked);
     const kpis = ['kpi-active-subs', 'kpi-retention'].map(pdfxKpi);
     const subsaveHtml = showSubsave
@@ -21244,12 +21467,13 @@ async function loadAuditResultsFromSheet() {
         '<div class="pdfx-kpis n2" style="margin-top:6px;">' + kpis.map(pdfxKpiCardHtml).join('') + '</div>' +
         '<div class="pdfx-card"><div class="pdfx-card-title">Active Subscriptions by Month</div>' + pdfxChartBlock('_snsChart') + '</div>'
       : '';
+    const accomplishedHtml = showAccomplished ? pdfxAccomplishedBlock() : '';
     const futureHtml = showFuture ? pdfxFutureOpportunitiesBlock() : '';
     return '' +
       '<div class="pdfx-page">' +
         '<div class="pdfx-inner">' +
           pdfxHeaderBand(monthYear, 'Opportunities') +
-          subsaveHtml + futureHtml +
+          subsaveHtml + accomplishedHtml + futureHtml +
           '<div class="pdfx-pin-bottom">' + pdfxFooter(monthYear) + '</div>' +
         '</div>' +
       '</div>';
