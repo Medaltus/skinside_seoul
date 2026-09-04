@@ -21006,7 +21006,7 @@ async function loadAuditResultsFromSheet() {
     return '' +
       '<div class="pdfx-page pdfx-cover">' +
         '<div class="pdfx-cover-navy">' +
-          (PDFX_WATERMARK_SRC ? '<img src="' + PDFX_WATERMARK_SRC + '" alt="" style="position:absolute;right:10px;top:110px;width:380px;height:auto;opacity:0.16;pointer-events:none;">' : '') +
+          (PDFX_WATERMARK_SRC ? '<img src="' + PDFX_WATERMARK_SRC + '" alt="" style="position:absolute;right:10px;top:110px;width:520px;height:auto;opacity:0.16;pointer-events:none;">' : '') +
           '<div class="pdfx-cover-toprow">' +
             '<span class="pdfx-logo-white" style="display:inline-block;">' + pdfxLogoHtml('height:48px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
             '<div class="pdfx-hdr-right"><div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div></div>' +
@@ -21156,14 +21156,22 @@ async function loadAuditResultsFromSheet() {
         if (!bd || !bd.latest) return { label: name, value: '—', mom: 'No data', momClass: 'flat' };
         const { latest, earliest, subcat } = bd;
         const change = earliest.date !== latest.date ? (earliest.bsr - latest.bsr) : null;
-        // Same "hide negative changes" checkbox as the live tab, respected
-        // here at build time since the PDF is static — per Jaclyn
-        // 2026-09-03, the BSR value itself always stays, only the change
-        // number gets omitted for negatives when this is checked.
-        const chStr = (change && change !== 0)
-          ? (change < 0 && hideNeg ? '' : (change > 0 ? `▲ ${Math.abs(change).toLocaleString()}` : `▼ ${Math.abs(change).toLocaleString()}`))
-          : '—';
-        return { label: name, value: '#' + latest.bsr.toLocaleString(), mom: (chStr || '—') + (subcat ? ' · ' + subcat : ''), momClass: change > 0 ? 'up' : change < 0 ? 'dn' : 'flat' };
+        // FIXED 2026-09-04 — two bugs here, both from the same root cause:
+        // pdfxKpiCardHtml() already prepends its OWN ▲/▼ arrow based on
+        // momClass, completely independent of whatever text is in mom.
+        // This code was ALSO writing a manual ▲/▼ character into chStr,
+        // producing a double arrow on every card ("▲ ▲ 1,079"). And
+        // "hide negatives" only ever cleared chStr's text — momClass
+        // stayed 'dn', so pdfxKpiCardHtml kept drawing its own red arrow
+        // regardless ("▼ —"), which is exactly what Jaclyn flagged.
+        // Fix: chStr never includes an arrow character now (let
+        // pdfxKpiCardHtml's own arrow+momClass logic be the only source
+        // of the arrow), and momClass is forced to 'flat' — not just the
+        // text — whenever a negative change is being hidden.
+        const isHiddenNeg = change < 0 && hideNeg;
+        const chStr = (change && change !== 0 && !isHiddenNeg) ? Math.abs(change).toLocaleString() : '';
+        const momClass = isHiddenNeg ? 'flat' : (change > 0 ? 'up' : change < 0 ? 'dn' : 'flat');
+        return { label: name, value: '#' + latest.bsr.toLocaleString(), mom: (chStr || '—') + (subcat ? ' · ' + subcat : ''), momClass: momClass };
       }).map(pdfxKpiCardHtml).join('');
       bsrHtml = '<div class="pdfx-chlabel" style="font-size:11px;">Subcategory BSR by Product</div><div class="pdfx-kpi-row-4">' + cards + '</div>';
     }
