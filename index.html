@@ -5731,9 +5731,27 @@ async function initSns() {
   // the actual aggregation math out from month-filtering, so MTD's partial-
   // month variant (aggregateMonthThroughDay) can reuse the same math
   // without duplicating it.
+  // Cancelled orders — Amazon's real order_status enum value is spelled
+  // "Canceled" (single L), but checking both spellings matches the same
+  // defensive convention already used elsewhere in this codebase.
+  // Confirmed 2026-09-04: this sheet's real column is literally named
+  // `status`.
+  function isCancelledAmzOrder(r) {
+    const status = (r.status || '').toLowerCase();
+    return status === 'cancelled' || status === 'canceled';
+  }
   function aggregateFilteredRows(filtered) {
     if (!filtered.length) return null;
-    const orderIds = new Set(filtered.map(r => r.order_id).filter(Boolean));
+    // Fully-returned orders (_amzFullyReturnedOrderIds, computed once
+    // after fetch — see above) are excluded from ORDER COUNT and
+    // REVENUE/AOV here, but deliberately NOT from totalUnits — Units
+    // already gets its own, separate returns-netting applied by the
+    // caller (curr.totalUnits -= currReturns.totalQty); excluding here
+    // too would subtract the same returned units twice. Per Jaclyn
+    // 2026-09-04.
+    const orderIds = new Set(
+      filtered.map(r => r.order_id).filter(Boolean).filter(id => !_amzFullyReturnedOrderIds.has(id))
+    );
     const totalOrders = orderIds.size;
     const totalUnits = filtered.reduce((s, r) => s + (parseInt(r.unit_count, 10) || 0), 0);
     // AOV -- sum item_price across ALL line items per order_id, then average those sums.
@@ -5741,7 +5759,7 @@ async function initSns() {
     // accumulate across rows to get the true per-order total before averaging.
     const orderTotals = {};
     filtered.forEach(r => {
-      if (!r.order_id) return;
+      if (!r.order_id || _amzFullyReturnedOrderIds.has(r.order_id)) return;
       orderTotals[r.order_id] = (orderTotals[r.order_id] || 0) + parseAmt(r.item_price);
     });
     const totalRevenue = Object.values(orderTotals).reduce((s, v) => s + v, 0);
@@ -5750,7 +5768,7 @@ async function initSns() {
   }
   function aggregateMonth(rows, year, month) {
     const prefix = `${year}-${String(month).padStart(2,'0')}`;
-    return aggregateFilteredRows(rows.filter(r => normalizeDate(r.date).substring(0, 7) === prefix));
+    return aggregateFilteredRows(rows.filter(r => normalizeDate(r.date).substring(0, 7) === prefix && !isCancelledAmzOrder(r)));
   }
   // Territory breakdown — added 2026-08-19 per Jaclyn, Skinside Seoul-specific.
   // Wraps the existing aggregateFilteredRows (combined total, unchanged)
@@ -5768,11 +5786,12 @@ async function initSns() {
   }
   function aggregateMonthWithTerritory(rows, year, month) {
     const prefix = `${year}-${String(month).padStart(2,'0')}`;
-    return aggregateFilteredRowsWithTerritory(rows.filter(r => normalizeDate(r.date).substring(0, 7) === prefix));
+    return aggregateFilteredRowsWithTerritory(rows.filter(r => normalizeDate(r.date).substring(0, 7) === prefix && !isCancelledAmzOrder(r)));
   }
   function aggregateMonthThroughDayWithTerritory(rows, year, month, throughDay) {
     const prefix = `${year}-${String(month).padStart(2,'0')}`;
     return aggregateFilteredRowsWithTerritory(rows.filter(r => {
+      if (isCancelledAmzOrder(r)) return false;
       const d = normalizeDate(r.date);
       if (d.substring(0, 7) !== prefix) return false;
       const day = parseInt(d.substring(8, 10), 10);
@@ -5785,6 +5804,7 @@ async function initSns() {
   function aggregateMonthThroughDay(rows, year, month, throughDay) {
     const prefix = `${year}-${String(month).padStart(2,'0')}`;
     return aggregateFilteredRows(rows.filter(r => {
+      if (isCancelledAmzOrder(r)) return false;
       const d = normalizeDate(r.date);
       if (d.substring(0, 7) !== prefix) return false;
       const day = parseInt(d.substring(8, 10), 10);
@@ -5881,6 +5901,15 @@ async function initSns() {
   // Period selector state, added 2026-08-12 — raw rows fetched once,
   // stored here so switching periods never re-fetches. See handoff doc.
   let _amzSyncRows = [], _amzHistRows = [], _amzReturnRows = [], _amzAdSummaryRows = [], _amzAdOrdersRowsAll = [];
+  // Fully-returned order_ids — computed once orders+returns are both
+  // fetched, below. Used by aggregateFilteredRows to exclude an order
+  // from the Orders COUNT specifically when every unit on it came back,
+  // mirroring (at order-count granularity) the same returns-netting
+  // Units already gets via currReturns.totalQty. Deliberately does NOT
+  // exclude partially-returned orders — those are still real, completed
+  // orders, just with fewer net units; only a fully-returned order
+  // shouldn't count as an order at all. Per Jaclyn 2026-09-04.
+  let _amzFullyReturnedOrderIds = new Set();
   window._amzActivePeriod = 'lastFull';
 
   window.initAmazonLive = function () {
@@ -5946,6 +5975,29 @@ async function initSns() {
       _amzReturnRows = isCsv(amzReturnsCsv) ? parseCsv(amzReturnsCsv).filter(isEvolisRow) : [];
       _amzAdSummaryRows = isCsv(adSummaryCsv) ? parseCsv(adSummaryCsv) : [];
       _amzAdOrdersRowsAll = isCsv(adOrdersCsv) ? parseCsv(adOrdersCsv) : [];
+
+      // Fully-returned order_ids — cross-references ALL known orders
+      // (sync + historical, so an order from either window is covered)
+      // against ALL returns by order_id. An order counts as "fully
+      // returned" when its total returned quantity meets or exceeds its
+      // total ordered quantity — matched by order_id directly (the
+      // Returns sheet has one, confirmed 2026-09-04), not by aggregate
+      // quantity movement the way Units netting works.
+      {
+        const orderedQtyById = {};
+        _amzSyncRows.concat(_amzHistRows).forEach(r => {
+          if (!r.order_id) return;
+          orderedQtyById[r.order_id] = (orderedQtyById[r.order_id] || 0) + (parseInt(r.unit_count, 10) || 0);
+        });
+        const returnedQtyById = {};
+        _amzReturnRows.forEach(r => {
+          if (!r.order_id) return;
+          returnedQtyById[r.order_id] = (returnedQtyById[r.order_id] || 0) + (parseInt(r.quantity, 10) || 0);
+        });
+        _amzFullyReturnedOrderIds = new Set(
+          Object.keys(orderedQtyById).filter(id => returnedQtyById[id] != null && returnedQtyById[id] >= orderedQtyById[id])
+        );
+      }
 
       // Skinside Seoul is Amazon.com (US) only right now — no CA/UK tab merge.
       // Every row gets tagged US by amazonTerritoryFor() below (or stays
