@@ -1463,6 +1463,26 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
 
     <div class="card" style="margin-bottom:20px;">
+      <div class="card-title">Ad Spend by Type <span style="font-weight:400;color:var(--muted);">(Sponsored Products / Brands / Display)</span></div>
+      <div id="ov-adtype-note" style="font-size:11px;color:var(--muted);margin-bottom:12px;display:none;"></div>
+      <div style="display:flex;flex-wrap:wrap;gap:20px;">
+        <div style="position:relative;height:280px;width:280px;flex-shrink:0;"><canvas id="chart-ov-adtype"></canvas></div>
+        <table class="tp-table" style="flex:1;min-width:260px;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:var(--navy);color:#fff;">
+              <th style="text-align:left;padding:8px 10px;">Ad Type</th>
+              <th style="text-align:left;padding:8px 10px;"># Campaigns</th>
+              <th style="text-align:left;padding:8px 10px;">ACOS</th>
+              <th style="text-align:left;padding:8px 10px;">Spend</th>
+              <th style="text-align:left;padding:8px 10px;">Sales</th>
+            </tr>
+          </thead>
+          <tbody id="ov-adtype-tbody"><tr><td colspan="5" style="text-align:center;padding:20px;color:var(--muted);">Loading…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
       <div class="card-title">Top Selling Products <span style="font-weight:400;color:var(--muted);">(by Units, Amazon + Walmart, Month to Date)</span></div>
       <table class="tp-table" style="width:100%;border-collapse:collapse;font-size:12px;">
         <thead>
@@ -22296,7 +22316,19 @@ async function loadAuditResultsFromSheet() {
       // already declared globally further down this file (used by the
       // existing "Returns Processed" KPI on Marketing → Fulfillment & CS),
       // reused here rather than redeclared.
-      const [amzCsv, webCsv, wmtCsv, adOrdersCsv, amzReturnsCsv, wmtReturnsCsv, webReturnsCsv, namesCsv, webAdsCsv, webShoppingCsv] = await Promise.all([
+      // Ad Spend by Type (SP/SB/SD) — added 2026-09-04, ported from évolis
+      // per the build-summary doc. Declared as fresh LOCAL consts here,
+      // not reused from the AD_SUMMARY_SHEET_ID/GID already declared
+      // elsewhere in this file (there are two other copies, in two
+      // separate, unrelated closures) — the doc's own #4 finding is that
+      // this file's <script> tags don't share scope, and a constant
+      // being visibly defined elsewhere is not confirmation it's
+      // reachable from here. This is a genuinely NEW fetch — Overview
+      // didn't previously pull the Advertising Cache sheet at all (only
+      // SHEET_AD_ORDERS, the ASIN-level data, for Ad-Driven Orders).
+      const OV_AD_SUMMARY_SHEET_ID = window.SHEET_CFG.SHEET_ADVERTISING.fileId;
+      const OV_AD_SUMMARY_GID      = window.SHEET_CFG.SHEET_ADVERTISING.gid;
+      const [amzCsv, webCsv, wmtCsv, adOrdersCsv, amzReturnsCsv, wmtReturnsCsv, webReturnsCsv, namesCsv, webAdsCsv, webShoppingCsv, adSummaryCsv] = await Promise.all([
         fetch(sheetCsvUrl(AMAZON_SHEET_ID, AMAZON_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
         fetch(sheetCsvUrl(WEB_SHEET_ID, WEB_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
         fetch(sheetCsvUrl(WMT_SHEET_ID, WMT_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
@@ -22325,6 +22357,16 @@ async function loadAuditResultsFromSheet() {
         // available source for per-ASIN Website ad units (not a full picture
         // of every Google campaign type).
         fetch(sheetCsvUrl(OV_WEB_ORDERS_SHEET_ID, WEB_SHOPPING_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
+        // Ad Spend by Type (SP/SB/SD) — Advertising Cache sheet, one row
+        // per year/month. NOT confirmed against live data that this
+        // brand's tab actually has the sp_/sb_/sd_ columns populated
+        // with real recent values (the porting doc is explicit that this
+        // varies by brand and needs checking, not assuming) — this is
+        // built to degrade gracefully to an honest "no ad spend
+        // recorded" message if the row/columns come back empty, rather
+        // than silently showing a misleading all-zero chart as if it
+        // were confirmed real data.
+        fetch(ovCsvUrl(OV_AD_SUMMARY_SHEET_ID, OV_AD_SUMMARY_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
       ]);
 
       const amzRows = isCsv(amzCsv) ? parseCsv(amzCsv).filter(isEvolisRow) : [];
@@ -22825,6 +22867,16 @@ async function loadAuditResultsFromSheet() {
       // match the hero number, which is worse than either being wrong alone.
       const donutTotal = amzMtdNetRevenue + wmtMtdNetRevenue;
       if (donutTotal > 0) {
+        // FIXED 2026-09-04 — this had no destroy-before-create guard,
+        // meaning a second call to initOverviewLive() in the same
+        // session (e.g. the MTD/Last Month toggle re-running this
+        // function) would throw "Canvas is already in use" on this
+        // exact canvas. Found while porting the Ad Spend by Type
+        // feature, whose own build doc flagged this as a known bug
+        // class on this exact page — turned out to already be latent
+        // here too, just not yet triggered before the period toggle
+        // made re-entry into this function possible.
+        if (window._ovDonutChart) { window._ovDonutChart.destroy(); window._ovDonutChart = null; }
         window._ovDonutChart = new Chart(document.getElementById('chart-ov-donut'), {
           type: 'doughnut',
           data: {
@@ -22833,6 +22885,73 @@ async function loadAuditResultsFromSheet() {
           },
           options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 10, font: { size: 12 } } } } }
         });
+      }
+
+      // -- Ad Spend by Type (SP/SB/SD) -- ported from évolis's Overview page,
+      // 2026-09-04, per the build-summary doc. Reads the Advertising Cache
+      // sheet's one-row-per-year/month format, matching the same
+      // refDate-based period lookup already used elsewhere on this page.
+      // NOT confirmed against live data that this brand's sp_/sb_/sd_
+      // columns are populated with real recent values (flagged explicitly
+      // in the porting doc as varying by brand) -- degrades to an honest
+      // "no ad spend recorded" message rather than a misleading all-zero
+      // chart if the row/columns come back empty.
+      {
+        const adSummaryRows = isCsv(adSummaryCsv) ? parseCsv(adSummaryCsv) : [];
+        const adSummaryRow = adSummaryRows.find(r => parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1);
+        const noteEl = document.getElementById('ov-adtype-note');
+        const tbodyEl = document.getElementById('ov-adtype-tbody');
+        const num = v => parseFloat(v) || 0;
+        const types = [
+          { key: 'sp', label: 'Sponsored Products', color: '#001f60' },
+          { key: 'sb', label: 'Sponsored Brands', color: '#24e9a3' },
+          { key: 'sd', label: 'Sponsored Display', color: '#c87d2f' },
+        ].map(t => ({
+          ...t,
+          spend: adSummaryRow ? num(adSummaryRow[t.key + '_spend']) : 0,
+          sales: adSummaryRow ? num(adSummaryRow[t.key + '_sales']) : 0,
+          acos: adSummaryRow ? num(adSummaryRow[t.key + '_acos']) : 0,
+          campaigns: adSummaryRow ? (parseInt(adSummaryRow[t.key + '_campaigns_running'], 10) || 0) : 0,
+        }));
+        const totalSpend = types.reduce((s, t) => s + t.spend, 0);
+
+        if (window._ovAdTypeChart) { window._ovAdTypeChart.destroy(); window._ovAdTypeChart = null; }
+
+        if (!adSummaryRow || totalSpend === 0) {
+          if (noteEl) { noteEl.style.display = 'block'; noteEl.textContent = 'No ad spend recorded for this period yet.'; }
+        } else {
+          const nonZeroTypes = types.filter(t => t.spend > 0);
+          if (noteEl) {
+            if (nonZeroTypes.length === 1) {
+              noteEl.style.display = 'block';
+              noteEl.textContent = `ℹ 100% ${nonZeroTypes[0].label} this period — no active ${types.filter(t => t.spend === 0).map(t => t.label).join(' or ')} spend.`;
+            } else {
+              noteEl.style.display = 'none';
+            }
+          }
+          const canvasEl = document.getElementById('chart-ov-adtype');
+          if (canvasEl) {
+            window._ovAdTypeChart = new Chart(canvasEl, {
+              type: 'doughnut',
+              data: {
+                labels: types.map(t => t.label),
+                datasets: [{ data: types.map(t => t.spend), backgroundColor: types.map(t => t.color), borderWidth: 0 }]
+              },
+              options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } } } } }
+            });
+          }
+        }
+
+        if (tbodyEl) {
+          tbodyEl.innerHTML = types.map(t => `
+            <tr>
+              <td style="padding:8px 10px;font-weight:600;">${t.label}</td>
+              <td style="padding:8px 10px;">${t.campaigns.toLocaleString()}</td>
+              <td style="padding:8px 10px;">${t.acos > 0 ? t.acos.toFixed(1) + '%' : '<span class="tp-dash">—</span>'}</td>
+              <td style="padding:8px 10px;">$${t.spend.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+              <td style="padding:8px 10px;">$${t.sales.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
+            </tr>`).join('');
+        }
       }
 
       // -- Ad Spend / Blended ACOS -- Amazon (prorated monthly estimate) + Website (real MTD) --
@@ -23011,6 +23130,8 @@ async function loadAuditResultsFromSheet() {
         wmtTrend.unshift(monthlyRevenue(wmtRevRows, ty, tm));
       }
       if ([...amzTrend, ...wmtTrend].some(v => v > 0)) {
+        // Same destroy-before-create fix as the donut chart above.
+        if (window._ovTrendChart) { window._ovTrendChart.destroy(); window._ovTrendChart = null; }
         window._ovTrendChart = new Chart(document.getElementById('chart-ov-trend'), {
           type: 'line',
           data: {
