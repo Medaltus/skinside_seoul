@@ -1306,20 +1306,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div class="home-hero-date" id="home-date"></div>
     </div>
 
-    <!-- KPI row -->
-    <div class="home-kpi-row">
-      <div class="home-kpi-card">
-        <div class="home-kpi-label">Total SKUs</div>
-        <div class="home-kpi-value" id="home-kpi-skus">&mdash;</div>
-        <div class="home-kpi-sub">In your catalog</div>
-      </div>
-      <div class="home-kpi-card">
-        <div class="home-kpi-label">Units On Hand</div>
-        <div class="home-kpi-value" id="home-kpi-units">&mdash;</div>
-        <div class="home-kpi-sub" id="home-kpi-units-sub">Consignment units</div>
-      </div>
-    </div>
-
     <!-- Team + Resources -->
     <div class="home-grid">
       <div class="card">
@@ -1463,10 +1449,18 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
 
     <div class="card" style="margin-bottom:20px;">
-      <div class="card-title">Ad Spend by Type <span style="font-weight:400;color:var(--muted);">(Sponsored Products / Brands / Display)</span></div>
-      <div id="ov-adtype-note" style="font-size:11px;color:var(--muted);margin-bottom:12px;display:none;"></div>
+      <div class="card-title">Ad Spend &amp; Sales by Type <span style="font-weight:400;color:var(--muted);">(Sponsored Products / Brands / Display)</span></div>
+      <div id="ov-adtype-note" style="font-size:11px;color:var(--muted);margin-bottom:4px;display:none;"></div>
+      <div id="ov-adtype-sales-note" style="font-size:11px;color:var(--muted);margin-bottom:12px;display:none;"></div>
       <div style="display:flex;flex-wrap:wrap;gap:20px;">
-        <div style="position:relative;height:280px;width:280px;flex-shrink:0;"><canvas id="chart-ov-adtype"></canvas></div>
+        <div style="flex-shrink:0;">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:6px;">Spend</div>
+          <div style="position:relative;height:220px;width:220px;"><canvas id="chart-ov-adtype"></canvas></div>
+        </div>
+        <div style="flex-shrink:0;">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);text-align:center;margin-bottom:6px;">Sales</div>
+          <div style="position:relative;height:220px;width:220px;"><canvas id="chart-ov-adtype-sales"></canvas></div>
+        </div>
         <table class="tp-table" style="flex:1;min-width:260px;border-collapse:collapse;font-size:12px;">
           <thead>
             <tr style="background:var(--navy);color:#fff;">
@@ -22900,6 +22894,7 @@ async function loadAuditResultsFromSheet() {
         const adSummaryRows = isCsv(adSummaryCsv) ? parseCsv(adSummaryCsv) : [];
         const adSummaryRow = adSummaryRows.find(r => parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1);
         const noteEl = document.getElementById('ov-adtype-note');
+        const salesNoteEl = document.getElementById('ov-adtype-sales-note');
         const tbodyEl = document.getElementById('ov-adtype-tbody');
         const num = v => parseFloat(v) || 0;
         const types = [
@@ -22913,34 +22908,43 @@ async function loadAuditResultsFromSheet() {
           acos: adSummaryRow ? num(adSummaryRow[t.key + '_acos']) : 0,
           campaigns: adSummaryRow ? (parseInt(adSummaryRow[t.key + '_campaigns_running'], 10) || 0) : 0,
         }));
-        const totalSpend = types.reduce((s, t) => s + t.spend, 0);
 
-        if (window._ovAdTypeChart) { window._ovAdTypeChart.destroy(); window._ovAdTypeChart = null; }
-
-        if (!adSummaryRow || totalSpend === 0) {
-          if (noteEl) { noteEl.style.display = 'block'; noteEl.textContent = 'No ad spend recorded for this period yet.'; }
-        } else {
-          const nonZeroTypes = types.filter(t => t.spend > 0);
-          if (noteEl) {
+        // Shared renderer for both doughnuts — spend and sales are
+        // structurally identical (same 3 types/colors, same "one type is
+        // 100%" vs "genuinely nothing recorded" note logic), just reading
+        // a different field per type. Added 2026-09-04 per Jaclyn — a
+        // spend-only circle was "only half the story."
+        function renderAdTypeDonut({ metric, noun, canvasId, chartVarName, noteElement }) {
+          const total = types.reduce((s, t) => s + t[metric], 0);
+          if (window[chartVarName]) { window[chartVarName].destroy(); window[chartVarName] = null; }
+          if (!adSummaryRow || total === 0) {
+            if (noteElement) { noteElement.style.display = 'block'; noteElement.textContent = `No ad ${noun} recorded for this period yet.`; }
+            return;
+          }
+          const nonZeroTypes = types.filter(t => t[metric] > 0);
+          if (noteElement) {
             if (nonZeroTypes.length === 1) {
-              noteEl.style.display = 'block';
-              noteEl.textContent = `ℹ 100% ${nonZeroTypes[0].label} this period — no active ${types.filter(t => t.spend === 0).map(t => t.label).join(' or ')} spend.`;
+              noteElement.style.display = 'block';
+              noteElement.textContent = `ℹ 100% ${nonZeroTypes[0].label} this period — no active ${types.filter(t => t[metric] === 0).map(t => t.label).join(' or ')} ${noun}.`;
             } else {
-              noteEl.style.display = 'none';
+              noteElement.style.display = 'none';
             }
           }
-          const canvasEl = document.getElementById('chart-ov-adtype');
+          const canvasEl = document.getElementById(canvasId);
           if (canvasEl) {
-            window._ovAdTypeChart = new Chart(canvasEl, {
+            window[chartVarName] = new Chart(canvasEl, {
               type: 'doughnut',
               data: {
                 labels: types.map(t => t.label),
-                datasets: [{ data: types.map(t => t.spend), backgroundColor: types.map(t => t.color), borderWidth: 0 }]
+                datasets: [{ data: types.map(t => t[metric]), backgroundColor: types.map(t => t.color), borderWidth: 0 }]
               },
               options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 10, font: { size: 11 } } } } }
             });
           }
         }
+
+        renderAdTypeDonut({ metric: 'spend', noun: 'spend', canvasId: 'chart-ov-adtype', chartVarName: '_ovAdTypeChart', noteElement: noteEl });
+        renderAdTypeDonut({ metric: 'sales', noun: 'sales', canvasId: 'chart-ov-adtype-sales', chartVarName: '_ovAdTypeSalesChart', noteElement: salesNoteEl });
 
         if (tbodyEl) {
           tbodyEl.innerHTML = types.map(t => `
