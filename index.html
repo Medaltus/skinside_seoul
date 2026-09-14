@@ -1412,6 +1412,22 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 
     <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;width:fit-content;margin-bottom:16px;"></div>
 
+    <!-- Goal Tracker — added 2026-09-05, ported from évolis's own Overview
+         page per Jaclyn. évolis has two side-by-side groups (Amazon+
+         Walmart, Website); this brand only needs one (Amazon), so this is
+         a single full-width card, not the two-column layout évolis uses.
+         Same sand/navy-accent treatment as the rest of that design
+         system's "featured content" cards. -->
+    <div class="card-title" style="font-size:16px;">Goal Tracker</div>
+    <div style="margin-bottom:22px;">
+      <div class="card" id="ov-goals-card-amz" style="margin-top:0;background:var(--sand);border:none;border-top:3px solid var(--navy);">
+        <div class="card-title" id="ov-goals-title-amz" style="font-size:16px;">Amazon</div>
+        <div id="ov-goals-body-amz" style="display:flex;gap:16px;">
+          <div style="color:var(--muted);flex:1;text-align:center;padding:20px;">Loading…</div>
+        </div>
+      </div>
+    </div>
+
     <div class="kpi-row">
       <div class="kpi-card" id="ov-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
       <div class="kpi-card" id="ov-kpi-units"><div class="kpi-label">Total Units Sold</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
@@ -1488,9 +1504,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             <th style="text-align:left;padding:8px 10px;">Total Units</th>
             <th style="text-align:left;padding:8px 10px;">Ads (Amazon)</th>
             <th style="text-align:left;padding:8px 10px;">Organic</th>
+            <th style="text-align:left;padding:8px 10px;">Conv% (Amazon)</th>
           </tr>
         </thead>
-        <tbody id="ov-products-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
+        <tbody id="ov-products-tbody"><tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">Loading…</td></tr></tbody>
       </table>
     </div>
 
@@ -19088,6 +19105,33 @@ function csvVals(line) {
   return (line.match(/(".*?"|[^,]+|(?<=,)(?=,)|^(?=,)|(?<=,)$)/g)||[]).map(v=>v.replace(/^"|"$/g,'').trim());
 }
 
+// Raw 2D-array CSV parser (row[columnIndex], not header-keyed) — added
+// 2026-09-05 for the Goal Tracker, ported from évolis. Needed because
+// that sheet's real headers are unreliable in places; positional access
+// by real column letter (as Jaclyn specified: P/S/AB) is the only
+// reliable way to read it.
+function parseCsv2D(text) {
+  if (!text || !text.trim()) return [];
+  const rows = [];
+  let row = [], field = '', inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; }
+        else inQuotes = false;
+      } else field += c;
+    } else {
+      if (c === '"') inQuotes = true;
+      else if (c === ',') { row.push(field); field = ''; }
+      else if (c === '\n') { row.push(field); rows.push(row); row = []; field = ''; }
+      else if (c === '\r') { /* skip, \n handles the line break */ }
+      else field += c;
+    }
+  }
+  if (field !== '' || row.length) { row.push(field); rows.push(row); }
+  return rows;
+}
 function parseCsvToRows(text) {
   const all = parseCsvFull(text);
   if (all.length < 2) return [];
@@ -22322,7 +22366,7 @@ async function loadAuditResultsFromSheet() {
       // SHEET_AD_ORDERS, the ASIN-level data, for Ad-Driven Orders).
       const OV_AD_SUMMARY_SHEET_ID = window.SHEET_CFG.SHEET_ADVERTISING.fileId;
       const OV_AD_SUMMARY_GID      = window.SHEET_CFG.SHEET_ADVERTISING.gid;
-      const [amzCsv, webCsv, wmtCsv, adOrdersCsv, amzReturnsCsv, wmtReturnsCsv, webReturnsCsv, namesCsv, webAdsCsv, webShoppingCsv, adSummaryCsv] = await Promise.all([
+      const [amzCsv, webCsv, wmtCsv, adOrdersCsv, amzReturnsCsv, wmtReturnsCsv, webReturnsCsv, namesCsv, webAdsCsv, webShoppingCsv, bizCsv, adSummaryCsv] = await Promise.all([
         fetch(sheetCsvUrl(AMAZON_SHEET_ID, AMAZON_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
         fetch(sheetCsvUrl(WEB_SHEET_ID, WEB_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
         fetch(sheetCsvUrl(WMT_SHEET_ID, WMT_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
@@ -22351,6 +22395,12 @@ async function loadAuditResultsFromSheet() {
         // available source for per-ASIN Website ad units (not a full picture
         // of every Google campaign type).
         fetch(sheetCsvUrl(OV_WEB_ORDERS_SHEET_ID, WEB_SHOPPING_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
+        // Business Report — added 2026-09-05 per Jaclyn, for the Conv%
+        // column on Top Selling Products. Amazon-only source (this sheet
+        // has no Website/Walmart sessions equivalent), same sheet/gid
+        // already confirmed and used elsewhere on this dashboard (Brand
+        // Momentum's Sessions section).
+        fetch(ovCsvUrl(window.SHEET_CFG.SHEET_BUSINESS_REPORT.fileId, window.SHEET_CFG.SHEET_BUSINESS_REPORT.gid) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => ''),
         // Ad Spend by Type (SP/SB/SD) — Advertising Cache sheet, one row
         // per year/month. NOT confirmed against live data that this
         // brand's tab actually has the sp_/sb_/sd_ columns populated
@@ -22825,6 +22875,31 @@ async function loadAuditResultsFromSheet() {
         return `<span class="tp-units">${curr.toLocaleString()}</span>${momBadge(curr, prevVal)}`;
       }
 
+      // Conv% for Top Selling Products — added 2026-09-05 per Jaclyn,
+      // ported from évolis, same styling as the PPC page's Product
+      // Performance table (rank-pill, green >=15%, amber otherwise).
+      // Honest scope note: this is Amazon-only (units ÷ sessions), not
+      // blended across Amazon+Walmart — Business Report has no Walmart
+      // sessions equivalent, so mixing blended units into this rate
+      // would silently inflate it against a denominator that only
+      // covers part of the numerator. Column header says "(Amazon)" for
+      // the same reason.
+      const bizRowsForConv = isCsv(bizCsv) ? parseCsvToRows(bizCsv) : [];
+      const sessionsByAsinCurr = {};
+      bizRowsForConv.forEach(r => {
+        if (parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1) {
+          const asin = (r.asin || '').trim().toUpperCase();
+          if (asin) sessionsByAsinCurr[asin] = (sessionsByAsinCurr[asin] || 0) + (parseInt(r.sessions, 10) || 0);
+        }
+      });
+      function convCell(amazonUnits, asin) {
+        const sessions = sessionsByAsinCurr[asin] || 0;
+        if (!sessions) return '<span class="tp-dash">—</span>';
+        const conv = (amazonUnits / sessions) * 100;
+        const convClass = conv >= 15 ? 'rank-top' : (conv > 0 ? 'rank-low' : 'rank-none');
+        return `<span class="rank-pill ${convClass}">${conv.toFixed(2)}%</span>`;
+      }
+
       const productRows = Array.from(allAsins).map(asin => {
         const a = amzUnitsByAsin[asin] || 0, m = wmtUnitsByAsin[asin] || 0;
         const aPrev = amzPrevUnitsByAsin[asin] || 0, mPrev = wmtPrevUnitsByAsin[asin] || 0;
@@ -22840,7 +22915,7 @@ async function loadAuditResultsFromSheet() {
       const tbody = document.getElementById('ov-products-tbody');
       if (tbody) {
         if (!productRows.length) {
-          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:24px;color:var(--muted);">No sales yet this month.</td></tr>';
         } else {
           tbody.innerHTML = productRows.map((r, i) => `
             <tr>
@@ -22851,6 +22926,7 @@ async function loadAuditResultsFromSheet() {
               <td style="padding:7px 10px;"><div class="tp-cell">${unitCell(r.total, r.totalPrev)}</div></td>
               <td style="padding:7px 10px;">${r.adUnits > 0 ? `<span class="tp-units">${r.adUnits.toLocaleString()}</span>` : '<span class="tp-dash">—</span>'}</td>
               <td style="padding:7px 10px;">${r.orgUnits > 0 ? `<span class="tp-units">${r.orgUnits.toLocaleString()}</span>` : '<span class="tp-dash">—</span>'}</td>
+              <td style="padding:7px 10px;">${convCell(r.amazon, r.asin)}</td>
             </tr>`).join('');
         }
       }
@@ -22956,6 +23032,138 @@ async function loadAuditResultsFromSheet() {
               <td style="padding:8px 10px;">$${t.sales.toLocaleString(undefined, { maximumFractionDigits: 0 })}</td>
             </tr>`).join('');
         }
+      }
+
+      // -- Goal Tracker -- ported from évolis's Overview page, 2026-09-05
+      // per Jaclyn. évolis has separate Amazon+Walmart / Website groups;
+      // this brand only needs Amazon. Column layout on this brand's tab
+      // (confirmed by Jaclyn, NOT the same positions as évolis's own tab
+      // on the same shared spreadsheet — évolis uses O/T/AD, this one
+      // uses P/S/AB): P=Total Sales Goal (index 15), S=Organic Sales Goal
+      // (index 18), AB=Ad Sales Goal (index 27).
+      try {
+        // Deliberately a SEPARATE validity filter from isValidAmazonRow
+        // (used for the rest of this page's KPIs) — that one excludes
+        // 'pending' status, but a pending order is still real, live
+        // revenue that should count toward a sales goal. Matches
+        // évolis's own reasoning for the same distinction.
+        function goalsIsValidAmazonRow(r) {
+          const status = (r.status || '').toLowerCase().trim();
+          if (status === 'cancelled') return false; // pending IS kept, deliberately
+          if ((r.promotion_ids || '').toLowerCase().includes('vine')) return false;
+          return true;
+        }
+        function parseGoalsDollar(val) {
+          const n = parseFloat(String(val || '').replace(/[$,()]/g, ''));
+          return isNaN(n) ? null : n;
+        }
+        function findGoalsRow(rows, year, month) {
+          const monthAbbr = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][month - 1];
+          const target = `${monthAbbr}-${String(year).slice(2)}`;
+          return rows.find(r => (r[0] || '').trim() === target) || null;
+        }
+
+        const goalsAmzCsv = await fetch('https://docs.google.com/spreadsheets/d/1trsHDgVSLprsOOjOuFWGZRDqVOV-eII3/export?format=csv&gid=1677661344' + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+        const goalsAmzRows = parseCsv2D(goalsAmzCsv);
+        const goalsRowAmz = findGoalsRow(goalsAmzRows, refDate.getFullYear(), refDate.getMonth() + 1);
+        console.log('[GoalTracker][qa] Amazon goals row found:', !!goalsRowAmz, goalsRowAmz ? { total: goalsRowAmz[15], organic: goalsRowAmz[18], ads: goalsRowAmz[27] } : null);
+
+        // Live actual revenue, pending-inclusive, netted against returns
+        // (a returned sale shouldn't count toward a sales goal; a pending
+        // one should, since it hasn't been returned).
+        const amzGoalsActual = aggregateRange(amzRows, mtdStartStr, mtdEndStr, goalsIsValidAmazonRow).totalRevenue - amzReturnsMtd.totalAmt;
+
+        let amzAdActual = null;
+        if (isCsv(adOrdersCsv)) {
+          const adRowsForGoals = parseCsv(adOrdersCsv).filter(r => parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1);
+          amzAdActual = adRowsForGoals.reduce((s, r) => s + parseAmt(r.sales), 0);
+        }
+        const amzOrganicActual = amzAdActual != null ? Math.max(0, amzGoalsActual - amzAdActual) : null;
+
+        // Progress ring — plain SVG, deliberately not Chart.js. A single-
+        // value gauge like this doesn't need a charting library, and SVG
+        // sidesteps the canvas-reuse bug class entirely (already found
+        // and fixed twice on this exact page — see the donut/trend/ad-
+        // type chart fixes above) since it's DOM-based, not canvas-based,
+        // and just re-renders as a fresh string on every toggle click
+        // with nothing to destroy first.
+        function buildGaugeSvg(pct, colorHex) {
+          const size = 140, stroke = 14, r = (size - stroke) / 2, c = size / 2;
+          const circumference = 2 * Math.PI * r;
+          const clamped = Math.max(0, Math.min(100, pct));
+          const dashOffset = circumference * (1 - clamped / 100);
+          return `<svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg);">
+            <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--border)" stroke-width="${stroke}"/>
+            <circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${colorHex}" stroke-width="${stroke}"
+              stroke-dasharray="${circumference}" stroke-dashoffset="${dashOffset}" stroke-linecap="butt"/>
+          </svg>`;
+        }
+
+        function renderGoalsGroup(actualOverall, actualAds, actualOrganic, goalRow) {
+          if (!goalRow) return `<div style="color:var(--muted);font-size:13px;flex:1;text-align:center;padding:20px;">No goals row found for this month.</div>`;
+          const overallGoal = parseGoalsDollar(goalRow[15]);
+          const organicGoal = parseGoalsDollar(goalRow[18]);
+          const adsGoal = parseGoalsDollar(goalRow[27]);
+          const fmtD = n => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+          function paceGauge(sublabel, actual, goal) {
+            if (goal == null) {
+              return `<div style="text-align:center;flex:1;">
+                <div style="font-size:15px;color:var(--muted);font-weight:700;margin-bottom:8px;">${sublabel}</div>
+                ${buildGaugeSvg(0, 'var(--border)')}
+                <div style="font-size:13px;color:var(--muted);margin-top:8px;">No goal set</div>
+              </div>`;
+            }
+            if (actual == null) {
+              return `<div style="text-align:center;flex:1;">
+                <div style="font-size:15px;color:var(--muted);font-weight:700;margin-bottom:8px;">${sublabel}</div>
+                ${buildGaugeSvg(0, 'var(--border)')}
+                <div style="font-size:13px;color:var(--muted);margin-top:8px;">Not available yet</div>
+              </div>`;
+            }
+            // Ring fill + center number reflect ACTUAL progress against
+            // the goal (actual ÷ goal) — real progress so far, not a
+            // maxed-out ring that hides how far along things actually
+            // are. The projection is used ONLY to decide the ring's
+            // color (on-pace vs not).
+            const actualPct = goal > 0 ? Math.round((actual / goal) * 100) : 0;
+            let projected = actual, statusText, statusColor;
+            if (period === 'mtd') {
+              const daysInMonth = new Date(refDate.getFullYear(), refDate.getMonth() + 1, 0).getDate();
+              const dayOfMonth = new Date().getDate();
+              projected = dayOfMonth > 0 ? (actual / dayOfMonth) * daysInMonth : actual;
+              const projectedPct = goal > 0 ? Math.round((projected / goal) * 100) : 0;
+              statusText = `Projecting ${fmtD(projected)}`;
+              statusColor = projectedPct >= 100 ? 'var(--green)' : 'var(--danger)';
+            } else {
+              // Last Full Month — the month is over, actual IS final, no separate projection.
+              statusText = actualPct >= 100 ? 'Hit goal' : 'Missed goal';
+              statusColor = actualPct >= 100 ? 'var(--green)' : 'var(--danger)';
+            }
+            return `<div style="text-align:center;flex:1;">
+              <div style="font-size:15px;color:var(--muted);font-weight:700;margin-bottom:8px;">${sublabel}</div>
+              <div style="position:relative;width:140px;height:140px;margin:0 auto;">
+                ${buildGaugeSvg(actualPct, statusColor)}
+                <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:${statusColor};">${actualPct}%</div>
+              </div>
+              <div style="font-size:14px;color:var(--navy);font-weight:700;margin-top:8px;">${statusText}</div>
+              <div style="font-size:14px;color:var(--navy);font-weight:700;">Goal ${fmtD(goal)}</div>
+            </div>`;
+          }
+
+          return `<div style="display:flex;gap:16px;flex:1;">
+            ${paceGauge('Total Sales', actualOverall, overallGoal)}
+            ${paceGauge('Organic Sales', actualOrganic, organicGoal)}
+            ${paceGauge('Ad Sales', actualAds, adsGoal)}
+          </div>`;
+        }
+
+        const goalsBodyAmzEl = document.getElementById('ov-goals-body-amz');
+        if (goalsBodyAmzEl) goalsBodyAmzEl.innerHTML = renderGoalsGroup(amzGoalsActual, amzAdActual, amzOrganicActual, goalsRowAmz);
+      } catch (err) {
+        console.warn('[GoalTracker] failed:', err.message);
+        const goalsBodyAmzEl = document.getElementById('ov-goals-body-amz');
+        if (goalsBodyAmzEl) goalsBodyAmzEl.innerHTML = '<div style="color:var(--danger);flex:1;text-align:center;padding:20px;">Goal Tracker failed to load — check console.</div>';
       }
 
       // -- Ad Spend / Blended ACOS -- Amazon (prorated monthly estimate) + Website (real MTD) --
