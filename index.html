@@ -21120,7 +21120,7 @@ async function loadAuditResultsFromSheet() {
     }
   }
 
-  function pdfxHeaderBand(monthYear, activeTab, isReviewsPage) {
+  function pdfxHeaderBand(monthYear, activeTab, isReviewsPage, eventOverride) {
     // Tabs — 2026-09-04 per Jaclyn: dropped "Fulfillment & Customer
     // Service" from this nav band entirely (its own PDF page/checkbox
     // still exists, just no longer represented here). Added "Reviews".
@@ -21148,7 +21148,9 @@ async function loadAuditResultsFromSheet() {
     return '<div class="pdfx-topband"' + (isReviewsPage ? ' style="margin:-22px -20px 0 -20px;padding:24px 20px 0;"' : '') + '>' +
       '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">' +
         '<span class="pdfx-logo-navy" style="display:inline-block;">' + pdfxLogoHtml('height:40px;width:auto;filter:brightness(0) invert(1);') + '</span>' +
-        '<div class="pdfx-tagright"><div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div></div>' +
+        '<div class="pdfx-tagright">' + (eventOverride
+          ? '<div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(eventOverride.name) + '</div><div style="font-size:10px;color:rgba(255,255,255,.65);margin-top:2px;">' + pdfxEscape(eventOverride.dates) + '</div>'
+          : '<div class="pdfx-hdr-tag">Brand Performance Report</div><div class="pdfx-hdr-month">' + pdfxEscape(monthYear) + '</div>') + '</div>' +
       '</div>' +
       '<div class="pdfx-tabs">' + tabsHtml + '</div>' +
       '</div>' +
@@ -21721,8 +21723,22 @@ async function loadAuditResultsFromSheet() {
     // possible. Worth a real check on the actual render before trusting
     // this looks clean rather than cramped — can't visually verify
     // page-break behavior from here.
+    // Header override — added 2026-09-05 per Jaclyn: this page has too
+    // much content to also fit the live dashboard's event name/dates
+    // (the ones loadStrategyEventHeader() populates), so instead of
+    // adding more content to an already-full page, the header itself
+    // now carries that info — "August 2026" becomes the event name,
+    // with a small dates line under it, so whoever receives this export
+    // knows which event/dates this strategy playbook is actually for.
+    // Reads the same live #evs-headline/#evs-dates elements that
+    // function already populates on page load, rather than re-fetching
+    // the Events sheet a second time for the same info.
+    const strategyEventOverride = {
+      name: pdfxText('#evs-headline') || 'Amazon Event',
+      dates: pdfxText('#evs-dates') || 'Dates TBD',
+    };
     const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
-      pdfxHeaderBand(monthYear, 'Events') +
+      pdfxHeaderBand(monthYear, 'Events', false, strategyEventOverride) +
       '<div class="pdfx-chlabel">Event Strategy</div>' +
       leadUp + during + leadOut + outlook +
       pdfxFooter(monthYear) +
@@ -22688,62 +22704,29 @@ async function loadAuditResultsFromSheet() {
       setKpi('ov-kpi-orders', mtd.orders.toLocaleString(), pctChange(mtd.orders, prev.orders), comparisonSuffix);
       setKpi('ov-kpi-aov',    '$' + aov.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), pctChange(Math.round(aov * 100), Math.round(aovPrev * 100)), comparisonSuffix);
 
-      // -- MTD Ad-Driven Orders / Pending Orders --
-      // Amazon: per Jaclyn (2026-07-24), the ad orders cron runs daily and
-      // captures every order, but only buckets by month — no day-of-purchase
-      // field — so a true day-level MTD-vs-MTD comparison isn't possible.
-      // No MOM badge there solves that: the current month's row count IS
-      // already "so far this month" by construction (the cron only ever
-      // adds today's orders as they happen), no proration needed. Each row
-      // is one order-level event (confirmed by Jaclyn), not a
-      // pre-aggregated units total, so counting rows = the actual
-      // ad-driven order count directly.
-      // Website: added 2026-08-05 per Jaclyn — Google Ads' "ads" tab is
-      // real day-level data, so its `conversions` column is simply summed
-      // over the MTD window (see webAdsMtd above) and added to Amazon's
-      // count for one blended figure. No MOM here either, to avoid mixing
-      // an exact Website sum with Amazon's monthly-bucketed estimate.
-      let adDrivenOrders = 0;
-      let adDrivenOrdersLastMonthFull = 0;
+      // -- MTD Ad-Driven Units --
+      // FIXED 2026-09-17 per Jaclyn — this card used to count ad-orders
+      // ROWS for Amazon (one row = one order-level event, per the
+      // sheet's original design) while ADDING that to Walmart's real
+      // ad_units SUM — two genuinely different units of measurement
+      // blended into one number labeled "units." That's exactly why this
+      // card's number and "MTD Organic Units" (Total - Ad-Driven) never
+      // reconciled against Total Units Sold: an Amazon order with more
+      // than 1 unit on it only ever counted as "1" here, while the
+      // Organic subtraction further down correctly used the real
+      // ad_units field. Real order data confirmed this — several orders
+      // with unit_count > 1 were only being counted once each.
+      // Fix: this card now displays totalAdUnitsCurr directly (computed
+      // below, same real ad_units sum — Amazon + Walmart, each capped
+      // per-ASIN at actual net units sold — that the Organic Units
+      // subtraction already uses). Same number feeds both, so
+      // Organic + Ad-Driven = Total by construction, not by coincidence.
       // refDate.getMonth() is 0-indexed, so it already equals "last month" in
       // 1-indexed terms (e.g. August=7 -> July=7). Only needs adjusting
-      // when the reference month is January.
+      // when the reference month is January. (lastMonthYear/lastMonthNum
+      // are still needed below for the per-ASIN ad-units MOM lookup.)
       let lastMonthYear = refDate.getFullYear(), lastMonthNum = refDate.getMonth();
       if (lastMonthNum === 0) { lastMonthNum = 12; lastMonthYear--; }
-      if (isCsv(adOrdersCsv)) {
-        const adRowsForOrders = parseCsv(adOrdersCsv);
-        adDrivenOrders = adRowsForOrders.filter(r =>
-          parseInt(r.year, 10) === refDate.getFullYear() &&
-          parseInt(r.month, 10) === refDate.getMonth() + 1 &&
-          (r.brand || '').trim().toLowerCase() === (window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul').toLowerCase()
-        ).length;
-        adDrivenOrdersLastMonthFull = adRowsForOrders.filter(r =>
-          parseInt(r.year, 10) === lastMonthYear &&
-          parseInt(r.month, 10) === lastMonthNum &&
-          (r.brand || '').trim().toLowerCase() === (window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul').toLowerCase()
-        ).length;
-      }
-
-      // Walmart — added 2026-08-06 per Jaclyn, explicit choice: sum
-      // ad_units from SHEET_WALMART_AD_ORDERS and add it into this same
-      // blended figure, same as Amazon's real order count and Website's
-      // real conversion count. This means the figure is a mix of true
-      // order counts (Amazon, Website) and an ad-attributed UNIT count
-      // (Walmart) — a deliberate simplicity tradeoff, not an oversight.
-      // Walmart's sheet only ever contains rows with real spend
-      // (zero-spend rows filtered server-side), so every unit here
-      // reflects genuine ad activity.
-      let walmartAdUnitsThisMonth = 0;
-      try {
-        const wmtAdOrdersCsvForOrders = await fetch(sheetCsvUrl(WALMART_AD_ORDERS_SHEET_ID, WALMART_AD_ORDERS_GID) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
-        if (isCsv(wmtAdOrdersCsvForOrders)) {
-          walmartAdUnitsThisMonth = parseCsv(wmtAdOrdersCsvForOrders)
-            .filter(r => parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1)
-            .reduce((s, r) => s + (parseInt(String(r.ad_units || '').replace(/^'/, ''), 10) || 0), 0);
-        }
-      } catch (e) { console.warn('[Skinside Seoul][overview] Walmart ad units (for Ad-Driven Orders) lookup failed:', e.message); }
-
-      setKpiPlain('ov-kpi-ad-orders', (adDrivenOrders + walmartAdUnitsThisMonth).toLocaleString(), 'This month (Amazon + Walmart ad units)');
       // NOTE: this card's own MOM/"Organic Orders" companion logic moved
       // further down — see "MTD Organic Units" below, after per-ASIN net
       // units and ad-attributed units are available. Per Jaclyn
@@ -22828,8 +22811,7 @@ async function loadAuditResultsFromSheet() {
       // file — same bug class caught on Skinuva's Overview page per its
       // own 2026-08-28 changelog ("Organic Units subtraction read from
       // the wrong brand's tab"). Fixed to use the confirmed real
-      // per-brand gid, with an explicit brand filter added defensively
-      // (same pattern already used a few lines up for adDrivenOrders),
+      // per-brand gid, with an explicit brand filter added defensively,
       // per that changelog's own recommendation to add the filter "even
       // when the gid looks right."
       let adUnitsByAsin = {};
@@ -22908,6 +22890,12 @@ async function loadAuditResultsFromSheet() {
       const organicUnits = Math.max(0, mtd.units - totalAdUnitsCurr);
       const organicUnitsPrev = Math.max(0, prev.units - totalAdUnitsPrev);
       setKpi('ov-kpi-organic-orders', organicUnits.toLocaleString(), pctChange(organicUnits, organicUnitsPrev), comparisonSuffixEst);
+      // Same totalAdUnitsCurr feeds both this card and the Organic Units
+      // subtraction above — guarantees the two always add up to Total
+      // Units Sold, since they're literally the same number split two
+      // ways, not two independently-computed figures that happen to be
+      // shown near each other.
+      setKpiPlain('ov-kpi-ad-orders', totalAdUnitsCurr.toLocaleString(), 'This month (Amazon + Walmart ad units, net of returns)');
 
       function momBadge(curr, prevVal) {
         if (!prevVal) return '';
