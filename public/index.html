@@ -1410,14 +1410,17 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
 
-    <!-- Goal Tracker — moved to top row 2026-09-17 per Jaclyn, so it's the
-         first thing visible after the hero, not buried below the period
-         toggle. Added 2026-09-05, ported from évolis's own Overview page.
-         évolis has two side-by-side groups (Amazon+Walmart, Website);
-         this brand only needs one (Amazon), so this is a single
-         full-width card, not the two-column layout évolis uses. Same
-         sand/navy-accent treatment as the rest of that design system's
-         "featured content" cards. -->
+    <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;width:fit-content;margin-bottom:16px;"></div>
+
+    <!-- Goal Tracker — reordered 2026-09-17 per Jaclyn to sit below the
+         MTD/Last Month toggle (was above it), so the toggle that controls
+         its own period context is visible before the section it affects,
+         not after. Added 2026-09-05, ported from évolis's own Overview
+         page. évolis has two side-by-side groups (Amazon+Walmart,
+         Website); this brand only needs one (Amazon), so this is a
+         single full-width card, not the two-column layout évolis uses.
+         Same sand/navy-accent treatment as the rest of that design
+         system's "featured content" cards. -->
     <div class="card-title" style="font-size:16px;">Goal Tracker</div>
     <div style="margin-bottom:22px;">
       <div class="card" id="ov-goals-card-amz" style="margin-top:0;background:var(--sand);border:none;border-top:3px solid var(--navy);">
@@ -1427,8 +1430,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
       </div>
     </div>
-
-    <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;width:fit-content;margin-bottom:16px;"></div>
 
     <div class="kpi-row">
       <div class="kpi-card" id="ov-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
@@ -23215,29 +23216,36 @@ async function loadAuditResultsFromSheet() {
       // all: webAdsMtd/webAdsPrevMtd (computed above) are already true,
       // day-aligned MTD and prior-MTD sums. They're added directly to
       // Amazon's prorated figures for one blended Ad Spend / ACOS number.
-      let proratedSpend = 0, proratedSales = 0, proratedSpendPrev = 0, proratedSalesPrev = 0;
+      let curPeriodAdSpend = 0, curPeriodAdSales = 0, prevPeriodAdSpend = 0, prevPeriodAdSales = 0;
       if (isCsv(adOrdersCsv)) {
         const adRows = parseCsv(adOrdersCsv);
+        // FIXED 2026-09-17 per Jaclyn — this used to ESTIMATE the current
+        // period's ad spend/sales by prorating the PRIOR period's real
+        // total by days-elapsed, on the assumption that the ad orders
+        // cron only writes a final, complete number once a month is
+        // fully over (no day-level field to know how much has really
+        // accrued yet within it). Real data disproved that assumption:
+        // the current month's row is updated progressively throughout
+        // the month (confirmed via last_updated timestamps matching
+        // today's date) and already reflects a real, live running total
+        // — proration was silently UNDER-reporting actual current ad
+        // performance by estimating off a potentially very different
+        // prior period's pace instead (~$9 estimated here vs ~$204 real
+        // for the same month). Fix: sum the real current- and prior-
+        // period rows directly, matching how the Goal Tracker and the
+        // Ad-Driven Units KPI already correctly read this same sheet.
+        // Uses refDate (already shifted for the MTD/Last Month toggle
+        // elsewhere in this function) so both toggle states read the
+        // correct real period automatically, no separate logic needed.
+        const curAdRows = adRows.filter(r => parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1);
         let lm = refDate.getMonth(), ly = refDate.getFullYear();
         lm -= 1; if (lm === 0) { lm = 12; ly--; }
-        let lm2 = lm - 1, ly2 = ly;
-        if (lm2 === 0) { lm2 = 12; ly2--; }
+        const prevAdRows = adRows.filter(r => parseInt(r.year, 10) === ly && parseInt(r.month, 10) === lm);
 
-        const lastMonthAdRows = adRows.filter(r => parseInt(r.year, 10) === ly && parseInt(r.month, 10) === lm);
-        const twoMonthsAgoAdRows = adRows.filter(r => parseInt(r.year, 10) === ly2 && parseInt(r.month, 10) === lm2);
-
-        const lastMonthSpend = lastMonthAdRows.reduce((s, r) => s + parseAmt(r.spend), 0);
-        const lastMonthSales = lastMonthAdRows.reduce((s, r) => s + parseAmt(r.sales), 0);
-        const twoMonthsAgoSpend = twoMonthsAgoAdRows.reduce((s, r) => s + parseAmt(r.spend), 0);
-        const twoMonthsAgoSales = twoMonthsAgoAdRows.reduce((s, r) => s + parseAmt(r.sales), 0);
-
-        const daysInLastMonth = new Date(ly, lm, 0).getDate();
-        const daysInTwoMonthsAgo = new Date(ly2, lm2, 0).getDate();
-
-        proratedSpend = lastMonthSpend * (daysElapsed / daysInLastMonth);
-        proratedSales = lastMonthSales * (daysElapsed / daysInLastMonth);
-        proratedSpendPrev = twoMonthsAgoSpend * (daysElapsed / daysInTwoMonthsAgo);
-        proratedSalesPrev = twoMonthsAgoSales * (daysElapsed / daysInTwoMonthsAgo);
+        curPeriodAdSpend = curAdRows.reduce((s, r) => s + parseAmt(r.spend), 0);
+        curPeriodAdSales = curAdRows.reduce((s, r) => s + parseAmt(r.sales), 0);
+        prevPeriodAdSpend = prevAdRows.reduce((s, r) => s + parseAmt(r.spend), 0);
+        prevPeriodAdSales = prevAdRows.reduce((s, r) => s + parseAmt(r.sales), 0);
       } else {
         console.warn('[Skinside Seoul][overview] ad orders sheet did not return CSV — Ad Spend/ACOS will reflect Website only.');
       }
@@ -23270,17 +23278,18 @@ async function loadAuditResultsFromSheet() {
       // placed above the Revenue by Channel donut / Monthly Revenue Trend
       // cards. Amazon + Walmart only. Moved to this point in the function
       // (rather than right after the KPI cards above) specifically so Ad
-      // Spend/Ad Sales are available -- Amazon's is the same prorated
-      // MTD estimate the Ad Spend/ACOS KPI cards use (proratedSpend/
-      // proratedSales; see the file-level comment on that estimate for
-      // why it's not a true day-level figure), Walmart's is the actual
-      // ad summary row for the current month (walmartSpendThisMonth/
+      // Spend/Ad Sales are available -- Amazon's is the same real-sum
+      // current-period figure the Ad Spend/ACOS KPI cards use
+      // (curPeriodAdSpend/curPeriodAdSales — FIXED 2026-09-17, previously
+      // a proration estimate that understated real performance; see the
+      // comment on that fix above), Walmart's is the actual ad summary
+      // row for the current month (walmartSpendThisMonth/
       // walmartSalesThisMonth, just fetched above).
       (function renderOvChannelBreakdown() {
         const tbody = document.getElementById('ov-channel-breakdown-tbody');
         if (!tbody) return;
         const rows = [
-          { label: 'Amazon',  adSpend: proratedSpend,          adSales: proratedSales,          units: amzMtdNetUnits, orders: amzMtd.totalOrders, revenue: amzMtdNetRevenue },
+          { label: 'Amazon',  adSpend: curPeriodAdSpend,        adSales: curPeriodAdSales,       units: amzMtdNetUnits, orders: amzMtd.totalOrders, revenue: amzMtdNetRevenue },
           { label: 'Walmart', adSpend: walmartSpendThisMonth,  adSales: walmartSalesThisMonth,  units: wmtMtdNetUnits, orders: wmtMtd.totalOrders, revenue: wmtMtdNetRevenue },
         ];
         tbody.innerHTML = rows.map(r => {
@@ -23298,10 +23307,10 @@ async function loadAuditResultsFromSheet() {
         }).join('');
       })();
 
-      const blendedSpend = proratedSpend + walmartSpendThisMonth;
-      const blendedSpendPrev = proratedSpendPrev + walmartSpendLastMonth;
-      const blendedSales = proratedSales + walmartSalesThisMonth;
-      const blendedSalesPrev = proratedSalesPrev + walmartSalesLastMonth;
+      const blendedSpend = curPeriodAdSpend + walmartSpendThisMonth;
+      const blendedSpendPrev = prevPeriodAdSpend + walmartSpendLastMonth;
+      const blendedSales = curPeriodAdSales + walmartSalesThisMonth;
+      const blendedSalesPrev = prevPeriodAdSales + walmartSalesLastMonth;
       const acos = blendedSales > 0 ? (blendedSpend / blendedSales) * 100 : 0;
       const acosPrev = blendedSalesPrev > 0 ? (blendedSpendPrev / blendedSalesPrev) * 100 : 0;
 
