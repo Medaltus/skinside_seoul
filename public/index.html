@@ -536,6 +536,18 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .voc-chip.neg{background:rgba(219,55,45,.08);color:var(--danger);}
 .voc-chip.gap{background:rgba(200,125,47,.1);color:var(--warn);}
 .rev-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:10px;}
+/* Category/product tab switching — ported from Cosmette's external
+   Inventory (Reviews) page, 2026-09-17, for the same feature here. */
+.cat-tabs{display:flex;gap:2px;margin-bottom:20px;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;overflow-x:auto;flex-wrap:wrap;}
+.cat-tab{border:none;background:none;font-family:var(--font);font-size:12px;font-weight:600;color:var(--muted);padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .13s;white-space:nowrap;}
+.cat-tab.active{background:var(--navy);color:#fff;}
+.cat-panel{display:none;}
+.cat-panel.active{display:block;}
+.prod-tabs{display:flex;gap:2px;margin-bottom:16px;background:var(--bg);border:1px solid var(--border2);border-radius:999px;padding:3px;overflow-x:auto;flex-wrap:wrap;}
+.prod-tab{border:none;background:none;font-family:var(--font);font-size:11.5px;font-weight:600;color:var(--muted);padding:6px 13px;border-radius:999px;cursor:pointer;white-space:nowrap;}
+.prod-tab.active{background:var(--navy);color:#fff;}
+.prod-panel{display:none;}
+.prod-panel.active{display:block;}
 .rev-hdr{display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap;}
 .rev-name{font-weight:600;font-size:12px;color:var(--navy);}
 .rev-stars-5{color:#24e9a3;font-size:12px;}
@@ -1196,9 +1208,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     <button class="nav-btn" onclick="showPage('inventory-external',this)">
       <svg viewBox="0 0 16 16"><path d="M1 5l7-4 7 4v7l-7 4-7-4V5z"/><path d="M8 1v14M1 5l7 4 7-4"/></svg>Inventory
     </button>
-    <button class="nav-btn" onclick="showPage('fulfillment',this)">
-      <svg viewBox="0 0 16 16"><rect x="1" y="5" width="14" height="9" rx="1.2"/><path d="M1 8h14M5 5V3a1 1 0 011-1h4a1 1 0 011 1v2"/><circle cx="4.5" cy="14" r="1.2"/><circle cx="11.5" cy="14" r="1.2"/></svg>Fulfillment
-    </button>
 
     <!-- Internal-only section — everything currently built lives below this line -->
     <div id="nav-internal-section" style="display:none;">
@@ -1600,75 +1609,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div id="oos-log-body"><div class="ppc-card" style="color:var(--muted);">Loading…</div></div>
     </div><!-- /inv-oos-log -->
 
-  </div>
-
-  <!-- ══ FULFILLMENT ══ -->
-  <div class="page" id="page-fulfillment">
-    <div class="page-hd">
-      <div><div class="page-title">Fulfillment</div><div class="page-sub">ShipStation · Processing performance</div></div>
-    </div>
-
-    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px;">
-      <div class="kpi-card">
-        <div class="kpi-label">Shipped Website Orders • Last 30 Days</div>
-        <div class="kpi-value" id="ff-kpi-shipped30">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Our Fulfillment Promise · Last 7 Days</div>
-        <div class="kpi-value" style="color:#1db88a;">—</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Same Day Fulfilled · weekday orders before 1p</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Avg Processing Time · Last 7 Days</div>
-        <div class="kpi-value" id="ff-kpi-proctime">—</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Business days · weekends excluded</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Avg Shipping Cost · Last 7 Days</div>
-        <div class="kpi-value" id="ff-kpi-shipcost">—</div>
-      </div>
-      <div class="kpi-card">
-        <div class="kpi-label">Inventory Prepped</div>
-        <div class="kpi-value" id="ff-kpi-invprepped">—</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;">Units received this month</div>
-      </div>
-    </div>
-
-    <div class="ppc-card">
-      <div class="ppc-card-title">Website Orders Shipped by Date · Last 30 Days</div>
-      <div style="position:relative;height:320px;"><canvas id="ff-shipped-chart"></canvas></div>
-      <div class="ppc-note" id="ff-chart-footer">Loading…</div>
-    </div>
-
-    <div class="ppc-card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <div class="ppc-card-title" style="margin-bottom:0;">Website Orders by State · Last 30 Days</div>
-        <div style="display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);">
-          <span>Fewer</span>
-          <div style="width:80px;height:7px;border-radius:4px;background:linear-gradient(to right,#dce6f5,#001F60);"></div>
-          <span>More</span>
-        </div>
-      </div>
-      <div style="position:relative;padding:8px 0;">
-        <div class="ff-map-tooltip" id="ff-map-tip"></div>
-        <svg id="ff-us-svg" viewBox="0 0 959 593" style="width:100%;height:auto;display:block;"></svg>
-      </div>
-      <div class="ppc-note" id="ff-map-footer">Loading…</div>
-      <div style="border-top:1px solid var(--border);margin-top:12px;overflow-y:auto;max-height:400px;">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>State</th><th>Orders</th>
-              <th>State</th><th>Orders</th>
-              <th>State</th><th>Orders</th>
-              <th>State</th><th>Orders</th>
-              <th>State</th><th>Orders</th>
-            </tr>
-          </thead>
-          <tbody id="ff-state-table-body"><tr><td colspan="10" style="color:var(--muted);">Loading…</td></tr></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 
   <!-- ══ SALES ══ -->
@@ -2475,131 +2415,22 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
   </div>
 
   <!-- ══ INVENTORY (EXTERNAL) ══ -->
-  <!-- Two tabs: Stock Levels (read-only consignment snapshot) and Inbound
-       Shipments (the ASN pipeline). Styled to visually match Luccini's
-       dashboard reference but built as plain HTML/vanilla JS, reusing
-       évolis's own existing .data-table/.kpi-card/.ppc-card classes where
-       they already cover the need, with a new .asn- prefixed set for the
-       shipment cards and upload modal (see CSS block, adapted from
-       Luccini's InboundTab.module.css onto évolis's own CSS variables).
-       Wired up by initInventoryExternalPage(). -->
+  <!-- Replaced 2026-09-17 per Jaclyn — this used to be a Stock Levels +
+       Inbound Shipments/ASN pipeline (removed entirely, not hidden).
+       Now matches Cosmette's own external "Inventory" page exactly:
+       Reviews grouped by product category, with a VOC Themes card per
+       category. Wired up by window.initExternalReviews() below (ported
+       from Cosmette, adapted to Skinside Seoul's real 7-product catalog
+       and SHEET_AMAZON_REVIEWS gid — NOT Cosmette's). -->
   <div class="page" id="page-inventory-external">
     <div class="page-hd">
-      <div><div class="page-title">Inventory</div><div class="page-sub">Consignment stock levels · Inbound shipment tracking</div></div>
+      <div><div class="page-title">Inventory</div><div class="page-sub">Amazon · Last synced —</div></div>
     </div>
 
-    <div class="channel-tabs-row" style="margin-bottom:18px;">
-      <div class="channel-tabs">
-        <button class="ch-tab active" onclick="showChannel('inventory-external','ix-stock',this)">📦 Stock Levels</button>
-        <button class="ch-tab" onclick="showChannel('inventory-external','ix-inbound',this)">🚚 Inbound Shipments</button>
-      </div>
-    </div>
-
-    <!-- ── Stock Levels ── -->
-    <div class="channel-page active" id="ix-stock">
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;">
-        <div class="kpi-card" style="border-top:3px solid var(--navy);"><div class="kpi-label">Total SKUs</div><div class="kpi-value" id="ix-kpi-total-skus">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Active products</div></div>
-        <div class="kpi-card" style="border-top:3px solid var(--green);"><div class="kpi-label">Total Units On Hand</div><div class="kpi-value" id="ix-kpi-units-onhand">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">Across all SKUs</div></div>
-        <div class="kpi-card" style="border-top:3px solid var(--danger);"><div class="kpi-label">Out of Stock</div><div class="kpi-value" id="ix-kpi-oos">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">SKUs at zero</div></div>
-        <div class="kpi-card" style="border-top:3px solid var(--warn);"><div class="kpi-label">Low Stock</div><div class="kpi-value" id="ix-kpi-low">—</div><div style="font-size:11px;color:var(--muted);margin-top:4px;">10 units or fewer</div></div>
-      </div>
-
-      <div class="ppc-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;">
-          <input type="text" id="ix-stock-search" placeholder="Search SKU, product name…" style="flex:1;min-width:220px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--font);font-size:12.5px;">
-          <div style="display:flex;gap:8px;align-items:center;">
-            <span id="ix-stock-updated" style="font-size:11px;color:var(--muted);"></span>
-            <button class="asn-btn-secondary" onclick="downloadStockLevelsCsv()">⬇ Download CSV</button>
-            <button class="asn-btn-secondary" onclick="loadStockLevelsExternal()">↻ Refresh</button>
-          </div>
-        </div>
-        <div id="ix-stock-count" style="font-size:11.5px;color:var(--muted);margin-bottom:8px;"></div>
-        <div style="overflow-x:auto;">
-          <table class="data-table">
-            <thead><tr>
-              <th>SKU</th><th>Product Name</th><th>On Hand</th><th>Inbound</th>
-            </tr></thead>
-            <tbody id="ix-stock-tbody"><tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">Loading…</td></tr></tbody>
-          </table>
-        </div>
-        <div class="ppc-note">ℹ Inbound will populate once an ASN is uploaded for that SKU.</div>
-      </div>
-    </div>
-
-    <!-- ── Inbound Shipments ── -->
-    <div class="channel-page" id="ix-inbound">
-      <div class="asn-header">
-        <div>
-          <div style="font-size:13px;color:var(--muted);">Upload a CSV to notify Medaltus of incoming inventory. Track open and received shipments here.</div>
-        </div>
-        <div class="asn-header-actions">
-          <button class="asn-btn-secondary" onclick="downloadAsnTemplate()">⬇ Download ASN Template</button>
-          <button class="asn-btn-primary" onclick="openAsnUploadModal()">⬆ Upload New ASN</button>
-        </div>
-      </div>
-
-      <div class="asn-subtabs">
-        <button class="asn-subtab active" onclick="showAsnSubTab('Open', this)">Open <span class="asn-subtab-count" id="asn-count-open">0</span></button>
-        <button class="asn-subtab" onclick="showAsnSubTab('Received', this)">Received <span class="asn-subtab-count" id="asn-count-received">0</span></button>
-      </div>
-
-      <div id="asn-list-open" class="asn-grid"></div>
-      <div id="asn-list-received" class="asn-grid" style="display:none;"></div>
-      <div id="asn-empty-state" class="asn-empty" style="display:none;">
-        <div class="asn-empty-icon">📭</div>
-        <div style="font-size:14px;font-weight:700;color:var(--navy);">No shipments yet</div>
-        <div style="font-size:12.5px;">Upload a CSV to create your first ASN.</div>
-      </div>
-      <div id="asn-error-state" class="asn-modal-error" style="display:none;margin-top:12px;"></div>
-    </div>
-  </div>
-
-  <!-- ── ASN Upload Modal ── -->
-  <div class="asn-modal-overlay" id="asn-upload-modal" style="display:none;">
-    <div class="asn-modal">
-      <div class="asn-modal-hd">
-        <h2 id="asn-modal-title">Upload New ASN</h2>
-        <button class="asn-modal-close" onclick="closeAsnUploadModal()">✕</button>
-      </div>
-      <div class="asn-modal-body">
-
-        <!-- Step 1: drop/select file -->
-        <div id="asn-step-drop">
-          <p class="asn-modal-sub" style="margin-bottom:14px;">CSV with columns: <strong>SKU, ProductName, Quantity</strong>. One row per SKU expected in this shipment.</p>
-          <div class="asn-dropzone" id="asn-dropzone" onclick="document.getElementById('asn-file-input').click()">
-            <span style="font-size:28px;">📄</span>
-            <p>Click to select a CSV, or drag one here</p>
-            <span>.csv files only</span>
-          </div>
-          <input type="file" id="asn-file-input" accept=".csv" style="display:none;" onchange="handleAsnFileSelect(event)">
-          <div class="asn-modal-error" id="asn-modal-error" style="display:none;margin-top:12px;"></div>
-        </div>
-
-        <!-- Step 2: review + submit -->
-        <div id="asn-step-review" style="display:none;">
-          <div class="asn-review-stats">
-            <div class="asn-review-stat"><span id="asn-review-skus">0</span><label>SKUs</label></div>
-            <div class="asn-review-stat"><span id="asn-review-units">0</span><label>Expected Units</label></div>
-          </div>
-          <p class="asn-preview-label" style="font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:4px 0 0;">Preview</p>
-          <div class="asn-preview-table">
-            <table>
-              <thead><tr><th>SKU</th><th>Product Name</th><th>Expected Qty</th></tr></thead>
-              <tbody id="asn-preview-tbody"></tbody>
-            </table>
-          </div>
-          <div class="asn-modal-actions" style="margin-top:14px;">
-            <button class="asn-back-btn" onclick="asnBackToDrop()">Back</button>
-            <button class="asn-submit-btn" id="asn-submit-btn" onclick="submitAsnUpload()">Create ASN</button>
-          </div>
-        </div>
-
-        <!-- Step 3: submitting -->
-        <div id="asn-step-submitting" style="display:none;text-align:center;padding:30px 0;">
-          <div class="asn-spinner"></div>
-          <p style="margin-top:14px;color:var(--muted);font-size:12.5px;">Creating shipment…</p>
-        </div>
-
+    <div class="card" style="margin-top:14px;">
+      <div class="card-title">Reviews</div>
+      <div id="ext-reviews-root">
+        <div class="placeholder-block"><div class="ph-icon">⭐</div><div class="ph-title">Loading reviews…</div></div>
       </div>
     </div>
   </div>
@@ -5056,6 +4887,12 @@ function showPage(id, btn) {
   // this is a no-op on subsequent visits to the page.
   if (id === 'organic' && typeof window.initRankTracker === 'function') window.initRankTracker('heartleaf');
 
+  // Inventory (external) — replaced 2026-09-17 with Cosmette's Reviews-by-
+  // category structure (no more channel sub-tabs here, so this can't be
+  // caught by the "auto-init first active channel" block further down —
+  // that only fires for pages that still have a .channel-page inside).
+  if (id === 'inventory-external' && typeof window.initExternalReviews === 'function') window.initExternalReviews();
+
   // Export PDF Report button — only shown on the three "performance" pages
   // (Sales, Marketing, Events). Hidden everywhere else (Overview, Inventory,
   // Fulfillment, Insights, Listing Audit, PPC, Organic).
@@ -5081,7 +4918,6 @@ function showPage(id, btn) {
     // Approved month once and kicks off all three channel loads together.
     if (cid && cid.indexOf('x-') === 0) window.initSalesExternalPage();
     if (cid && cid.indexOf('mx-') === 0) window.initMarketingExternalPage();
-    if (cid && cid.indexOf('ix-') === 0) window.initInventoryExternalPage();
     if (cid==='m-stewardship')   window.initStewardshipLive();
     if (cid==='m-fulfillment-cs') window.initMarketingFulfillmentCS();
     if (cid==='m-opportunities' && !window._snsChart) initSns();
@@ -5125,7 +4961,6 @@ function showChannel(page, channelId, btn) {
     }
     if (channelId.indexOf('x-') === 0)   window.initSalesExternalPage();
     if (channelId.indexOf('mx-') === 0)  window.initMarketingExternalPage();
-    if (channelId.indexOf('ix-') === 0)  window.initInventoryExternalPage();
     if (channelId === 'm-stewardship')   window.initStewardshipLive();
     if (channelId === 'm-opportunities' && !window._snsChart) initSns();
     if (channelId === 'ev-primeday')     window.initPrimeDayReport();
@@ -11374,677 +11209,6 @@ async function initSnsExternal() {
   };
 })();
 
-// ══════════════════════════════════════════════════════════════════════════════
-// INVENTORY PAGE (EXTERNAL) — Stock Levels + Inbound Shipments (ASN pipeline)
-// Stock Levels reads SHEET_CONSIGNMENT_INVENTORY directly (client-side CSV,
-// same C- prefix stripping already established on the Home page KPI and the
-// internal Inventory page's Consignment column). Inbound Shipments reads the
-// master tracker (Inbound_Shipments tab) for the shipment list, then — per
-// Jaclyn's spec — pulls each card's actual stats (SKUs/Expected/Received/
-// Discrepancies) live from that shipment's own per-ASN sheet rather than
-// caching them on the tracker row. Creating a shipment and editing shipping
-// info are the only two things that need real writes, so those go through
-// /api/create-asn and /api/update-asn-shipping (service-account auth) —
-// everything else here is a plain public-CSV read.
-// ══════════════════════════════════════════════════════════════════════════════
-(function () {
-  'use strict';
-
-  const CONSIGNMENT_SHEET_ID = window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.fileId;
-  const CONSIGNMENT_GID      = window.SHEET_CFG.SHEET_CONSIGNMENT_INVENTORY.gid;
-  // FIXED 2026-08-19 — this was hardcoded to évolis's own ASN tracker
-  // sheet, meaning every skinside-seoul ASN created or edited through this page
-  // was actually being written into évolis's spreadsheet by mistake.
-  // Now points at skinside-seoul's own ASN sheet, and is passed through
-  // explicitly to /api/create-asn and /api/update-asn-shipping below
-  // (both now accept a trackerSheetId parameter for exactly this reason
-  // — see those files' own headers).
-  const TRACKER_SHEET_ID     = '1gb5uf0MQ5qGp1DSdiD4oZO84t4a28n_aRm0-qZag1l4';
-  const TRACKER_TAB          = 'Inbound_Shipments';
-  const ASN_TEMPLATE_ID      = '12wOeZryBrUKsWFrPr6SzHadwEti1SI1hEEv1X2vjHkk';
-  // Same master Product Short Name sheet used elsewhere on this dashboard
-  // (col A=ASIN, col B=SKU (base, no -SF), col C=Product Short Name).
-  const PRODUCT_NAMES_SHEET_ID = '1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA';
-  const PRODUCT_NAMES_GID      = '164358627';
-
-  function gvizCsvUrl(sheetId, tabName) {
-    return `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(tabName)}&_cb=${Date.now()}`;
-  }
-  function fileCsvUrl(fileId, gid) {
-    return `https://docs.google.com/spreadsheets/d/${fileId}/export?format=csv&gid=${gid || 0}&_cb=${Date.now()}`;
-  }
-  function isCsv(text) { return !!text && text.trim().length > 0 && !text.trim().startsWith('<'); }
-  function parseCsvLine(line) {
-    const out = []; let cur = ''; let inQ = false;
-    for (let i = 0; i < line.length; i++) {
-      const c = line[i];
-      if (inQ) { if (c === '"') { if (line[i+1] === '"') { cur += '"'; i++; } else inQ = false; } else cur += c; }
-      else { if (c === '"') inQ = true; else if (c === ',') { out.push(cur); cur = ''; } else cur += c; }
-    }
-    out.push(cur);
-    return out;
-  }
-  // Header-keyed rows, for sheets with a normal header row (consignment sheet, tracker).
-  function parseCsvRows(text) {
-    const lines = text.trim().split('\n');
-    if (lines.length < 2) return [];
-    const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim().toLowerCase().replace(/\s+/g,''));
-    const rows = [];
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      const cols = parseCsvLine(lines[i]);
-      const row = {};
-      headers.forEach((h, idx) => { row[h] = (cols[idx] || '').replace(/^"|"$/g,'').trim(); });
-      rows.push(row);
-    }
-    return rows;
-  }
-  // Raw grid (array of arrays), for the per-ASN sheet's fixed header-block-
-  // plus-table layout, where row position (not a header name) is the key.
-  function parseCsvGrid(text) {
-    return text.replace(/\r/g,'').split('\n').map(parseCsvLine);
-  }
-  function escapeHtml(s) {
-    return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-  function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
-  function fileIdFromUrl(url) {
-    const m = String(url || '').match(/\/d\/([a-zA-Z0-9_-]+)/);
-    return m ? m[1] : null;
-  }
-  // Needed since 2026-07-27 — every ASN now lives as its own TAB inside one
-  // shared spreadsheet (see create-asn.js) rather than as gid 0 of its own
-  // separate file. driveUrl now looks like ".../edit#gid=123456789", and
-  // that gid is different for every ASN, so it has to be read from the URL
-  // instead of assumed to be 0.
-  function gidFromUrl(url) {
-    const m = String(url || '').match(/[#&?]gid=(\d+)/);
-    return m ? m[1] : '0';
-  }
-
-  // ══════════════════════════════════════════════════════════════════════
-  // STOCK LEVELS
-  // ══════════════════════════════════════════════════════════════════════
-  let _stockRows = [];
-  let _stockSearchWired = false;
-  let _skuNameMap = {};   // SKU (base, no -SF) -> Product Short Name, from the master sheet
-  let _skuStatusMap = {}; // SKU (base, no -SF) -> 'LIVE' | 'DELETED', col H of the same master sheet
-  let _inboundBySku = {}; // SKU -> summed Expected Qty across all *Open* ASNs
-
-  let _shopifySkus = new Set(); // base SKUs that have a Channel=Shopify row on the master sheet
-  // Added 2026-08-11 per Jaclyn: marketing collateral (brochures, cards,
-  // inserts) also needs its consignment stock tracked on this page, even
-  // though these items aren't sold on Shopify (or any channel) at all —
-  // matched purely by name, not by Channel/SKU Type, since they don't fit
-  // either of those columns' normal meaning.
-  let _collateralSkus = new Set();
-
-  // REWRITTEN 2026-08-10 per Jaclyn: switched from manual column-index
-  // parsing (cols[1]/cols[2]/cols[7]) to this sheet's own header-keyed
-  // parseCsvRows(), the same pattern already used for the Consignment and
-  // Tracker sheets below — column-position parsing is exactly the bug
-  // class that's bitten this codebase before if the sheet ever gets a
-  // column inserted/reordered. Also now captures Channel, needed by
-  // loadStockLevelsExternal below to scope this page to Shopify SKUs only
-  // (no separate bundle filter needed — Shopify never lists bundle SKUs).
-  // The sheet carries one row per (SKU, Channel) combination — the
-  // Shopify row for a given product uses a "C-"-prefixed SKU string
-  // distinct from that same product's Amazon row (e.g. "C-SVA0001" vs
-  // "SVA0001") — so the "C-" prefix is stripped here too, not just "-SF",
-  // to land on the same base-SKU key the Consignment sheet itself uses.
-  //
-  // FIXED 2026-08-10 per Jaclyn: this sheet is shared across every
-  // Medaltus brand (confirmed — Skinside Seoul and eraclea rows both live in it),
-  // and this function was only filtering by Channel = Shopify with no
-  // Brand check at all, so other brands' own Shopify-channel rows (e.g.
-  // évolis's bundle-style SKUs) were leaking into Skinside Seoul's SKU universe
-  // right alongside its own. Every row is now discarded outright unless
-  // Brand = Skinside Seoul, before any other field is even read from it.
-  async function loadSkuNameMap() {
-    try {
-      const csv = await fetch(fileCsvUrl(PRODUCT_NAMES_SHEET_ID, PRODUCT_NAMES_GID)).then(r => r.ok ? r.text() : '').catch(() => '');
-      if (!isCsv(csv)) return;
-      parseCsvRows(csv).forEach(r => {
-        const brand = (r.brand || '').trim().toUpperCase();
-        if (brand !== 'SKINUVA') return;
-        const sku    = (r.sku || '').trim().toUpperCase().replace(/-SF$/i, '').replace(/^C-/, '');
-        const name   = (r.productshortname || '').trim();
-        const status = (r.status || '').trim().toUpperCase();
-        const channel = (r.channel || '').trim().toUpperCase();
-        if (sku && name) _skuNameMap[sku] = name;
-        if (sku && status) _skuStatusMap[sku] = status;
-        if (sku && channel === 'SHOPIFY') _shopifySkus.add(sku);
-        if (sku && /brochure|card|insert/i.test(name)) _collateralSkus.add(sku);
-      });
-    } catch (e) {
-      console.warn('[InventoryExternal] Product name lookup failed:', e.message);
-    }
-  }
-
-  window.loadStockLevelsExternal = async function () {
-    const tbody = document.getElementById('ix-stock-tbody');
-    try {
-      const consignCsv = await fetch(fileCsvUrl(CONSIGNMENT_SHEET_ID, CONSIGNMENT_GID)).then(r => r.ok ? r.text() : '').catch(() => '');
-      if (!Object.keys(_skuNameMap).length) await loadSkuNameMap();
-
-      // REWRITTEN 2026-08-10 per Jaclyn: this page's SKU universe used to
-      // come from Amazon's Products Cache sheet (added 2026-08-03 to stop
-      // travel-size SKUs with no consignment line item from disappearing
-      // entirely — see below for why that mattered). But Products Cache is
-      // an AMAZON-listing snapshot, and this page is specifically about
-      // Shopify-fulfilled 3PL consignment stock — an unrelated sales
-      // channel. Worse, it silently pulled in bundle ASINs (bundles are
-      // real, separately-listed Amazon products, so they show up in that
-      // snapshot too) — the exact same bug class already fixed on the
-      // Total SKUs KPI. Now sources the SKU list from the master Product
-      // Short Name sheet instead (already loaded via loadSkuNameMap for
-      // names/status) filtered to SKU Type = CATALOG — channel-agnostic,
-      // excludes bundles, and keeps the original fix's benefit: any real
-      // catalog SKU with zero consignment stock still shows here as an
-      // honest 0, rather than disappearing the way a Consignment-sheet-only
-      // list would.
-      const consignRows = isCsv(consignCsv) ? parseCsvRows(consignCsv) : [];
-      const consignMap = {};
-      consignRows.forEach(r => {
-        const sku = (r.sku || '').trim().toUpperCase().replace(/^C-/, '');
-        if (!sku) return;
-        consignMap[sku] = {
-          onHand: parseFloat(r.on_hand ?? r.onhand) || 0,
-          available: parseFloat(r.available) || 0,
-          lastUpdated: r.last_updated || r.lastupdated || '',
-        };
-      });
-
-      // Scoped to Shopify-channel SKUs, PLUS marketing collateral (name
-      // contains Brochure/Card/Insert) regardless of channel — added
-      // 2026-08-11 per Jaclyn. Confirmed via the master sheet's own
-      // Channel column (2026-08-10, screenshots from Jaclyn): SKUs are
-      // listed per (SKU, Channel) row, and this page is specifically
-      // about Shopify-fulfilled 3PL consignment stock, not Amazon/
-      // Walmart — collateral items are the one deliberate exception,
-      // since Medaltus stocks/fulfills those on Skinside Seoul's behalf too even
-      // though they aren't sold on any channel. No separate CATALOG/
-      // BUNDLE type filter needed — per Jaclyn, Shopify only ever lists
-      // catalog SKUs, never bundles.
-      const skuSet = new Set([..._shopifySkus, ..._collateralSkus]);
-
-      _stockRows = [...skuSet].map(sku => {
-        const c = consignMap[sku] || { onHand: 0, available: 0, lastUpdated: '' };
-        return {
-          sku,
-          name: _skuNameMap[sku] || '',
-          onHand: c.onHand,
-          available: c.available,
-          lastUpdated: c.lastUpdated,
-          discontinued: _skuStatusMap[sku] === 'DELETED',
-        };
-      })
-        // Discontinued (Status = DELETED on the master sheet) products drop
-        // off this page entirely once On Hand hits zero — nothing left to
-        // track. Until then they still show (greyed, sorted to the bottom
-        // in renderStockLevelsTable) so leftover stock isn't silently
-        // hidden. Per Jaclyn, 2026-07-24.
-        .filter(r => !(r.discontinued && r.onHand === 0));
-
-      renderStockLevelsKpis(_stockRows);
-      wireStockSearch();
-      renderStockLevelsTable();
-
-      const latest = _stockRows.reduce((max, r) => (r.lastUpdated > max ? r.lastUpdated : max), '');
-      const updatedEl = document.getElementById('ix-stock-updated');
-      if (updatedEl && latest) {
-        const d = new Date(latest);
-        updatedEl.textContent = 'Updated ' + (isNaN(d) ? latest : d.toLocaleDateString('en-US', { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' }));
-      }
-    } catch (err) {
-      console.warn('[InventoryExternal] Stock Levels load failed:', err.message);
-      if (tbody) tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--danger);">Failed to load — try Refresh.</td></tr>';
-    }
-  };
-
-  function renderStockLevelsKpis(rows) {
-    setText('ix-kpi-total-skus', rows.length.toLocaleString());
-    setText('ix-kpi-units-onhand', rows.reduce((s, r) => s + r.onHand, 0).toLocaleString());
-    setText('ix-kpi-oos', rows.filter(r => r.onHand === 0).length.toLocaleString());
-    setText('ix-kpi-low', rows.filter(r => r.onHand > 0 && r.onHand <= 10).length.toLocaleString());
-  }
-
-  function wireStockSearch() {
-    if (_stockSearchWired) return;
-    const el = document.getElementById('ix-stock-search');
-    if (el) { el.addEventListener('input', renderStockLevelsTable); _stockSearchWired = true; }
-  }
-
-  function renderStockLevelsTable() {
-    const tbody = document.getElementById('ix-stock-tbody');
-    const countEl = document.getElementById('ix-stock-count');
-    if (!tbody) return;
-    const q = (document.getElementById('ix-stock-search')?.value || '').trim().toLowerCase();
-    const filtered = q
-      ? _stockRows.filter(r => r.sku.toLowerCase().includes(q) || r.name.toLowerCase().includes(q))
-      : _stockRows;
-    if (countEl) {
-      countEl.textContent = q
-        ? `${filtered.length.toLocaleString()} of ${_stockRows.length.toLocaleString()} SKUs`
-        : `${filtered.length.toLocaleString()} SKUs`;
-    }
-    if (!filtered.length) {
-      tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;padding:20px;color:var(--muted);font-style:italic;">${_stockRows.length ? 'No matching SKUs.' : 'No consignment data yet.'}</td></tr>`;
-      return;
-    }
-    tbody.innerHTML = filtered
-      .slice()
-      .sort((a, b) => (a.discontinued === b.discontinued ? a.sku.localeCompare(b.sku) : (a.discontinued ? 1 : -1)))
-      .map(r => {
-        const inbound = _inboundBySku[r.sku];
-        const rowStyle = r.discontinued ? ' style="opacity:0.5;"' : '';
-        const badge = r.discontinued ? ' <span style="font-size:9.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border:1px solid var(--border);border-radius:10px;padding:1px 6px;">Discontinued</span>' : '';
-        return `<tr${rowStyle}>
-        <td>${escapeHtml(r.sku)}</td>
-        <td>${escapeHtml(r.name)}${badge}</td>
-        <td>${r.onHand.toLocaleString()}</td>
-        <td>${inbound !== undefined ? inbound.toLocaleString() : '<span style="color:var(--muted);">—</span>'}</td>
-      </tr>`;
-      }).join('');
-  }
-
-  window.downloadStockLevelsCsv = function () {
-    const headers = ['SKU', 'Product Name', 'On Hand', 'Inbound'];
-    const lines = [headers.join(',')];
-    _stockRows.forEach(r => {
-      const inbound = _inboundBySku[r.sku];
-      lines.push([r.sku, `"${(r.name || '').replace(/"/g, '""')}"`, r.onHand, inbound !== undefined ? inbound : ''].join(','));
-    });
-    triggerCsvDownload(lines.join('\n'), `skinside-seoul-stock-levels-${new Date().toISOString().slice(0, 10)}.csv`);
-  };
-
-  function triggerCsvDownload(csvText, filename) {
-    const blob = new Blob([csvText], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
-    document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-  }
-
-  // ══════════════════════════════════════════════════════════════════════
-  // INBOUND SHIPMENTS
-  // ══════════════════════════════════════════════════════════════════════
-  let _trackerRows = [];   // one row per shipment, from the master tracker
-  let _asnDetailCache = {}; // shipmentId -> parsed per-ASN-sheet detail
-
-  // Reads the fixed header-block-plus-line-items layout every per-ASN sheet
-  // uses (rows 3–11 = labeled header fields, row 13 = line-item header, row
-  // 14+ = line items) — position-based, not header-name-based, since column
-  // A holds a label rather than a consistent header across rows 3–11.
-  function parseAsnSheetDetail(csvText) {
-    const grid = parseCsvGrid(csvText);
-    const cell = (r, c) => (grid[r] && grid[r][c] || '').trim();
-    const detail = {
-      shipmentId: cell(2, 1), uploadDate: cell(3, 1), status: cell(4, 1),
-      carrier: cell(5, 1), trackingNo: cell(6, 1), boxCount: cell(7, 1), notes: cell(8, 1),
-      totalSkus: parseInt(cell(9, 1), 10) || 0, totalUnits: parseInt(cell(10, 1), 10) || 0,
-      lineItems: [],
-    };
-    for (let i = 13; i < grid.length; i++) {
-      const sku = cell(i, 0);
-      if (!sku) continue;
-      const expected = parseFloat(cell(i, 2)) || 0;
-      const received = cell(i, 3) === '' ? null : (parseFloat(cell(i, 3)) || 0);
-      detail.lineItems.push({
-        sku, productName: cell(i, 1), expectedQty: expected, receivedQty: received,
-        discrepancy: cell(i, 4), caseQty: cell(i, 5), numCases: cell(i, 6), location: cell(i, 7),
-      });
-    }
-    detail.receivedUnits = detail.lineItems.reduce((s, li) => s + (li.receivedQty || 0), 0);
-    detail.discrepancyCount = detail.lineItems.filter(li => li.receivedQty != null && li.receivedQty !== li.expectedQty).length;
-    detail.anyReceivedEntered = detail.lineItems.some(li => li.receivedQty != null);
-    return detail;
-  }
-
-  async function fetchAsnDetail(shipmentId, driveUrl, force) {
-    if (!force && _asnDetailCache[shipmentId]) return _asnDetailCache[shipmentId];
-    const fileId = fileIdFromUrl(driveUrl);
-    if (!fileId) return null;
-    const gid = gidFromUrl(driveUrl);
-    try {
-      const csv = await fetch(fileCsvUrl(fileId, gid)).then(r => r.ok ? r.text() : '').catch(() => '');
-      if (!isCsv(csv)) return null;
-      const detail = parseAsnSheetDetail(csv);
-      _asnDetailCache[shipmentId] = detail;
-      return detail;
-    } catch (e) {
-      console.warn('[InventoryExternal] ASN detail fetch failed for', shipmentId, e.message);
-      return null;
-    }
-  }
-
-  window.loadInboundShipmentsExternal = async function () {
-    const errEl = document.getElementById('asn-error-state');
-    try {
-      const csv = await fetch(gvizCsvUrl(TRACKER_SHEET_ID, TRACKER_TAB)).then(r => r.ok ? r.text() : '').catch(() => '');
-      const rows = isCsv(csv) ? parseCsvRows(csv) : [];
-      _trackerRows = rows.filter(r => r.shipmentid);
-      if (errEl) errEl.style.display = 'none';
-
-      // Render immediately with tracker-only info (fast first paint), then
-      // fill in each card's live stats as its per-ASN sheet loads.
-      renderAsnLists(/*detailsReady*/false);
-      await Promise.all(_trackerRows.map(r => fetchAsnDetail(r.shipmentid, r.driveurl)));
-      renderAsnLists(/*detailsReady*/true);
-
-      // Aggregate Expected Qty per SKU across all *Open* shipments only —
-      // Received shipments' expected units are already reflected in stock
-      // on-hand, so counting them here would double-count as "inbound."
-      _inboundBySku = {};
-      _trackerRows
-        .filter(r => (r.status || '').trim() === 'Open')
-        .forEach(r => {
-          const detail = _asnDetailCache[r.shipmentid];
-          if (!detail) return;
-          detail.lineItems.forEach(li => {
-            const sku = (li.sku || '').trim().toUpperCase();
-            if (!sku) return;
-            _inboundBySku[sku] = (_inboundBySku[sku] || 0) + (li.expectedQty || 0);
-          });
-        });
-      renderStockLevelsTable(); // refresh now that inbound numbers are available
-    } catch (err) {
-      console.warn('[InventoryExternal] Inbound Shipments load failed:', err.message);
-      if (errEl) { errEl.textContent = 'Failed to load shipments — try refreshing the page.'; errEl.style.display = 'block'; }
-    }
-  };
-
-  function renderAsnLists() {
-    const openRows = _trackerRows.filter(r => (r.status || '').trim() === 'Open')
-      .sort((a, b) => (b.uploaddate || '').localeCompare(a.uploaddate || ''));
-    const receivedRows = _trackerRows.filter(r => (r.status || '').trim() === 'Received')
-      .sort((a, b) => (b.receiveddate || '').localeCompare(a.receiveddate || ''));
-
-    setText('asn-count-open', openRows.length);
-    setText('asn-count-received', receivedRows.length);
-
-    const openEl = document.getElementById('asn-list-open');
-    const recEl = document.getElementById('asn-list-received');
-    if (openEl) openEl.innerHTML = openRows.map(renderAsnCard).join('');
-    if (recEl) recEl.innerHTML = receivedRows.map(renderAsnCard).join('');
-
-    const emptyEl = document.getElementById('asn-empty-state');
-    if (emptyEl) emptyEl.style.display = _trackerRows.length === 0 ? 'flex' : 'none';
-  }
-
-  function renderAsnCard(r) {
-    const shipmentId = r.shipmentid || '';
-    const status = (r.status || '').trim() || 'Open';
-    const detail = _asnDetailCache[shipmentId];
-    const skus = detail ? detail.totalSkus : '…';
-    const expected = detail ? detail.totalUnits : '…';
-    const received = detail ? detail.receivedUnits : '…';
-    const discRaw = r.discrepancycount !== undefined && r.discrepancycount !== '' ? r.discrepancycount : (detail ? detail.discrepancyCount : null);
-    const disc = discRaw == null ? '…' : discRaw;
-    const hasDisc = discRaw != null && Number(discRaw) > 0;
-
-    const metaChips = [];
-    if (r.carrier) metaChips.push(`<span class="asn-meta-chip">🚚 ${escapeHtml(r.carrier)}</span>`);
-    if (r.trackingno) metaChips.push(`<span class="asn-meta-chip">📍 ${escapeHtml(r.trackingno)}</span>`);
-    if (r.boxcount) metaChips.push(`<span class="asn-meta-chip">📦 ${escapeHtml(r.boxcount)} boxes/pallets</span>`);
-
-    const metaSection = metaChips.length
-      ? `<div class="asn-meta">${metaChips.join('')}</div>`
-      : (status === 'Open'
-          ? `<div class="asn-meta"><button class="asn-edit-meta-btn" onclick="toggleAsnMetaForm('${escapeHtml(shipmentId)}')">✏️ Add shipping info</button></div>`
-          : '');
-
-    const statsRow = status === 'Received'
-      ? `<div class="asn-stats">
-           <div class="asn-stat"><span class="asn-stat-label">SKUs</span><span class="asn-stat-value">${skus}</span></div>
-           <div class="asn-stat"><span class="asn-stat-label">Expected</span><span class="asn-stat-value">${typeof expected === 'number' ? expected.toLocaleString() : expected}</span></div>
-           <div class="asn-stat"><span class="asn-stat-label">Received</span><span class="asn-stat-value">${typeof received === 'number' ? received.toLocaleString() : received}</span></div>
-           <div class="asn-stat"><span class="asn-stat-label">Discrepancies</span><span class="asn-stat-value" data-disc="${hasDisc ? 'yes' : 'no'}">${disc}</span></div>
-         </div>`
-      : `<div class="asn-stats">
-           <div class="asn-stat"><span class="asn-stat-label">SKUs</span><span class="asn-stat-value">${skus}</span></div>
-           <div class="asn-stat"><span class="asn-stat-label">Expected</span><span class="asn-stat-value">${typeof expected === 'number' ? expected.toLocaleString() : expected}</span></div>
-         </div>`;
-
-    const footer = status === 'Received'
-      ? `<div class="asn-footer"><button class="asn-download-btn" onclick="downloadDiscrepancyReport('${escapeHtml(shipmentId)}')">⬇ Download Discrepancy Report</button></div>`
-      : '';
-
-    const dateLine = status === 'Received' && r.receiveddate
-      ? `Uploaded ${escapeHtml(r.uploaddate || '')} · Received ${escapeHtml(r.receiveddate)}`
-      : `Uploaded ${escapeHtml(r.uploaddate || '')}`;
-
-    return `
-      <div class="asn-card" data-status="${status}" id="asn-card-${escapeHtml(shipmentId)}">
-        <div class="asn-card-hd">
-          <div>
-            <a class="asn-id-link" href="${escapeHtml(r.driveurl || '#')}" target="_blank" rel="noopener">${escapeHtml(shipmentId)} ↗</a>
-            <div class="asn-upload-date">${dateLine}</div>
-          </div>
-          <span class="asn-badge" data-status="${status}">${status === 'Received' ? '✅ Received' : '📦 Open'}</span>
-        </div>
-        ${statsRow}
-        ${metaSection}
-        <div class="asn-meta-form" id="asn-meta-form-${escapeHtml(shipmentId)}" style="display:none;padding:12px 14px;">
-          <div class="asn-meta-form-grid">
-            <input class="asn-meta-input" id="asn-meta-carrier-${escapeHtml(shipmentId)}" placeholder="Carrier (e.g. UPS)">
-            <input class="asn-meta-input" id="asn-meta-tracking-${escapeHtml(shipmentId)}" placeholder="PRO / Tracking #">
-            <input class="asn-meta-input" id="asn-meta-boxcount-${escapeHtml(shipmentId)}" placeholder="Box / Pallet count" style="grid-column:1 / -1;">
-          </div>
-          <div class="asn-meta-actions">
-            <button class="asn-back-btn" onclick="toggleAsnMetaForm('${escapeHtml(shipmentId)}')">Cancel</button>
-            <button class="asn-submit-btn" onclick="saveAsnMeta('${escapeHtml(shipmentId)}')">Save</button>
-          </div>
-        </div>
-        ${footer}
-      </div>`;
-  }
-
-  window.toggleAsnMetaForm = function (shipmentId) {
-    const form = document.getElementById(`asn-meta-form-${shipmentId}`);
-    if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
-  };
-
-  window.saveAsnMeta = async function (shipmentId) {
-    const carrier = document.getElementById(`asn-meta-carrier-${shipmentId}`)?.value.trim() || '';
-    const trackingNo = document.getElementById(`asn-meta-tracking-${shipmentId}`)?.value.trim() || '';
-    const boxCount = document.getElementById(`asn-meta-boxcount-${shipmentId}`)?.value.trim() || '';
-    try {
-      const res = await fetch('/api/update-asn-shipping', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ shipmentId, carrier, trackingNo, boxCount, trackerSheetId: TRACKER_SHEET_ID }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-      delete _asnDetailCache[shipmentId];
-      await window.loadInboundShipmentsExternal();
-    } catch (e) {
-      alert('Failed to save shipping info: ' + e.message);
-    }
-  };
-
-  // Builds the same two-tab .xlsx as the Close Shipment email attachment
-  // (see buildDiscrepancyXlsxBlob in the Apps Script) — Discrepancies tab
-  // filtered to mismatched SKUs only, plus a tab named after the shipment
-  // with every SKU. Uses the SheetJS library already loaded on this page.
-  window.downloadDiscrepancyReport = async function (shipmentId) {
-    const row = _trackerRows.find(r => r.shipmentid === shipmentId);
-    if (!row) return;
-    const detail = await fetchAsnDetail(shipmentId, row.driveurl, /*force*/true);
-    if (!detail) { alert('Could not load this shipment\'s sheet.'); return; }
-
-    const withVariance = detail.lineItems.map(li => ({
-      sku: li.sku,
-      productName: li.productName,
-      shipQty: li.expectedQty,
-      receivedQty: li.receivedQty ?? 0,
-      variance: (li.receivedQty ?? 0) - li.expectedQty,
-    }));
-    const mismatched = withVariance.filter(i => i.variance !== 0);
-
-    const headerBlock = [
-      ['Shipment ID', shipmentId],
-      ['Carrier', row.carrier || ''],
-      ['Tracking', row.trackingno || ''],
-      ['Upload Date', row.uploaddate || ''],
-      [],
-    ];
-    const buildRows = (items, includeType) => {
-      const headers = includeType
-        ? ['SKU', 'Product Name', 'Ship Qty', 'Received Qty', 'Variance', 'Type']
-        : ['SKU', 'Product Name', 'Ship Qty', 'Received Qty', 'Variance'];
-      const dataRows = items.map(i => {
-        const r = [i.sku, i.productName, i.shipQty, i.receivedQty, i.variance];
-        if (includeType) r.push(i.variance < 0 ? 'Short' : 'Over');
-        return r;
-      });
-      return [...headerBlock, headers, ...dataRows];
-    };
-
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(buildRows(mismatched, true)), 'Discrepancies');
-    // Sheet names can't exceed 31 chars or contain []*/\?: — shipment IDs
-    // here are short and alphanumeric-plus-hyphen, so this is safe as-is.
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(buildRows(withVariance, false)), shipmentId);
-    XLSX.writeFile(wb, `${shipmentId}-Discrepancy-Report.xlsx`);
-  };
-
-  window.downloadAsnTemplate = function () {
-    window.open(`https://docs.google.com/spreadsheets/d/${ASN_TEMPLATE_ID}/copy`, '_blank');
-  };
-
-  window.showAsnSubTab = function (status, btn) {
-    document.querySelectorAll('.asn-subtab').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    document.getElementById('asn-list-open').style.display = status === 'Open' ? '' : 'none';
-    document.getElementById('asn-list-received').style.display = status === 'Received' ? '' : 'none';
-  };
-
-  // ══════════════════════════════════════════════════════════════════════
-  // UPLOAD MODAL
-  // ══════════════════════════════════════════════════════════════════════
-  let _asnParsedRows = [];
-
-  window.openAsnUploadModal = function () {
-    document.getElementById('asn-upload-modal').style.display = 'flex';
-    asnBackToDrop();
-  };
-  window.closeAsnUploadModal = function () {
-    document.getElementById('asn-upload-modal').style.display = 'none';
-  };
-  window.asnBackToDrop = function () {
-    document.getElementById('asn-step-drop').style.display = 'block';
-    document.getElementById('asn-step-review').style.display = 'none';
-    document.getElementById('asn-step-submitting').style.display = 'none';
-    document.getElementById('asn-modal-error').style.display = 'none';
-    document.getElementById('asn-file-input').value = '';
-    _asnParsedRows = [];
-  };
-
-  function showAsnModalError(msg) {
-    const el = document.getElementById('asn-modal-error');
-    el.textContent = msg;
-    el.style.display = 'block';
-  }
-
-  window.handleAsnFileSelect = function (event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = String(e.target.result || '');
-        const lines = text.replace(/\r/g, '').split('\n').filter(l => l.trim());
-        if (lines.length < 2) { showAsnModalError('That CSV has no data rows.'); return; }
-        const headers = parseCsvLine(lines[0]).map(h => h.trim().toLowerCase());
-        const skuIdx = headers.indexOf('sku');
-        const nameIdx = headers.findIndex(h => h === 'productname' || h === 'product name');
-        const qtyIdx = headers.indexOf('quantity');
-        if (skuIdx < 0 || nameIdx < 0 || qtyIdx < 0) {
-          showAsnModalError('Expected columns SKU, ProductName, Quantity — check the template.');
-          return;
-        }
-        const parsed = [];
-        for (let i = 1; i < lines.length; i++) {
-          const cols = parseCsvLine(lines[i]);
-          const sku = (cols[skuIdx] || '').trim();
-          if (!sku) continue;
-          parsed.push({
-            sku,
-            productName: (cols[nameIdx] || '').trim(),
-            quantity: parseInt(cols[qtyIdx], 10) || 0,
-          });
-        }
-        if (!parsed.length) { showAsnModalError('No valid rows found — check the SKU column is filled in.'); return; }
-        _asnParsedRows = parsed;
-        showAsnReviewStep();
-      } catch (err) {
-        showAsnModalError('Could not read that file: ' + err.message);
-      }
-    };
-    reader.readAsText(file);
-  };
-
-  function showAsnReviewStep() {
-    document.getElementById('asn-step-drop').style.display = 'none';
-    document.getElementById('asn-step-review').style.display = 'block';
-    setText('asn-review-skus', _asnParsedRows.length.toLocaleString());
-    setText('asn-review-units', _asnParsedRows.reduce((s, r) => s + r.quantity, 0).toLocaleString());
-    document.getElementById('asn-preview-tbody').innerHTML = _asnParsedRows
-      .map(r => `<tr><td>${escapeHtml(r.sku)}</td><td>${escapeHtml(r.productName)}</td><td>${r.quantity.toLocaleString()}</td></tr>`)
-      .join('');
-  }
-
-  window.submitAsnUpload = async function () {
-    if (!_asnParsedRows.length) return;
-    document.getElementById('asn-step-review').style.display = 'none';
-    document.getElementById('asn-step-submitting').style.display = 'block';
-    try {
-      const res = await fetch('/api/create-asn', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ rows: _asnParsedRows, trackerSheetId: TRACKER_SHEET_ID }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-      window.closeAsnUploadModal();
-
-      // FIXED 2026-08-19 -- the write itself succeeds immediately, but this
-      // reads back through the gviz endpoint (gvizCsvUrl), which has its own
-      // server-side caching on Google's end separate from the browser --
-      // a cache-busting query param doesn't help there, only time does. A
-      // single fetch immediately after the write can genuinely come back
-      // without the new row even though it's already in the sheet. Retry a
-      // few times with increasing delay before giving up; each call is a
-      // full idempotent re-render, so repeating it is harmless.
-      const priorCount = _trackerRows.length;
-      const delays = [1500, 3000, 5000];
-      for (const ms of delays) {
-        await new Promise(r => setTimeout(r, ms));
-        await window.loadInboundShipmentsExternal();
-        if (_trackerRows.length > priorCount) break;
-      }
-    } catch (err) {
-      document.getElementById('asn-step-submitting').style.display = 'none';
-      document.getElementById('asn-step-review').style.display = 'block';
-      showAsnModalError('Upload failed: ' + err.message);
-    }
-  };
-
-  // ══════════════════════════════════════════════════════════════════════
-  // Page orchestrator
-  // ══════════════════════════════════════════════════════════════════════
-  window.initInventoryExternalPage = function () {
-    if (window.__inventoryExternalPromise) return window.__inventoryExternalPromise;
-    window.__inventoryExternalPromise = Promise.all([
-      window.loadStockLevelsExternal(),
-      window.loadInboundShipmentsExternal(),
-    ]);
-    return window.__inventoryExternalPromise;
-  };
-})();
 
 // ══════════════════════════════════════════════════════════════════════════════
 // ORGANIC > ACTIVATORS > RANK TRACKER
@@ -16644,6 +15808,234 @@ async function loadSkinsideMomentum() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// External Inventory page's Reviews-by-category — ported from Cosmette,
+// 2026-09-17. Grouped by SS_REVIEW_CATEGORY_BY_SKU (defined earlier).
+// Within each category: aggregated star-rating distribution + one sub-tab
+// per product showing its 5 most recent reviews. VOC Themes card is
+// included for structural parity with Cosmette but will show "Not
+// automated yet" here — Skinside Seoul has no run-voc-themes.js cron or
+// SHEET_VOC_THEMES entry, and this degrades to that message gracefully
+// rather than erroring, same as it does on Cosmette for any category the
+// cron hasn't reached yet.
+(function () {
+  'use strict';
+
+  function csEscapeHtml(s) {
+    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  }
+  function csRenderStars(rating) {
+    const n = Math.max(0, Math.min(5, Math.round(parseFloat(rating) || 0)));
+    return `<span class="rev-stars-${n}">${'★'.repeat(n)}</span>`;
+  }
+  function csRenderReviewCard(r) {
+    const purchaseType = /vine/i.test(r.purchase_type || '') ? 'Amazon Vine' : 'Verified Purchase';
+    return `<div class="rev-card">
+      <div class="rev-hdr"><span class="rev-name">${csEscapeHtml(r.reviewer_name)}</span>${csRenderStars(r.star_rating)}<span class="rev-date">${csEscapeHtml(purchaseType)}</span></div>
+      <div class="rev-title">"${csEscapeHtml(r.review_title)}"</div>
+      <div class="rev-body">${csEscapeHtml(r.review_text)}</div>
+    </div>`;
+  }
+  function csRenderStarDistribution(reviews) {
+    if (!reviews.length) return '<div style="color:var(--muted);font-size:12px;">No reviews found for this category.</div>';
+    const counts = { 5:0, 4:0, 3:0, 2:0, 1:0 };
+    let sum = 0;
+    reviews.forEach(r => { const n = Math.max(1, Math.min(5, Math.round(parseFloat(r.star_rating) || 0))); counts[n]++; sum += parseFloat(r.star_rating) || 0; });
+    const total = reviews.length;
+    const avg = (sum / total).toFixed(1);
+    const barColors = { 5:null, 4:'#a8d9c8', 3:'var(--warn)', 2:'#e8a080', 1:'var(--danger)' };
+    const rows = [5,4,3,2,1].map(n => {
+      const pct = total ? Math.round((counts[n]/total)*100) : 0;
+      const colorStyle = barColors[n] ? `background:${barColors[n]};` : '';
+      return `<div class="star-bar-row"><div class="star-bar-lbl">${n} ★</div><div class="star-bar-track"><div class="star-bar-fill" style="width:${pct}%;${colorStyle}"></div></div><div class="star-bar-count">${counts[n]}</div></div>`;
+    }).join('');
+    return `<div style="font-size:26px;font-weight:700;color:var(--navy);margin-bottom:4px;">${avg} <span style="font-size:16px;color:var(--muted);font-weight:400;">/ 5</span></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">${total.toLocaleString()} total reviews</div>
+      ${rows}`;
+  }
+  function csRenderVocThemes(themeRow) {
+    if (!themeRow || !themeRow.themes_json) {
+      return '<div style="font-size:12px;color:var(--muted);line-height:1.7;">📋 Not automated yet — categorizing review text into themes is a real analysis step, not a mechanical data pull. Coming later.</div>';
+    }
+    let themes;
+    try { themes = JSON.parse(themeRow.themes_json); }
+    catch (e) { return '<div style="font-size:12px;color:var(--muted);">Could not load themes for this category.</div>'; }
+    if (!Array.isArray(themes) || !themes.length) {
+      return '<div style="font-size:12px;color:var(--muted);">No recurring themes identified yet.</div>';
+    }
+    const STATUS_STYLE = {
+      active:   { bg: 'rgba(219,55,45,.1)', color: 'var(--danger)', label: 'Active' },
+      new:      { bg: 'rgba(200,125,47,.12)', color: 'var(--warn)', label: 'New Theme' },
+      resolved: { bg: 'rgba(36,233,163,.13)', color: '#1db88a', label: 'Resolved' },
+    };
+    function timeAgoLabel(dateStr) {
+      const d = Date.parse(dateStr);
+      if (isNaN(d)) return '';
+      const days = Math.floor((Date.now() - d) / 86400000);
+      if (days < 0) return '';
+      if (days < 1) return 'today';
+      if (days < 14) return days + (days === 1 ? ' day ago' : ' days ago');
+      if (days < 60) return Math.floor(days/7) + ' weeks ago';
+      if (days < 730) return Math.floor(days/30) + ' months ago';
+      return Math.floor(days/365) + ' years ago';
+    }
+    const rowsHtml = themes.map(t => {
+      const st = STATUS_STYLE[t.status] || STATUS_STYLE.active;
+      const agoLabel = timeAgoLabel(t.most_recent_review_date);
+      return `<div style="padding:10px 0;border-bottom:1px solid var(--border2);">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+          <div style="font-size:12.5px;font-weight:700;color:var(--navy);">${csEscapeHtml(t.theme||'')}</div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            ${agoLabel ? `<span style="font-size:9.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--bg2);color:var(--muted);">${csEscapeHtml(agoLabel)}</span>` : ''}
+            <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:999px;white-space:nowrap;background:${st.bg};color:${st.color};">${st.label}</span>
+          </div>
+        </div>
+        ${t.example_quote ? `<div style="font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:2px;">"${csEscapeHtml(t.example_quote)}"</div>` : ''}
+        ${t.note ? `<div style="font-size:11px;color:var(--muted);">${csEscapeHtml(t.note)}</div>` : ''}
+      </div>`;
+    }).join('');
+    const dateNote = themeRow.date ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">Last analyzed ${csEscapeHtml(themeRow.date)}</div>` : '';
+    return dateNote + rowsHtml;
+  }
+  function csSlugify(s) {
+    return String(s || 'uncategorized').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'uncategorized';
+  }
+
+  async function buildReviewsUI(rootId, ns) {
+    const root = document.getElementById(rootId);
+    if (!root) return;
+    const cfg = window.SHEET_CFG.SHEET_AMAZON_REVIEWS;
+    if (!cfg) { root.innerHTML = '<div class="placeholder-block"><div class="ph-icon">⭐</div><div class="ph-title">Reviews not yet connected</div></div>'; return; }
+
+    try {
+      const reviewsUrl = (cfg.gid != null && cfg.gid !== '')
+        ? csSheetCsvUrl(cfg.fileId, cfg.gid)
+        : `https://docs.google.com/spreadsheets/d/${cfg.fileId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul')}`;
+      const csv = await csFetchTextWithTimeout(reviewsUrl + `&_cb=${Date.now()}`, 20000);
+      const allReviews = csIsCsv(csv) ? csParseCsv(csv) : [];
+      console.log('[SkinsideReviews:'+ns+'] total review rows loaded:', allReviews.length, '— columns:', allReviews.length ? Object.keys(allReviews[0]).join(' | ') : '(none)');
+      if (!allReviews.length) {
+        root.innerHTML = '<div class="placeholder-block"><div class="ph-icon">⭐</div><div class="ph-title">No review data yet</div></div>';
+        return;
+      }
+
+      // VOC Themes — gracefully shows "not automated yet" if this key
+      // isn't in SHEET_CONFIG (expected for this brand right now).
+      let themesByCategory = {};
+      const vocCfg = window.SHEET_CFG.SHEET_VOC_THEMES;
+      if (vocCfg) {
+        try {
+          const vocUrl = (vocCfg.gid != null && vocCfg.gid !== '')
+            ? csSheetCsvUrl(vocCfg.fileId, vocCfg.gid)
+            : `https://docs.google.com/spreadsheets/d/${vocCfg.fileId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul')}`;
+          const vocCsv = await csFetchTextWithTimeout(vocUrl + `&_cb=${Date.now()}`, 20000);
+          const vocRows = csIsCsv(vocCsv) ? csParseCsv(vocCsv) : [];
+          vocRows.forEach(r => {
+            const cat = (r.category || '').trim();
+            if (!cat) return;
+            if (!themesByCategory[cat] || (r.date||'') >= (themesByCategory[cat].date||'')) themesByCategory[cat] = r;
+          });
+        } catch (e) { console.warn('[SkinsideReviews:'+ns+'] VOC Themes fetch failed:', e.message); }
+      }
+
+      // Category comes from SS_REVIEW_CATEGORY_BY_SKU (hardcoded — see
+      // that map's own comment for why, above). Product names reuse the
+      // SAME canonical SKU->name lookup already built for the Sales
+      // Reviews tab and Brand Momentum (ssrGetProductNameMap), rather
+      // than a fresh copy of Cosmette's own name-lookup function.
+      const nameBySku = await ssrGetProductNameMap();
+      const byCategory = {};
+      allReviews.forEach(r => {
+        const sku = csBaseSku(r.sku);
+        const cat = SS_REVIEW_CATEGORY_BY_SKU[sku] || 'Uncategorized';
+        (byCategory[cat] = byCategory[cat] || []).push(r);
+      });
+      const categories = Object.keys(byCategory).sort();
+
+      const catTabsHtml = categories.map((cat, i) =>
+        `<button class="cat-tab${i===0?' active':''}" onclick="window.__csSelectReviewCategory('${rootId}','${csSlugify(cat)}', this)">${csEscapeHtml(cat)}</button>`
+      ).join('');
+
+      const catPanelsHtml = categories.map((cat, i) => {
+        const catSlug = `${ns}-${csSlugify(cat)}`;
+        const catReviews = byCategory[cat];
+        const byProduct = {};
+        catReviews.forEach(r => {
+          const sku = csBaseSku(r.sku);
+          const key = (r.sku || r.asin || r.product_name || 'unknown').trim();
+          const cleanName = nameBySku[sku] || r.product_name || key;
+          (byProduct[key] = byProduct[key] || { label: cleanName, reviews: [] }).reviews.push(r);
+        });
+        const productKeys = Object.keys(byProduct);
+        const prodTabsHtml = productKeys.map((key, j) =>
+          `<button class="prod-tab${j===0?' active':''}" onclick="window.__csSelectReviewProduct('${rootId}','${catSlug}','${csSlugify(key)}', this)">${csEscapeHtml(byProduct[key].label)}</button>`
+        ).join('');
+        const prodPanelsHtml = productKeys.map((key, j) => {
+          const sorted = byProduct[key].reviews.slice().sort((a,b) => (Date.parse(b.date)||0) - (Date.parse(a.date)||0));
+          const top5 = sorted.slice(0,5);
+          return `<div class="prod-panel${j===0?' active':''}" id="prodpanel-${catSlug}-${csSlugify(key)}">
+            ${top5.length ? top5.map(csRenderReviewCard).join('') : '<div style="color:var(--muted);font-size:12px;">No reviews found for this product.</div>'}
+          </div>`;
+        }).join('');
+
+        return `<div class="cat-panel${i===0?' active':''}" id="catpanel-${catSlug}">
+          <div class="two-col" style="margin-bottom:16px;">
+            <div class="card"><div class="card-title">Star Rating Distribution — ${csEscapeHtml(cat)}</div>${csRenderStarDistribution(catReviews)}</div>
+            <div class="card">
+              <div class="card-title">VOC Themes — ${csEscapeHtml(cat)}</div>
+              ${csRenderVocThemes(themesByCategory[cat])}
+            </div>
+          </div>
+          <div class="prod-tabs">${prodTabsHtml}</div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;">Select Reviews — ${csEscapeHtml(cat)}</div>
+          ${prodPanelsHtml}
+        </div>`;
+      }).join('');
+
+      root.innerHTML = `<div class="cat-tabs">${catTabsHtml}</div>${catPanelsHtml}`;
+
+    } catch (err) {
+      console.warn('[SkinsideReviews:'+ns+'] failed:', err.message);
+      const isTimeout = err.message === 'timeout';
+      root.innerHTML = `<div class="placeholder-block">
+        <div class="ph-icon">⭐</div>
+        <div class="ph-title">${isTimeout ? 'Reviews took too long to load' : 'Error loading reviews'}</div>
+        <div class="ph-sub">${isTimeout ? "Google's export was slow to respond — this sheet is large and shared across brands. Usually works on retry." : csEscapeHtml(err.message)}</div>
+        <button class="btn-edit" style="margin-top:10px;" onclick="window.__csRetryReviews('${rootId}','${ns}')">↻ Retry</button>
+      </div>`;
+    }
+  }
+
+  window.initExternalReviews = function () {
+    if (window._csExtReviewsPromise) return window._csExtReviewsPromise;
+    window._csExtReviewsPromise = buildReviewsUI('ext-reviews-root', 'ext');
+    return window._csExtReviewsPromise;
+  };
+  window.__csRetryReviews = function (rootId, ns) {
+    window._csExtReviewsPromise = null;
+    window.initExternalReviews();
+  };
+  window.__csSelectReviewCategory = function (rootId, catSlug, btn) {
+    const root = document.getElementById(rootId);
+    if (!root) return;
+    const ns = rootId.startsWith('ext') ? 'ext' : 'ins';
+    root.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    root.querySelectorAll('.cat-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById(`catpanel-${ns}-${catSlug}`);
+    if (panel) panel.classList.add('active');
+  };
+  window.__csSelectReviewProduct = function (rootId, catSlug, prodSlug, btn) {
+    const scope = document.getElementById(`catpanel-${catSlug}`);
+    if (!scope) return;
+    scope.querySelectorAll('.prod-tab').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    scope.querySelectorAll('.prod-panel').forEach(p => p.classList.remove('active'));
+    const panel = document.getElementById(`prodpanel-${catSlug}-${prodSlug}`);
+    if (panel) panel.classList.add('active');
+  };
+})();
+
 async function renderReviewsTab() {
   try {
     const allReviews = await fetchAmazonReviews();
@@ -19181,6 +18573,100 @@ function parseCsv2D(text) {
   if (field !== '' || row.length) { row.push(field); rows.push(row); }
   return rows;
 }
+// ══════════════════════════════════════════════════════════════════════════
+// EXTERNAL INVENTORY PAGE — REVIEWS BY CATEGORY (ported from Cosmette's own
+// external Inventory page, 2026-09-17, per Jaclyn). Cosmette's page uses
+// this exact same "Reviews grouped by category + VOC Themes" structure
+// instead of stock-level data — same port here, adapted to Skinside
+// Seoul's real 7-product catalog and its own SHEET_AMAZON_REVIEWS gid
+// (NOT Cosmette's — that sheet is shared across brands, one tab each).
+//
+// Category grouping: Cosmette reads a real "category" column already
+// confirmed on its own Master SKU List. Skinside Seoul's equivalent sheet
+// has no such column confirmed anywhere in this file — rather than group
+// every review under one undifferentiated "Uncategorized" bucket (which
+// would defeat the point of a by-category browsing page), this uses a
+// small hardcoded SKU->category map instead, since the catalog is only 7
+// products. This is a judgment call, not a confirmed source — worth
+// checking with Jaclyn that these 4 groupings (Cleansers/Serums/Creams/
+// Masks) match how she'd actually want them organized.
+const SS_REVIEW_CATEGORY_BY_SKU = {
+  'SSS0001': 'Cleansers',       // Heartleaf Foaming Cleanser
+  'SSS0002': 'Serums',          // Spicule Serum
+  'SSS0003': 'Serums',          // Vitamin C Serum
+  'SSS0004': 'Serums',          // 96% Snail Mucin Essence
+  'SSS0005': 'Creams',          // 92% Snail Cream
+  'SSS0006': 'Creams',          // Vitamin C Capsule Cream
+  'SSS0022': 'Masks',           // Biocellulose Coconut Gel Mask
+};
+
+function csSheetCsvUrl(fileId, gid) {
+  return `https://docs.google.com/spreadsheets/d/${fileId}/export?format=csv&gid=${gid}`;
+}
+// Same-origin `fetch` has no built-in timeout — a slow response just hangs
+// the promise forever with no error and nothing in console. Confirmed
+// real failure mode on this exact (large, shared, multi-brand) Reviews
+// sheet on Cosmette's own dashboard. Throws Error('timeout') on expiry,
+// distinguished from a real network/HTTP error so callers can show a
+// different message.
+async function csFetchTextWithTimeout(url, timeoutMs) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs || 20000);
+  try {
+    const res = await fetch(url, { signal: controller.signal });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return await res.text();
+  } catch (e) {
+    if (e.name === 'AbortError') throw new Error('timeout');
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+function csIsCsv(text) {
+  const t = (text || '').trim();
+  return t.length > 0 && !t.startsWith('<') && !t.startsWith('{');
+}
+// Full-document, quote-aware CSV tokenizer — handles a review/note field
+// containing a real line break inside quotes correctly (a naive split on
+// '\n' first would treat that as a row boundary and corrupt the field
+// plus shift every column after it for the rest of that row).
+function csParseCsvRecords(text) {
+  const records = [];
+  let field = '', record = [], inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '"') { if (text[i + 1] === '"') { field += '"'; i++; } else { inQ = false; } }
+      else { field += c; }
+    } else {
+      if (c === '"') { inQ = true; }
+      else if (c === ',') { record.push(field); field = ''; }
+      else if (c === '\r') { /* skip — \n (or \r\n) handled below */ }
+      else if (c === '\n') { record.push(field); field = ''; records.push(record); record = []; }
+      else { field += c; }
+    }
+  }
+  if (field.length || record.length) { record.push(field); records.push(record); }
+  return records.filter(r => !(r.length === 1 && r[0] === ''));
+}
+function csParseCsv(text) {
+  const records = csParseCsvRecords(text.trim() + '\n');
+  if (records.length < 2) return [];
+  const headers = records[0].map(h => h.replace(/^"|"$/g, '').trim());
+  const rows = [];
+  for (let i = 1; i < records.length; i++) {
+    const vals = records[i];
+    const row = {};
+    headers.forEach((h, idx) => { row[h] = (vals[idx] || '').replace(/^"|"$/g, '').trim(); });
+    rows.push(row);
+  }
+  return rows;
+}
+function csBaseSku(s) {
+  return (s || '').trim().toUpperCase().replace(/-SF$/i, '');
+}
+
 function parseCsvToRows(text) {
   const all = parseCsvFull(text);
   if (all.length < 2) return [];
@@ -23106,7 +22592,7 @@ async function loadAuditResultsFromSheet() {
       // this brand only needs Amazon. Column layout on this brand's tab
       // (confirmed by Jaclyn, NOT the same positions as évolis's own tab
       // on the same shared spreadsheet — évolis uses O/T/AD, this one
-      // uses O/S/AB): O=Total Sales Goal (index 14), S=Organic Sales Goal
+      // uses P/S/AB): P=Total Sales Goal (index 15), S=Organic Sales Goal
       // (index 18), AB=Ad Sales Goal (index 27).
       try {
         // Deliberately a SEPARATE validity filter from isValidAmazonRow
@@ -23133,7 +22619,7 @@ async function loadAuditResultsFromSheet() {
         const goalsAmzCsv = await fetch('https://docs.google.com/spreadsheets/d/1trsHDgVSLprsOOjOuFWGZRDqVOV-eII3/export?format=csv&gid=1677661344' + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
         const goalsAmzRows = parseCsv2D(goalsAmzCsv);
         const goalsRowAmz = findGoalsRow(goalsAmzRows, refDate.getFullYear(), refDate.getMonth() + 1);
-        console.log('[GoalTracker][qa] Amazon goals row found:', !!goalsRowAmz, goalsRowAmz ? { total: goalsRowAmz[14], organic: goalsRowAmz[18], ads: goalsRowAmz[27] } : null);
+        console.log('[GoalTracker][qa] Amazon goals row found:', !!goalsRowAmz, goalsRowAmz ? { total: goalsRowAmz[15], organic: goalsRowAmz[18], ads: goalsRowAmz[27] } : null);
 
         // Live actual revenue, pending-inclusive, netted against returns
         // (a returned sale shouldn't count toward a sales goal; a pending
@@ -23168,7 +22654,7 @@ async function loadAuditResultsFromSheet() {
 
         function renderGoalsGroup(actualOverall, actualAds, actualOrganic, goalRow) {
           if (!goalRow) return `<div style="color:var(--muted);font-size:13px;flex:1;text-align:center;padding:20px;">No goals row found for this month.</div>`;
-          const overallGoal = parseGoalsDollar(goalRow[14]);
+          const overallGoal = parseGoalsDollar(goalRow[15]);
           const organicGoal = parseGoalsDollar(goalRow[18]);
           const adsGoal = parseGoalsDollar(goalRow[27]);
           const fmtD = n => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
