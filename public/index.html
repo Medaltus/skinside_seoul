@@ -6117,7 +6117,7 @@ async function initSns() {
     }
 
     if (!curr) {
-      showError(`No Évolis data found for ${cfg.year}-${String(cfg.month).padStart(2,'0')}.`);
+      showError(`No Skinside Seoul data found for ${cfg.year}-${String(cfg.month).padStart(2,'0')}.`);
       return;
     }
 
@@ -8622,7 +8622,7 @@ async function initSns() {
       if (prevYoy) prevYoy.totalUnits = Math.max(0, prevYoy.totalUnits - yoyReturns.totalQty);
 
       if (!curr) {
-        showError(`No Évolis data found for ${year}-${String(month).padStart(2,'0')}. syncRows:${syncRows.length} histRows:${histRows.length}`);
+        showError(`No Skinside Seoul data found for ${year}-${String(month).padStart(2,'0')}. syncRows:${syncRows.length} histRows:${histRows.length}`);
         return;
       }
 
@@ -10099,7 +10099,18 @@ async function initSns() {
   // {year, month} whose status is exactly "Approved".
   async function getLatestApprovedMonth() {
     try {
-      const res = await fetch(gvizCsvUrl('evolis'));
+      // FIXED 2026-09-18 — this was hardcoded to 'evolis', meaning this
+      // brand's External Sales/Marketing pages were reading ÉVOLIS's own
+      // approval history off the shared Report Insights spreadsheet, not
+      // this brand's. Explains exactly the symptom reported: the page
+      // was stuck showing June 2026 (évolis's own latest Approved month)
+      // and erroring on real Amazon data that only exists for this
+      // brand's actual months. NOT independently confirmed that
+      // 'skinside-seoul' is this brand's real tab name on that shared
+      // sheet the way 'evolis' was confirmed for évolis's own — matches
+      // the tabName this brand's write-report-insights.js config already
+      // assumes, but worth a direct check against the real spreadsheet.
+      const res = await fetch(gvizCsvUrl(window.SHEET_CFG.BRAND_SLUG || 'skinside-seoul'));
       if (!res.ok) return null;
       const csv = await res.text();
       if (!isCsv(csv)) return null;
