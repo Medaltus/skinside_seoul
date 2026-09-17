@@ -881,10 +881,12 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .audit-run-btn.running .spinner{display:block;}
 .audit-run-btn.running .btn-label{opacity:.7;}
 .ppc-run-btn{display:flex;align-items:center;gap:9px;background:var(--sand);color:var(--navy);border:none;border-radius:999px;padding:13px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;box-shadow:0 2px 8px rgba(244,223,208,.6);}
+.voc-run-btn{display:flex;align-items:center;gap:9px;background:var(--warn);color:#fff;border:none;border-radius:999px;padding:13px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;box-shadow:0 2px 8px rgba(200,125,47,.35);}
 .ppc-run-btn:hover{box-shadow:0 4px 14px rgba(244,223,208,.85);transform:translateY(-1px);}
 .ppc-run-btn:disabled{background:var(--muted);color:#fff;cursor:not-allowed;box-shadow:none;transform:none;}
 .ppc-run-btn .spinner{width:14px;height:14px;border:2px solid rgba(0,31,96,.25);border-top-color:var(--navy);border-radius:50%;animation:spin .7s linear infinite;display:none;}
 .ppc-run-btn.running .spinner{display:block;}
+.voc-run-btn.running .spinner{display:block;}
 .ppc-run-btn.running .btn-label{opacity:.7;}
 
 /* ══════════════════════════════════════════════════════════════
@@ -3277,6 +3279,13 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
               <span class="btn-label">📈 Run PPC Analysis</span>
             </button>
             <div class="last-run-note" id="last-run-ppc">Last run: —</div>
+          </div>
+          <div>
+            <button class="voc-run-btn" id="run-voc-themes-btn" onclick="runVocThemesAnalysis()">
+              <div class="spinner"></div>
+              <span class="btn-label">⭐ Run VOC Themes</span>
+            </button>
+            <div class="last-run-note" id="last-run-voc">Last run: —</div>
           </div>
           <span class="upload-status" id="upload-status" style="align-self:center;"></span>
         </div>
@@ -18743,6 +18752,34 @@ async function runPpcStrategyAnalysis() {
   } finally { btn.classList.remove('running'); btn.disabled = false; }
 }
 
+// Added 2026-09-18 per Jaclyn — manual trigger for run-voc-themes.js,
+// same pattern as the three buttons above it. Response shape matches
+// that cron's own res.status(200).json({ ok:true, categories: [...] }),
+// so the success message reports categories processed rather than a
+// SKU count (which this cron doesn't return).
+async function runVocThemesAnalysis() {
+  const btn = document.getElementById('run-voc-themes-btn');
+  const st = document.getElementById('upload-status');
+  btn.classList.add('running'); btn.disabled = true;
+  try {
+    st.textContent = 'Running VOC Themes…'; st.className = 'upload-status';
+    const res = await fetch('/api/run-voc-themes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brand: INSIGHTS_BRAND_TAB }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('Request failed: ' + res.status));
+    const catCount = (data.categories || []).length;
+    st.textContent = `✓ Done — ${catCount} categor${catCount === 1 ? 'y' : 'ies'} — ` + new Date().toLocaleTimeString();
+    st.className = 'upload-status success';
+    if (typeof window.loadLastRunDates === 'function') window.loadLastRunDates();
+  } catch (err) {
+    console.error(err);
+    st.textContent = '✗ ' + err.message; st.className = 'upload-status error';
+  } finally { btn.classList.remove('running'); btn.disabled = false; }
+}
+
 // Added 2026-08-07 per Jaclyn — shows when each of the 3 buttons above
 // was last successfully run, read from the same sheets each one writes
 // to (not a separately-tracked "last run" record). Runs on page load so
@@ -18787,6 +18824,25 @@ async function loadLastRunDates() {
     const el = document.getElementById('last-run-ppc');
     if (el) el.textContent = formatLastRun(latest);
   } catch (err) { console.warn('[LastRun] ppc failed:', err.message); }
+
+  // Run VOC Themes — added 2026-09-18. Most recent `uploaded_at` across
+  // this brand's own tab on SHEET_VOC_THEMES. Needs window.SHEET_CFG.
+  // SHEET_VOC_THEMES (fileId + gid) added to SHEET_CONFIG once that tab
+  // exists — this is a CLIENT-SIDE public-CSV read, unlike the cron
+  // itself (which authenticates via the Sheets API and only needs a tab
+  // name, no gid). Until that config entry exists, this quietly shows
+  // "Last run: never" rather than erroring, same graceful-missing-config
+  // handling used throughout this dashboard.
+  try {
+    const vocCfg = window.SHEET_CFG.SHEET_VOC_THEMES;
+    if (vocCfg && vocCfg.fileId && vocCfg.gid) {
+      const csv = await fetch(ovCsvUrl(vocCfg.fileId, vocCfg.gid)).then(r => r.ok ? r.text() : '').catch(() => '');
+      const rows = parseCsvToRows(csv);
+      const latest = rows.reduce((max, r) => ((r.uploaded_at || '') > max ? r.uploaded_at : max), '');
+      const el = document.getElementById('last-run-voc');
+      if (el) el.textContent = formatLastRun(latest);
+    }
+  } catch (err) { console.warn('[LastRun] voc themes failed:', err.message); }
 }
 window.loadLastRunDates = loadLastRunDates;
 
