@@ -22254,16 +22254,17 @@ async function loadAuditResultsFromSheet() {
   // Aggregates rows whose (normalized) date falls within an inclusive
   // [startStr, endStr] range \u2014 this is the piece that lets us do true
   // month-to-date instead of only ever whole calendar months.
-  function aggregateRange(rows, startStr, endStr, validFn) {
+  function aggregateRange(rows, startStr, endStr, validFn, excludeOrderIds) {
+    excludeOrderIds = excludeOrderIds || new Set();
     const filtered = rows.filter(r => {
       const d = normalizeDate(r.date);
       return d && d >= startStr && d <= endStr && validFn(r);
     });
-    const orderIds = new Set(filtered.map(r => r.order_id).filter(Boolean));
+    const orderIds = new Set(filtered.map(r => r.order_id).filter(Boolean).filter(id => !excludeOrderIds.has(id)));
     const totalOrders = orderIds.size;
     const totalUnits = filtered.reduce((s, r) => s + (parseInt(r.unit_count, 10) || 0), 0);
     const orderTotals = {};
-    filtered.forEach(r => { if (!r.order_id) return; orderTotals[r.order_id] = (orderTotals[r.order_id] || 0) + parseAmt(r.item_price); });
+    filtered.forEach(r => { if (!r.order_id || excludeOrderIds.has(r.order_id)) return; orderTotals[r.order_id] = (orderTotals[r.order_id] || 0) + parseAmt(r.item_price); });
     const totalRevenue = Object.values(orderTotals).reduce((s, v) => s + v, 0);
     const skuSet = new Set(filtered.map(r => (r.sku || '').trim()).filter(Boolean));
     return { totalUnits, totalOrders, totalRevenue, skuSet, filteredRows: filtered };
@@ -22657,10 +22658,39 @@ async function loadAuditResultsFromSheet() {
       const webReturnsPrev = aggregateReturnsRange(webReturnsCsv, prevStartStr, prevEndStr, 'refund_date', { skuPrefix: 'C-' });
       console.log('[Skinside Seoul][overview] returns this MTD \u2014 amazon:', amzReturnsMtd, 'walmart:', wmtReturnsMtd, 'website:', webReturnsMtd);
 
-      const amzMtd = aggregateRange(amzRows, mtdStartStr, mtdEndStr, isValidAmazonRow);
+      // Fully-returned Amazon orders — added 2026-09-17 per Jaclyn: Total
+      // Orders here counted every order_id regardless of whether it was
+      // later fully returned — same bug class already found and fixed on
+      // the Amazon Sales page, which never reached this page since that
+      // fix lives in a separate, unrelated closure (this file's <script>
+      // blocks don't share scope with each other). Matches an order's
+      // total ordered quantity against its total returned quantity by
+      // order_id; only a FULLY returned order (returned >= ordered) gets
+      // excluded — a partial return still counts as one real order, same
+      // reasoning as the Amazon Sales page fix. Deliberately not applied
+      // to Website/Walmart below — Walmart has no revenue at all on this
+      // brand yet, and this was specifically raised about Amazon.
+      let ovAmzFullyReturnedOrderIds = new Set();
+      if (isCsv(amzReturnsCsv)) {
+        const orderedQtyById = {};
+        amzRows.forEach(r => {
+          if (!r.order_id) return;
+          orderedQtyById[r.order_id] = (orderedQtyById[r.order_id] || 0) + (parseInt(r.unit_count, 10) || 0);
+        });
+        const returnedQtyById = {};
+        parseCsv(amzReturnsCsv).forEach(r => {
+          if (!r.order_id) return;
+          returnedQtyById[r.order_id] = (returnedQtyById[r.order_id] || 0) + (parseInt(r.quantity, 10) || 0);
+        });
+        ovAmzFullyReturnedOrderIds = new Set(
+          Object.keys(orderedQtyById).filter(id => returnedQtyById[id] != null && returnedQtyById[id] >= orderedQtyById[id])
+        );
+      }
+
+      const amzMtd = aggregateRange(amzRows, mtdStartStr, mtdEndStr, isValidAmazonRow, ovAmzFullyReturnedOrderIds);
       const webMtd = aggregateRange(webRows, mtdStartStr, mtdEndStr, isValidWebRow);
       const wmtMtd = aggregateRange(wmtRows, mtdStartStr, mtdEndStr, isValidWalmartRow);
-      const amzPrev = aggregateRange(amzRows, prevStartStr, prevEndStr, isValidAmazonRow);
+      const amzPrev = aggregateRange(amzRows, prevStartStr, prevEndStr, isValidAmazonRow, ovAmzFullyReturnedOrderIds);
       const webPrev = aggregateRange(webRows, prevStartStr, prevEndStr, isValidWebRow);
       const wmtPrev = aggregateRange(wmtRows, prevStartStr, prevEndStr, isValidWalmartRow);
 
