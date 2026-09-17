@@ -1410,14 +1410,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
 
-    <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;width:fit-content;margin-bottom:16px;"></div>
-
-    <!-- Goal Tracker — added 2026-09-05, ported from évolis's own Overview
-         page per Jaclyn. évolis has two side-by-side groups (Amazon+
-         Walmart, Website); this brand only needs one (Amazon), so this is
-         a single full-width card, not the two-column layout évolis uses.
-         Same sand/navy-accent treatment as the rest of that design
-         system's "featured content" cards. -->
+    <!-- Goal Tracker — moved to top row 2026-09-17 per Jaclyn, so it's the
+         first thing visible after the hero, not buried below the period
+         toggle. Added 2026-09-05, ported from évolis's own Overview page.
+         évolis has two side-by-side groups (Amazon+Walmart, Website);
+         this brand only needs one (Amazon), so this is a single
+         full-width card, not the two-column layout évolis uses. Same
+         sand/navy-accent treatment as the rest of that design system's
+         "featured content" cards. -->
     <div class="card-title" style="font-size:16px;">Goal Tracker</div>
     <div style="margin-bottom:22px;">
       <div class="card" id="ov-goals-card-amz" style="margin-top:0;background:var(--sand);border:none;border-top:3px solid var(--navy);">
@@ -1427,6 +1427,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
       </div>
     </div>
+
+    <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;width:fit-content;margin-bottom:16px;"></div>
 
     <div class="kpi-row">
       <div class="kpi-card" id="ov-kpi-total-sales"><div class="kpi-label">Total Sales</div><div class="kpi-value">—</div><div class="kpi-mom flat">Loading…</div></div>
@@ -23073,7 +23075,7 @@ async function loadAuditResultsFromSheet() {
       // this brand only needs Amazon. Column layout on this brand's tab
       // (confirmed by Jaclyn, NOT the same positions as évolis's own tab
       // on the same shared spreadsheet — évolis uses O/T/AD, this one
-      // uses P/S/AB): P=Total Sales Goal (index 15), S=Organic Sales Goal
+      // uses O/S/AB): O=Total Sales Goal (index 14), S=Organic Sales Goal
       // (index 18), AB=Ad Sales Goal (index 27).
       try {
         // Deliberately a SEPARATE validity filter from isValidAmazonRow
@@ -23100,7 +23102,7 @@ async function loadAuditResultsFromSheet() {
         const goalsAmzCsv = await fetch('https://docs.google.com/spreadsheets/d/1trsHDgVSLprsOOjOuFWGZRDqVOV-eII3/export?format=csv&gid=1677661344' + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
         const goalsAmzRows = parseCsv2D(goalsAmzCsv);
         const goalsRowAmz = findGoalsRow(goalsAmzRows, refDate.getFullYear(), refDate.getMonth() + 1);
-        console.log('[GoalTracker][qa] Amazon goals row found:', !!goalsRowAmz, goalsRowAmz ? { total: goalsRowAmz[15], organic: goalsRowAmz[18], ads: goalsRowAmz[27] } : null);
+        console.log('[GoalTracker][qa] Amazon goals row found:', !!goalsRowAmz, goalsRowAmz ? { total: goalsRowAmz[14], organic: goalsRowAmz[18], ads: goalsRowAmz[27] } : null);
 
         // Live actual revenue, pending-inclusive, netted against returns
         // (a returned sale shouldn't count toward a sales goal; a pending
@@ -23135,7 +23137,7 @@ async function loadAuditResultsFromSheet() {
 
         function renderGoalsGroup(actualOverall, actualAds, actualOrganic, goalRow) {
           if (!goalRow) return `<div style="color:var(--muted);font-size:13px;flex:1;text-align:center;padding:20px;">No goals row found for this month.</div>`;
-          const overallGoal = parseGoalsDollar(goalRow[15]);
+          const overallGoal = parseGoalsDollar(goalRow[14]);
           const organicGoal = parseGoalsDollar(goalRow[18]);
           const adsGoal = parseGoalsDollar(goalRow[27]);
           const fmtD = n => '$' + n.toLocaleString(undefined, { maximumFractionDigits: 0 });
