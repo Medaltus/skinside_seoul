@@ -3113,7 +3113,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Heartleaf Cleanser</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-heartleaf-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -3134,7 +3134,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Spicule Serum</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-spicule-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -3155,7 +3155,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Vitamin C Serum</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-vitcserum-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -3176,7 +3176,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Snail Mucin Serum</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-snailserum-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -3197,7 +3197,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Snail Mucin Cream</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-snailcream-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -3218,7 +3218,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Vitamin C Cream</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-vitccream-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -3239,7 +3239,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
           </div>
           <div class="card" style="margin-top:0;">
             <div class="card-title">VOC Themes — Coconut Gel Mask</div>
-            <div style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
+            <div id="revcat-coconutmask-voc" style="font-size:12px;color:var(--muted);line-height:1.6;">📋 Not automated yet — planned to pull from the Insights Log sheet (organic/PPC "wins" and "risks" from the weekly Run Analysis cron) so themes stay current without manual tagging. Coming later.</div>
           </div>
         </div>
 
@@ -11610,7 +11610,7 @@ async function initSnsExternal() {
   // which never actually had a working save path before this).
 
   // ── Auto-init all data on page load (no lazy loading) ──
-  document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     // Amazon/Web/Walmart are window.xxx async functions defined in the inner IIFE
     if (typeof window.initAmazonLive  === 'function') window.initAmazonLive();
     // window.initWebLive() intentionally not called — Website channel
@@ -11625,6 +11625,7 @@ async function initSnsExternal() {
     // further down) and exposed on window so it can be called from here.
     if (typeof window.initInsightsOverview === 'function') window.initInsightsOverview();
     if (typeof window.initCompetitorLandscape === 'function') window.initCompetitorLandscape();
+    if (typeof window.loadInsightsReviewsVocThemes === 'function') window.loadInsightsReviewsVocThemes();
     if (typeof window.renderProductPortfolioCards === 'function') {
       window.renderProductPortfolioCards('heartleaf', ['SSS0001']);
       window.renderProductPortfolioCards('spicule', ['SSS0002']);
@@ -15693,12 +15694,62 @@ async function loadSkinsideMomentum() {
 // SHEET_VOC_THEMES entry, and this degrades to that message gracefully
 // rather than erroring, same as it does on Cosmette for any category the
 // cron hasn't reached yet.
+//
+// csEscapeHtml/csRenderVocThemes moved to TOP-LEVEL scope 2026-09-18 (out
+// of the IIFE below) so the Insights > Reviews tab's own VOC Themes cards
+// can call the exact same rendering logic — one implementation, not two
+// that could quietly drift apart.
+function csEscapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+}
+function csRenderVocThemes(themeRow) {
+  if (!themeRow || !themeRow.themes_json) {
+    return '<div style="font-size:12px;color:var(--muted);line-height:1.7;">📋 Not automated yet — categorizing review text into themes is a real analysis step, not a mechanical data pull. Coming later.</div>';
+  }
+  let themes;
+  try { themes = JSON.parse(themeRow.themes_json); }
+  catch (e) { return '<div style="font-size:12px;color:var(--muted);">Could not load themes for this category.</div>'; }
+  if (!Array.isArray(themes) || !themes.length) {
+    return '<div style="font-size:12px;color:var(--muted);">No recurring themes identified yet.</div>';
+  }
+  const STATUS_STYLE = {
+    active:   { bg: 'rgba(219,55,45,.1)', color: 'var(--danger)', label: 'Active' },
+    new:      { bg: 'rgba(200,125,47,.12)', color: 'var(--warn)', label: 'New Theme' },
+    resolved: { bg: 'rgba(36,233,163,.13)', color: '#1db88a', label: 'Resolved' },
+  };
+  function timeAgoLabel(dateStr) {
+    const d = Date.parse(dateStr);
+    if (isNaN(d)) return '';
+    const days = Math.floor((Date.now() - d) / 86400000);
+    if (days < 0) return '';
+    if (days < 1) return 'today';
+    if (days < 14) return days + (days === 1 ? ' day ago' : ' days ago');
+    if (days < 60) return Math.floor(days/7) + ' weeks ago';
+    if (days < 730) return Math.floor(days/30) + ' months ago';
+    return Math.floor(days/365) + ' years ago';
+  }
+  const rowsHtml = themes.map(t => {
+    const st = STATUS_STYLE[t.status] || STATUS_STYLE.active;
+    const agoLabel = timeAgoLabel(t.most_recent_review_date);
+    return `<div style="padding:10px 0;border-bottom:1px solid var(--border2);">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+        <div style="font-size:12.5px;font-weight:700;color:var(--navy);">${csEscapeHtml(t.theme||'')}</div>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+          ${agoLabel ? `<span style="font-size:9.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--bg2);color:var(--muted);">${csEscapeHtml(agoLabel)}</span>` : ''}
+          <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:999px;white-space:nowrap;background:${st.bg};color:${st.color};">${st.label}</span>
+        </div>
+      </div>
+      ${t.example_quote ? `<div style="font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:2px;">"${csEscapeHtml(t.example_quote)}"</div>` : ''}
+      ${t.note ? `<div style="font-size:11px;color:var(--muted);">${csEscapeHtml(t.note)}</div>` : ''}
+    </div>`;
+  }).join('');
+  const dateNote = themeRow.date ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">Last analyzed ${csEscapeHtml(themeRow.date)}</div>` : '';
+  return dateNote + rowsHtml;
+}
+
 (function () {
   'use strict';
 
-  function csEscapeHtml(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
-  }
   function csRenderStars(rating) {
     const n = Math.max(0, Math.min(5, Math.round(parseFloat(rating) || 0)));
     return `<span class="rev-stars-${n}">${'★'.repeat(n)}</span>`;
@@ -15727,50 +15778,6 @@ async function loadSkinsideMomentum() {
     return `<div style="font-size:26px;font-weight:700;color:var(--navy);margin-bottom:4px;">${avg} <span style="font-size:16px;color:var(--muted);font-weight:400;">/ 5</span></div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">${total.toLocaleString()} total reviews</div>
       ${rows}`;
-  }
-  function csRenderVocThemes(themeRow) {
-    if (!themeRow || !themeRow.themes_json) {
-      return '<div style="font-size:12px;color:var(--muted);line-height:1.7;">📋 Not automated yet — categorizing review text into themes is a real analysis step, not a mechanical data pull. Coming later.</div>';
-    }
-    let themes;
-    try { themes = JSON.parse(themeRow.themes_json); }
-    catch (e) { return '<div style="font-size:12px;color:var(--muted);">Could not load themes for this category.</div>'; }
-    if (!Array.isArray(themes) || !themes.length) {
-      return '<div style="font-size:12px;color:var(--muted);">No recurring themes identified yet.</div>';
-    }
-    const STATUS_STYLE = {
-      active:   { bg: 'rgba(219,55,45,.1)', color: 'var(--danger)', label: 'Active' },
-      new:      { bg: 'rgba(200,125,47,.12)', color: 'var(--warn)', label: 'New Theme' },
-      resolved: { bg: 'rgba(36,233,163,.13)', color: '#1db88a', label: 'Resolved' },
-    };
-    function timeAgoLabel(dateStr) {
-      const d = Date.parse(dateStr);
-      if (isNaN(d)) return '';
-      const days = Math.floor((Date.now() - d) / 86400000);
-      if (days < 0) return '';
-      if (days < 1) return 'today';
-      if (days < 14) return days + (days === 1 ? ' day ago' : ' days ago');
-      if (days < 60) return Math.floor(days/7) + ' weeks ago';
-      if (days < 730) return Math.floor(days/30) + ' months ago';
-      return Math.floor(days/365) + ' years ago';
-    }
-    const rowsHtml = themes.map(t => {
-      const st = STATUS_STYLE[t.status] || STATUS_STYLE.active;
-      const agoLabel = timeAgoLabel(t.most_recent_review_date);
-      return `<div style="padding:10px 0;border-bottom:1px solid var(--border2);">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
-          <div style="font-size:12.5px;font-weight:700;color:var(--navy);">${csEscapeHtml(t.theme||'')}</div>
-          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
-            ${agoLabel ? `<span style="font-size:9.5px;font-weight:600;padding:2px 8px;border-radius:999px;white-space:nowrap;background:var(--bg2);color:var(--muted);">${csEscapeHtml(agoLabel)}</span>` : ''}
-            <span style="font-size:9.5px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:999px;white-space:nowrap;background:${st.bg};color:${st.color};">${st.label}</span>
-          </div>
-        </div>
-        ${t.example_quote ? `<div style="font-size:11.5px;color:var(--muted);font-style:italic;margin-bottom:2px;">"${csEscapeHtml(t.example_quote)}"</div>` : ''}
-        ${t.note ? `<div style="font-size:11px;color:var(--muted);">${csEscapeHtml(t.note)}</div>` : ''}
-      </div>`;
-    }).join('');
-    const dateNote = themeRow.date ? `<div style="font-size:10px;color:var(--muted);margin-bottom:8px;">Last analyzed ${csEscapeHtml(themeRow.date)}</div>` : '';
-    return dateNote + rowsHtml;
   }
   function csSlugify(s) {
     return String(s || 'uncategorized').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'uncategorized';
@@ -18532,6 +18539,49 @@ function csParseCsv(text) {
 function csBaseSku(s) {
   return (s || '').trim().toUpperCase().replace(/-SF$/i, '');
 }
+
+// Insights > Reviews tab's VOC Themes cards — added 2026-09-18, now that
+// SHEET_VOC_THEMES is configured. This tab is organized per-PRODUCT (7
+// sub-tabs), but VOC Themes data is written per-CATEGORY by run-voc-
+// themes.js (Cleansers/Serums/Creams/Masks — see SS_REVIEW_CATEGORY_BY_SKU
+// above). So several product sub-tabs legitimately show the SAME
+// category's theme data — e.g. Spicule Serum, Vitamin C Serum, and Snail
+// Mucin Serum all show the "Serums" category's themes, since that's the
+// real granularity this data exists at. Reuses csRenderVocThemes (moved
+// to top-level scope specifically so this and the External Inventory
+// page share one implementation).
+const INSIGHTS_REVIEWS_PRODUCT_TO_CATEGORY = {
+  'revcat-heartleaf-voc':   'Cleansers',
+  'revcat-spicule-voc':     'Serums',
+  'revcat-vitcserum-voc':   'Serums',
+  'revcat-snailserum-voc':  'Serums',
+  'revcat-snailcream-voc':  'Creams',
+  'revcat-vitccream-voc':   'Creams',
+  'revcat-coconutmask-voc': 'Masks',
+};
+async function loadInsightsReviewsVocThemes() {
+  const vocCfg = window.SHEET_CFG.SHEET_VOC_THEMES;
+  if (!vocCfg || !vocCfg.fileId || !vocCfg.gid) return; // stays on the static "Not automated yet" text until this is configured
+  try {
+    const csv = await csFetchTextWithTimeout(csSheetCsvUrl(vocCfg.fileId, vocCfg.gid) + `&_cb=${Date.now()}`, 20000);
+    const rows = csIsCsv(csv) ? csParseCsv(csv) : [];
+    // Most recent row per category wins — same "last write for this
+    // category is the current truth" logic buildReviewsUI() uses.
+    const latestByCategory = {};
+    rows.forEach(r => {
+      const cat = (r.category || '').trim();
+      if (!cat) return;
+      if (!latestByCategory[cat] || (r.date || '') >= (latestByCategory[cat].date || '')) latestByCategory[cat] = r;
+    });
+    Object.entries(INSIGHTS_REVIEWS_PRODUCT_TO_CATEGORY).forEach(([elId, category]) => {
+      const el = document.getElementById(elId);
+      if (el) el.outerHTML = `<div id="${elId}">${csRenderVocThemes(latestByCategory[category])}</div>`;
+    });
+  } catch (err) {
+    console.warn('[Insights Reviews VOC Themes] failed:', err.message);
+  }
+}
+window.loadInsightsReviewsVocThemes = loadInsightsReviewsVocThemes;
 
 function parseCsvToRows(text) {
   const all = parseCsvFull(text);
