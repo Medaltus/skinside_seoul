@@ -14456,14 +14456,16 @@ const SHEET_COMPETITOR_ID = window.SHEET_CFG.SHEET_COMPETITOR.fileId;
 // to an empty string), so each of the three keyword tables renders "No
 // keywords found — check row 3 on the competitor sheet." rather than
 // throwing — safe, if not perfectly worded for the not-built-yet case.
+// Confirmed 2026-09-18 per Jaclyn — real gids for each product type's
+// competitor tab on the shared Products sheet (Insights > Products page).
 const COMPETITOR_GID_BY_PRODUCT_TYPE = {
-  heartleaf:   null,
-  spicule:     null,
-  vitcserum:   null,
-  snailserum:  null,
-  snailcream:  null,
-  vitccream:   null,
-  coconutmask: null,
+  heartleaf:   '128588341',
+  spicule:     '317114203',
+  vitcserum:   '577522716',
+  snailserum:  '1754637993',
+  snailcream:  '1790421277',
+  vitccream:   '934338754',
+  coconutmask: '1883890489',
 };
 
 function clFindSectionRow(rows, needle) {
