@@ -15803,7 +15803,11 @@ function csRenderVocThemes(themeRow) {
 
       // VOC Themes — gracefully shows "not automated yet" if this key
       // isn't in SHEET_CONFIG (expected for this brand right now).
-      let themesByCategory = {};
+      // UPDATED 2026-09-18: keyed by PRODUCT now (run-voc-themes.js runs
+      // per product, not per broader category — see that file's CHANGED
+      // note), so this card moved from once-per-category to once-per-
+      // product-sub-tab below.
+      let themesByProduct = {};
       const vocCfg = window.SHEET_CFG.SHEET_VOC_THEMES;
       if (vocCfg) {
         try {
@@ -15813,9 +15817,9 @@ function csRenderVocThemes(themeRow) {
           const vocCsv = await csFetchTextWithTimeout(vocUrl + `&_cb=${Date.now()}`, 20000);
           const vocRows = csIsCsv(vocCsv) ? csParseCsv(vocCsv) : [];
           vocRows.forEach(r => {
-            const cat = (r.category || '').trim();
-            if (!cat) return;
-            if (!themesByCategory[cat] || (r.date||'') >= (themesByCategory[cat].date||'')) themesByCategory[cat] = r;
+            const product = (r.category || '').trim(); // sheet column still named "category" — see run-voc-themes.js's CHANGED note
+            if (!product) return;
+            if (!themesByProduct[product] || (r.date||'') >= (themesByProduct[product].date||'')) themesByProduct[product] = r;
           });
         } catch (e) { console.warn('[SkinsideReviews:'+ns+'] VOC Themes fetch failed:', e.message); }
       }
@@ -15846,7 +15850,8 @@ function csRenderVocThemes(themeRow) {
           const sku = csBaseSku(r.sku);
           const key = (r.sku || r.asin || r.product_name || 'unknown').trim();
           const cleanName = nameBySku[sku] || r.product_name || key;
-          (byProduct[key] = byProduct[key] || { label: cleanName, reviews: [] }).reviews.push(r);
+          const vocProductName = SS_REVIEW_PRODUCT_BY_SKU[sku] || null;
+          (byProduct[key] = byProduct[key] || { label: cleanName, vocProductName, reviews: [] }).reviews.push(r);
         });
         const productKeys = Object.keys(byProduct);
         const prodTabsHtml = productKeys.map((key, j) =>
@@ -15855,18 +15860,19 @@ function csRenderVocThemes(themeRow) {
         const prodPanelsHtml = productKeys.map((key, j) => {
           const sorted = byProduct[key].reviews.slice().sort((a,b) => (Date.parse(b.date)||0) - (Date.parse(a.date)||0));
           const top5 = sorted.slice(0,5);
+          const vocName = byProduct[key].vocProductName;
           return `<div class="prod-panel${j===0?' active':''}" id="prodpanel-${catSlug}-${csSlugify(key)}">
+            <div class="card" style="margin-bottom:14px;">
+              <div class="card-title">VOC Themes — ${csEscapeHtml(byProduct[key].label)}</div>
+              ${csRenderVocThemes(vocName ? themesByProduct[vocName] : null)}
+            </div>
             ${top5.length ? top5.map(csRenderReviewCard).join('') : '<div style="color:var(--muted);font-size:12px;">No reviews found for this product.</div>'}
           </div>`;
         }).join('');
 
         return `<div class="cat-panel${i===0?' active':''}" id="catpanel-${catSlug}">
-          <div class="two-col" style="margin-bottom:16px;">
-            <div class="card"><div class="card-title">Star Rating Distribution — ${csEscapeHtml(cat)}</div>${csRenderStarDistribution(catReviews)}</div>
-            <div class="card">
-              <div class="card-title">VOC Themes — ${csEscapeHtml(cat)}</div>
-              ${csRenderVocThemes(themesByCategory[cat])}
-            </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title">Star Rating Distribution — ${csEscapeHtml(cat)}</div>${csRenderStarDistribution(catReviews)}
           </div>
           <div class="prod-tabs">${prodTabsHtml}</div>
           <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:10px;">Select Reviews — ${csEscapeHtml(cat)}</div>
@@ -18473,6 +18479,27 @@ const SS_REVIEW_CATEGORY_BY_SKU = {
   'SSS0022': 'Masks',           // Biocellulose Coconut Gel Mask
 };
 
+// Added 2026-09-18 — run-voc-themes.js now runs per INDIVIDUAL PRODUCT (7
+// groups), not per the 4 broader categories above (see that file's own
+// CHANGED note). VOC Themes cards moved from once-per-category to once-
+// per-product-sub-tab accordingly (see buildReviewsUI below). Deliberately
+// a SEPARATE hardcoded map from ssrGetProductNameMap()'s sheet-derived
+// names — that lookup's display text isn't guaranteed to match the exact
+// product-name strings run-voc-themes.js writes into the `category`
+// column, and a mismatch here would mean a theme silently never being
+// found. Must be kept in sync BY HAND with SS_REVIEW_PRODUCT_BY_SKU in
+// run-voc-themes.js — same risk already documented for the category map
+// above, same reason.
+const SS_REVIEW_PRODUCT_BY_SKU = {
+  'SSS0001': 'Heartleaf Cleanser',
+  'SSS0002': 'Spicule Serum',
+  'SSS0003': 'Vitamin C Serum',
+  'SSS0004': 'Snail Mucin Serum',
+  'SSS0005': 'Snail Mucin Cream',
+  'SSS0006': 'Vitamin C Cream',
+  'SSS0022': 'Coconut Gel Mask',
+};
+
 function csSheetCsvUrl(fileId, gid) {
   return `https://docs.google.com/spreadsheets/d/${fileId}/export?format=csv&gid=${gid}`;
 }
@@ -18541,23 +18568,25 @@ function csBaseSku(s) {
 }
 
 // Insights > Reviews tab's VOC Themes cards — added 2026-09-18, now that
-// SHEET_VOC_THEMES is configured. This tab is organized per-PRODUCT (7
-// sub-tabs), but VOC Themes data is written per-CATEGORY by run-voc-
-// themes.js (Cleansers/Serums/Creams/Masks — see SS_REVIEW_CATEGORY_BY_SKU
-// above). So several product sub-tabs legitimately show the SAME
-// category's theme data — e.g. Spicule Serum, Vitamin C Serum, and Snail
-// Mucin Serum all show the "Serums" category's themes, since that's the
-// real granularity this data exists at. Reuses csRenderVocThemes (moved
-// to top-level scope specifically so this and the External Inventory
-// page share one implementation).
+// SHEET_VOC_THEMES is configured. UPDATED 2026-09-18: run-voc-themes.js
+// now runs per INDIVIDUAL PRODUCT (7 groups), not per broader category (4
+// groups) — see that file's own CHANGED note. This map is now a direct
+// 1:1 lookup (each product sub-tab shows only its own themes), not a
+// shared-category lookup where e.g. Spicule Serum and Vitamin C Serum
+// used to show the exact same "Serums" data. Product names on the right
+// must match SS_REVIEW_PRODUCT_BY_SKU's values in run-voc-themes.js
+// exactly, since that's literally what gets written to the `category`
+// column (kept that name for sheet-schema continuity) this reads by.
+// Reuses csRenderVocThemes (top-level scope, shared with the External
+// Inventory page's own per-product VOC Themes cards).
 const INSIGHTS_REVIEWS_PRODUCT_TO_CATEGORY = {
-  'revcat-heartleaf-voc':   'Cleansers',
-  'revcat-spicule-voc':     'Serums',
-  'revcat-vitcserum-voc':   'Serums',
-  'revcat-snailserum-voc':  'Serums',
-  'revcat-snailcream-voc':  'Creams',
-  'revcat-vitccream-voc':   'Creams',
-  'revcat-coconutmask-voc': 'Masks',
+  'revcat-heartleaf-voc':   'Heartleaf Cleanser',
+  'revcat-spicule-voc':     'Spicule Serum',
+  'revcat-vitcserum-voc':   'Vitamin C Serum',
+  'revcat-snailserum-voc':  'Snail Mucin Serum',
+  'revcat-snailcream-voc':  'Snail Mucin Cream',
+  'revcat-vitccream-voc':   'Vitamin C Cream',
+  'revcat-coconutmask-voc': 'Coconut Gel Mask',
 };
 async function loadInsightsReviewsVocThemes() {
   const vocCfg = window.SHEET_CFG.SHEET_VOC_THEMES;
@@ -18565,17 +18594,17 @@ async function loadInsightsReviewsVocThemes() {
   try {
     const csv = await csFetchTextWithTimeout(csSheetCsvUrl(vocCfg.fileId, vocCfg.gid) + `&_cb=${Date.now()}`, 20000);
     const rows = csIsCsv(csv) ? csParseCsv(csv) : [];
-    // Most recent row per category wins — same "last write for this
-    // category is the current truth" logic buildReviewsUI() uses.
-    const latestByCategory = {};
+    // Most recent row per product wins — same "last write for this
+    // product is the current truth" logic buildReviewsUI() uses.
+    const latestByProduct = {};
     rows.forEach(r => {
-      const cat = (r.category || '').trim();
-      if (!cat) return;
-      if (!latestByCategory[cat] || (r.date || '') >= (latestByCategory[cat].date || '')) latestByCategory[cat] = r;
+      const product = (r.category || '').trim(); // sheet column still named "category" — see run-voc-themes.js's CHANGED note
+      if (!product) return;
+      if (!latestByProduct[product] || (r.date || '') >= (latestByProduct[product].date || '')) latestByProduct[product] = r;
     });
-    Object.entries(INSIGHTS_REVIEWS_PRODUCT_TO_CATEGORY).forEach(([elId, category]) => {
+    Object.entries(INSIGHTS_REVIEWS_PRODUCT_TO_CATEGORY).forEach(([elId, product]) => {
       const el = document.getElementById(elId);
-      if (el) el.outerHTML = `<div id="${elId}">${csRenderVocThemes(latestByCategory[category])}</div>`;
+      if (el) el.outerHTML = `<div id="${elId}">${csRenderVocThemes(latestByProduct[product])}</div>`;
     });
   } catch (err) {
     console.warn('[Insights Reviews VOC Themes] failed:', err.message);
