@@ -1,34 +1,53 @@
 // api/upload-insight-image.js
 //
-// Ported 2026-09-30 per Jaclyn — the VBC/Dazzle Dry reference file,
-// verbatim. REPORTS_FOLDER_ID is deliberately the SAME Drive folder
-// Dazzle Dry uses (per Jaclyn), so Cosmette's uploads land in that
-// folder's shared "Report Images" subfolder. Filenames are timestamp-
-// prefixed, so uploads from different brands never collide.
-//
 // Receives an image file (as base64 JSON from a browser <input type="file">
-// + FileReader — no multipart parsing needed), uploads it to the
-// "Report Images" subfolder inside REPORTS_FOLDER_ID, makes that one file
-// public ("anyone with the link can view"), and returns a direct,
-// <img src>-embeddable URL. Called by ddUploadInsightImage() on the
-// What's Been Accomplished cards (Marketing > Opportunities).
+// + FileReader — no multipart parsing needed) and uploads it to a dedicated
+// "Report Images" subfolder inside the shared Reports Archive Drive folder,
+// then makes that one file public ("anyone with the link can view") and
+// returns a direct, <img src>-embeddable URL.
+//
+// Ported verbatim from VBC's own upload-insight-image.js, 2026-10-01, per
+// Jaclyn — finishes the "real upload coming later" TODO on Skinside
+// Seoul's Accomplished cards' image fields, which previously only
+// accepted a URL someone had already hosted elsewhere by hand. This is
+// modeled closely on api/upload-report.js's Drive auth/upload pattern
+// (same service account, same parent folder), but PDFs never needed a
+// public link (they're fetched through an authenticated endpoint
+// instead) — images embedded directly in a PDF export via
+// pdfxImagesFromContainer() DO need a URL a plain <img> tag can load
+// without any auth, hence the extra permissions.create() step below that
+// upload-report.js doesn't have.
 //
 // Folder: creates "Report Images" under REPORTS_FOLDER_ID on first use if
-// it doesn't already exist, rather than mixing raw image assets into the
-// same folder as finished PDF reports.
+// it doesn't already exist (checked/cached per cold start), rather than
+// mixing raw image assets into the same folder as finished PDF reports.
 //
-// Auth: GOOGLE_CLIENT_EMAIL + GOOGLE_PRIVATE_KEY (same service-account env
-// vars as every other Drive/Sheets route). That service account needs
-// edit access to REPORTS_FOLDER_ID.
+// Auth reuses the same service-account env vars as every other Medaltus
+// Drive cron: GOOGLE_CLIENT_EMAIL + GOOGLE_PRIVATE_KEY.
+//
+// UNCONFIRMED FOR SKINSIDE SEOUL — needs a real check before trusting:
+//   - REPORTS_FOLDER_ID below is VBC's own Reports Archive folder id,
+//     copied from the reference file. Skinside Seoul almost certainly
+//     has its OWN Reports Archive Drive folder, with a DIFFERENT id —
+//     uploading into the wrong brand's folder would put these images
+//     somewhere nobody on this brand would ever look. Get Skinside
+//     Seoul's real folder id before this goes live, the same way the
+//     fileId/gid pairs for every sheet on this dashboard were each
+//     individually confirmed rather than assumed from a reference brand.
+//   - The service account (GOOGLE_CLIENT_EMAIL/GOOGLE_PRIVATE_KEY) needs
+//     Editor access on whatever REPORTS_FOLDER_ID actually is for this
+//     brand — not just assumed because it worked for VBC's folder.
 //
 // NOTE on payload size: base64 inflates the image by ~33%, and Vercel's
-// default serverless body limit is 4.5MB. The dashboard rejects files over
-// 4MB before sending for this reason.
+// default serverless body limit is 4.5MB — fine for a normal photo, but if
+// uploads start failing with a 413, either compress client-side before
+// sending or raise the limit for this route in vercel.json.
 
 const { google } = require('googleapis');
 const { Readable } = require('stream');
 
-// Same Drive folder as Dazzle Dry, per Jaclyn (2026-09-30).
+// UNCONFIRMED — see the note above. This is VBC's own folder id, copied
+// from the reference file, not independently verified for this brand.
 const REPORTS_FOLDER_ID = '1z4ivJTBMVs6mttDO4E4c76OjknkFOg2P';
 const IMAGES_SUBFOLDER_NAME = 'Report Images';
 
