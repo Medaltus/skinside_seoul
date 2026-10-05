@@ -760,6 +760,26 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
    condensed ranked-list style for Fastest Path (replacing the 5 wide
    .org-p1-card cards with one compact list). ── */
 .insight-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px;}
+/* What's Been Accomplished — editor + cards restyled 2026-10-05 to match
+   VBC's Dazzle Dry / Vivian Valenty Opportunities page (values copied from
+   VBC's .evo-page rules), scoped to this section only. */
+#m-opp-accomplished-section .acc-card-ph-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+#m-opp-accomplished-section .acc-card-ph-sub{font-size:11px;color:var(--muted);margin-bottom:8px;}
+#m-opp-accomplished-section .acc-card-ph-body{font-size:12px;color:var(--navy);line-height:1.6;}
+#m-opp-accomplished-section .acc-card-img{width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);}
+#acc-editor{background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;margin-top:12px;}
+#acc-editor .acc-editor-label{font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;}
+#acc-editor input[type="text"],#acc-editor textarea{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);font-family:var(--font);font-size:12.5px;color:var(--navy);background:var(--white);outline:none;line-height:1.5;margin-bottom:10px;}
+#acc-editor textarea{resize:vertical;min-height:72px;}
+#acc-editor input[type="text"]:focus,#acc-editor textarea:focus{border-color:var(--navy);}
+#acc-editor .acc-image-inputs{margin-top:10px;padding-top:10px;border-top:1px dashed var(--border2);}
+#acc-editor .insight-image-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+#acc-editor .insight-image-row input[type="text"]{flex:1;margin-bottom:0;}
+#acc-editor .insight-image-upload-btn{background:none;border:1px solid rgba(0,31,96,0.20);border-radius:var(--radius-sm);padding:4px 10px;font-size:10.5px;color:var(--muted);cursor:pointer;transition:all .13s;font-family:var(--font);white-space:nowrap;flex-shrink:0;}
+#acc-editor .insight-image-upload-btn:hover{border-color:var(--navy);color:var(--navy);}
+#acc-editor .insight-image-upload-btn.uploading{color:var(--muted);cursor:wait;}
+#acc-editor .insight-image-upload-btn.uploaded{border-color:#1db88a;color:#1db88a;}
+#acc-editor .insight-image-upload-btn.upload-error{border-color:var(--danger);color:var(--danger);}
 .insight-grid .ppc-opp-card{margin-bottom:0;}
 .ppc-opp-card.action-type{border-left:4px solid var(--danger);}
 .ppc-opp-card.opportunity-type{border-left:4px solid var(--warn);}
@@ -2186,36 +2206,43 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       <div id="m-opp-accomplished-section">
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div style="display:inline-block;background:var(--sand);border:1px solid rgba(200,125,47,.35);border-radius:4px;padding:3px 10px;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--warn);">What's Been Accomplished</div>
+          <div class="card-title" style="margin-bottom:0;">What's Been Accomplished</div>
           <button class="btn-edit" id="acc-edit-btn">✏️ Edit</button>
         </div>
+        <!-- Restyled 2026-10-05 to match VBC (Dazzle Dry / Vivian Valenty): all 4
+             cards always shown. The "Accomplished N / No content yet." text lives
+             in .acc-card-ph, never in .opp-title, so the PDF export (which skips
+             any card whose .opp-title is empty) still leaves unused slots out. -->
         <div class="opp-grid" id="acc-grid" style="grid-template-columns:1fr 1fr;">
-          <div class="opp-card" id="acc-card-1" style="display:none;">
+          <div class="opp-card" id="acc-card-1">
+            <div class="acc-card-ph" id="acc-ph-1"><div class="acc-card-ph-title">Accomplished 1</div><div class="acc-card-ph-sub">—</div><div class="acc-card-ph-body">No content yet.</div></div>
             <div class="opp-title" id="acc-title-1"></div>
             <div class="opp-subtitle" id="acc-subtitle-1"></div>
             <div class="opp-body" id="acc-body-1"></div>
             <div id="acc-images-1" style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"></div>
           </div>
-          <div class="opp-card" id="acc-card-2" style="display:none;">
+          <div class="opp-card" id="acc-card-2">
+            <div class="acc-card-ph" id="acc-ph-2"><div class="acc-card-ph-title">Accomplished 2</div><div class="acc-card-ph-sub">—</div><div class="acc-card-ph-body">No content yet.</div></div>
             <div class="opp-title" id="acc-title-2"></div>
             <div class="opp-subtitle" id="acc-subtitle-2"></div>
             <div class="opp-body" id="acc-body-2"></div>
             <div id="acc-images-2" style="display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;"></div>
           </div>
-          <div class="opp-card" id="acc-card-3" style="display:none;">
+          <div class="opp-card" id="acc-card-3">
+            <div class="acc-card-ph" id="acc-ph-3"><div class="acc-card-ph-title">Accomplished 3</div><div class="acc-card-ph-sub">—</div><div class="acc-card-ph-body">No content yet.</div></div>
             <div class="opp-title" id="acc-title-3"></div>
             <div class="opp-subtitle" id="acc-subtitle-3"></div>
             <div class="opp-body" id="acc-body-3"></div>
           </div>
-          <div class="opp-card" id="acc-card-4" style="display:none;">
+          <div class="opp-card" id="acc-card-4">
+            <div class="acc-card-ph" id="acc-ph-4"><div class="acc-card-ph-title">Accomplished 4</div><div class="acc-card-ph-sub">—</div><div class="acc-card-ph-body">No content yet.</div></div>
             <div class="opp-title" id="acc-title-4"></div>
             <div class="opp-subtitle" id="acc-subtitle-4"></div>
             <div class="opp-body" id="acc-body-4"></div>
           </div>
         </div>
-        <div id="acc-empty-state" style="display:none;color:var(--muted);font-size:12px;padding:8px 0;">No accomplishments added yet — click Edit to add up to 4.</div>
 
-        <div id="acc-editor" style="display:none;margin-top:16px;border-top:1px solid var(--border);padding-top:16px;">
+        <div id="acc-editor" style="display:none;">
           <div id="acc-editor-slots"></div>
           <div style="display:flex;gap:10px;margin-top:16px;">
             <button class="btn-edit" id="acc-save-btn" style="background:var(--navy);color:#fff;">Save</button>
@@ -13108,25 +13135,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const slotsEl = document.getElementById('acc-editor-slots');
     if (!editBtn || !saveBtn || !editorEl || !slotsEl) return;
 
-    const IMAGE_COUNTS = { 1: 3, 2: 2, 3: 0, 4: 0 };
+    // Image slots per card — matches the report-insights sheet exactly:
+    // accomplished1_image1..6 and accomplished2_image1..6; cards 3-4 have no
+    // image columns. (Was {1:3, 2:2} before the sheet gained image4-6 /
+    // image3-6 — 2026-10-05.)
+    const IMAGE_COUNTS = { 1: 6, 2: 6, 3: 0, 4: 0 };
 
-    // Real upload via /api/upload-insight-image, replacing the old
-    // paste-a-hosted-link-only text inputs — per Jaclyn 2026-10-01,
-    // ported from VBC's own upload-insight-image.js. Keeps the SAME
-    // hidden input id (textarea-acc${n}-image${i}) the save handler
-    // already reads .value from below, so only this editor UI changes —
-    // the save/load logic needs no changes at all.
+    // Upload — same behavior as VBC's ddUploadInsightImage: 4MB guard (stays
+    // under Vercel's 4.5MB body limit once base64-inflated), button shows
+    // ⟳ Uploading… / ✓ Uploaded / ✗ Upload failed, and the returned Drive URL
+    // lands in that slot's URL field (which is what Save reads). A URL can
+    // also just be pasted into the field directly.
     async function uploadAccImage(n, i, fileInput) {
       const file = fileInput.files && fileInput.files[0];
       if (!file) return;
-      const hiddenInput = document.getElementById(`textarea-acc${n}-image${i}`);
-      const statusEl = document.getElementById(`acc-upload-status-${n}-${i}`);
-      const previewEl = document.getElementById(`acc-upload-preview-${n}-${i}`);
-      if (statusEl) { statusEl.textContent = 'Uploading…'; statusEl.style.color = 'var(--muted)'; }
+      const target = document.getElementById(`textarea-acc${n}-image${i}`);
+      const btn = document.getElementById(`acc-upload-btn-${n}-${i}`);
+      const setBtn = (label, cls) => { if (btn) { btn.textContent = label; btn.className = 'insight-image-upload-btn' + (cls ? ' ' + cls : ''); } };
+      if (file.size > 4 * 1024 * 1024) { setBtn('✗ Too large (max 4MB)', 'upload-error'); fileInput.value = ''; return; }
       try {
+        setBtn('⟳ Uploading…', 'uploading');
         const base64 = await new Promise((resolve, reject) => {
           const reader = new FileReader();
-          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onload = () => resolve(String(reader.result).split(',')[1] || '');
           reader.onerror = () => reject(new Error('Could not read file'));
           reader.readAsDataURL(file);
         });
@@ -13136,41 +13167,37 @@ document.addEventListener('DOMContentLoaded', function() {
           body: JSON.stringify({ filename: file.name, mimeType: file.type, imageBase64: base64 }),
         });
         const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || ('Upload failed: ' + res.status));
-        if (hiddenInput) hiddenInput.value = data.url;
-        if (previewEl) previewEl.innerHTML = `<img src="${data.url}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">`;
-        if (statusEl) { statusEl.textContent = '✓ Uploaded'; statusEl.style.color = 'var(--green)'; }
+        if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
+        if (target) target.value = data.url;
+        setBtn('✓ Uploaded', 'uploaded');
       } catch (err) {
-        if (statusEl) { statusEl.textContent = '✗ ' + err.message; statusEl.style.color = 'var(--danger)'; }
         console.error('[Accomplished image upload]', err);
+        setBtn('✗ Upload failed', 'upload-error');
+      } finally {
+        fileInput.value = ''; // allows re-selecting the same file
       }
     }
     window.__uploadAccImage = uploadAccImage;
 
-    slotsEl.innerHTML = [1, 2, 3, 4].map(n => {
-      const imgInputs = IMAGE_COUNTS[n]
-        ? Array.from({ length: IMAGE_COUNTS[n] }, (_, i) => i + 1).map(i => `
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-          <div id="acc-upload-preview-${n}-${i}" style="flex-shrink:0;width:56px;height:56px;"></div>
-          <div style="flex:1;">
-            <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">Image ${i} <span style="font-weight:400;">(optional)</span></div>
-            <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" onchange="window.__uploadAccImage(${n},${i},this)" style="font-size:11px;">
-            <span id="acc-upload-status-${n}-${i}" style="font-size:10px;margin-left:6px;"></span>
-            <input type="hidden" id="textarea-acc${n}-image${i}">
-          </div>
-        </div>`).join('')
-        : '';
+    // Editor — VBC's layout: 2 columns (1|2 then 3|4), Title / Subtitle /
+    // Body, then "Images (up to 6)" rows of URL field + 📤 Upload. Field ids
+    // (textarea-acc${n}-*) are unchanged, so Save below needs no changes.
+    slotsEl.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' + [1, 2, 3, 4].map(n => {
+      const count = IMAGE_COUNTS[n] || 0;
+      const imageRows = Array.from({ length: count }, (_, k) => k + 1).map(i => `
+            <div class="insight-image-row">
+              <input type="text" id="textarea-acc${n}-image${i}" placeholder="Image ${i} URL">
+              <label class="insight-image-upload-btn" id="acc-upload-btn-${n}-${i}" for="acc-upload-file-${n}-${i}">📤 Upload</label>
+              <input type="file" id="acc-upload-file-${n}-${i}" accept="image/*" style="display:none;" onchange="window.__uploadAccImage(${n},${i},this)">
+            </div>`).join('');
       return `
-      <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px;">
-        <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;">Accomplished ${n} — Title</div>
-        <textarea id="textarea-acc${n}-title" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--navy);resize:none;height:40px;margin-bottom:8px;"></textarea>
-        <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;">Subtitle <span style="font-weight:400;color:var(--muted);">(optional)</span></div>
-        <textarea id="textarea-acc${n}-subtitle" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--navy);resize:none;height:40px;margin-bottom:8px;"></textarea>
-        <div style="font-size:11px;font-weight:600;color:var(--navy);margin-bottom:4px;">Body</div>
-        <textarea id="textarea-acc${n}-body" style="width:100%;box-sizing:border-box;padding:8px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:12px;color:var(--navy);resize:vertical;min-height:60px;margin-bottom:8px;"></textarea>
-        ${imgInputs}
-      </div>`;
-    }).join('');
+        <div>
+          <div class="acc-editor-label">Accomplished ${n} — Title</div><input type="text" id="textarea-acc${n}-title">
+          <div class="acc-editor-label">Subtitle</div><input type="text" id="textarea-acc${n}-subtitle">
+          <div class="acc-editor-label">Body</div><textarea id="textarea-acc${n}-body"></textarea>
+          ${count ? `<div class="acc-image-inputs"><div class="acc-editor-label">Images (up to ${count})</div>${imageRows}</div>` : ''}
+        </div>`;
+    }).join('') + '</div>';
 
     function getLastFullMonthLocalAcc() {
       const now = new Date();
@@ -13178,27 +13205,26 @@ document.addEventListener('DOMContentLoaded', function() {
       if (month === 0) { month = 12; year--; }
       return { year, month };
     }
+    const escAttr = v => String(v || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
     async function load() {
       const { year, month } = getLastFullMonthLocalAcc();
       const row = await window.reportInsightsFetchRow(BRAND, { year: String(year), month: String(month) });
-      let anyVisible = false;
       [1, 2, 3, 4].forEach(n => {
         const title    = row ? (row[`accomplished${n}_title`]    || '') : '';
         const subtitle = row ? (row[`accomplished${n}_subtitle`] || '') : '';
         const body     = row ? (row[`accomplished${n}_body`]     || '') : '';
-        const card = document.getElementById(`acc-card-${n}`);
-        if (title) {
-          anyVisible = true;
-          card.style.display = '';
-          document.getElementById(`acc-title-${n}`).textContent = title;
-          const subEl = document.getElementById(`acc-subtitle-${n}`);
-          if (subtitle) { subEl.textContent = subtitle; subEl.style.display = ''; }
-          else { subEl.textContent = ''; subEl.style.display = 'none'; }
-          document.getElementById(`acc-body-${n}`).textContent = body;
-        } else {
-          card.style.display = 'none';
-        }
+        const ph    = document.getElementById(`acc-ph-${n}`);
+        const tEl   = document.getElementById(`acc-title-${n}`);
+        const subEl = document.getElementById(`acc-subtitle-${n}`);
+        const bEl   = document.getElementById(`acc-body-${n}`);
+        // Card always shows; placeholder only when this slot has no title.
+        if (ph) ph.style.display = title ? 'none' : '';
+        tEl.textContent = title;
+        subEl.textContent = title ? subtitle : '';
+        subEl.style.display = (title && subtitle) ? '' : 'none';
+        bEl.textContent = title ? body : '';
+
         const taTitle = document.getElementById(`textarea-acc${n}-title`);
         const taSub   = document.getElementById(`textarea-acc${n}-subtitle`);
         const taBody  = document.getElementById(`textarea-acc${n}-body`);
@@ -13206,25 +13232,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (taSub)   taSub.value = subtitle;
         if (taBody)  taBody.value = body;
 
-        const imgCount = IMAGE_COUNTS[n] || 0;
-        const imagesEl = document.getElementById(`acc-images-${n}`);
         const urls = [];
-        for (let i = 1; i <= imgCount; i++) {
+        for (let i = 1; i <= (IMAGE_COUNTS[n] || 0); i++) {
           const url = row ? (row[`accomplished${n}_image${i}`] || '') : '';
           const taImg = document.getElementById(`textarea-acc${n}-image${i}`);
           if (taImg) taImg.value = url;
-          // Populate the editor's own preview thumbnail too, not just the
-          // live (non-editing) card's images — otherwise opening Edit on
-          // an already-saved card looks like every image slot is empty.
-          const previewEl = document.getElementById(`acc-upload-preview-${n}-${i}`);
-          if (previewEl) previewEl.innerHTML = url ? `<img src="${url}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">` : '';
+          const btn = document.getElementById(`acc-upload-btn-${n}-${i}`);
+          if (btn) { btn.textContent = '📤 Upload'; btn.className = 'insight-image-upload-btn'; }
           if (url) urls.push(url);
         }
+        const imagesEl = document.getElementById(`acc-images-${n}`);
         if (imagesEl) {
-          imagesEl.innerHTML = urls.map(u => `<img src="${u}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">`).join('');
+          imagesEl.innerHTML = title
+            ? urls.map(u => `<img src="${escAttr(u)}" class="acc-card-img" alt="" onerror="this.style.display='none'">`).join('')
+            : '';
         }
       });
-      document.getElementById('acc-empty-state').style.display = anyVisible ? 'none' : 'block';
       return row;
     }
 
@@ -18824,7 +18847,20 @@ async function loadSalesInsightsCategoryChart() {
 
       const prefix = (sc.BRAND_SKU_PREFIX || 'SSS').toUpperCase();
       const slug = (sc.BRAND_SLUG || 'skinside-seoul').toLowerCase();
-      const skuOf = r => csBaseSku(r.sku || '');
+      // FIXED 2026-10-05: the Historical Orders sheet leaves `sku` blank for this
+      // brand (only ASIN is filled), so those rows fell into "Other" AND
+      // slipped past the dedupe below (order_id|'' never matched order_id|SSS…),
+      // counting every overlapping order twice. A blank SKU is now resolved
+      // from the ASIN via the Master SKU List, and dedupe keys on order_id|ASIN,
+      // which both sheets always have.
+      const asinOf = r => (r.asin || '').trim().toUpperCase();
+      const skuOf = r => {
+        const raw = csBaseSku(r.sku || '');
+        if (raw) return raw;
+        const m = master.byAsin && master.byAsin[asinOf(r)];
+        return m && m.sku ? csBaseSku(m.sku) : '';
+      };
+      const dedupeKey = r => `${r.order_id}|${asinOf(r) || skuOf(r)}`;
       const isBrandRow = r => (r.brand || '').toLowerCase().trim() === slug || skuOf(r).startsWith(prefix);
       const isValid = r => {
         const st = (r.status || '').toLowerCase().trim();
@@ -18835,8 +18871,8 @@ async function loadSalesInsightsCategoryChart() {
       const catOf = sku => (master.bySku[sku] && master.bySku[sku].category) || 'Other';
 
       const syncRows = parseCsvToRows(syncCsv).filter(isBrandRow);
-      const seen = new Set(syncRows.map(r => `${r.order_id}|${skuOf(r)}`));
-      const histRows = parseCsvToRows(histCsv).filter(isBrandRow).filter(r => !seen.has(`${r.order_id}|${skuOf(r)}`));
+      const seen = new Set(syncRows.map(dedupeKey));
+      const histRows = parseCsvToRows(histCsv).filter(isBrandRow).filter(r => !seen.has(dedupeKey(r)));
       const retRows = parseCsvToRows(retCsv).filter(isBrandRow);
 
       const byPeriod = {}; // 'YYYY-M' -> { category: units }
