@@ -2031,11 +2031,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
           <span style="font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;">Show sections:</span>
           <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
-            <input type="checkbox" id="m-opp-cb-subsave" checked style="margin:0;"
-              onchange="(function(cb){var s=document.getElementById('m-opp-subsave-section');if(s)s.style.display=cb.checked?'':'none';})(this)">
-            Subscribe &amp; Save
-          </label>
-          <label style="display:flex;align-items:center;gap:4px;cursor:pointer;font-size:11px;color:var(--navy);flex-shrink:0;">
             <input type="checkbox" id="m-opp-cb-accomplished" checked style="margin:0;"
               onchange="(function(cb){var s=document.getElementById('m-opp-accomplished-section');if(s)s.style.display=cb.checked?'':'none';})(this)">
             What's Been Accomplished
@@ -2046,21 +2041,6 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
             Future Opportunities
           </label>
         </div>
-      </div>
-
-      <div id="m-opp-subsave-section">
-      <div class="section-label">Subscribe &amp; Save</div>
-      <div class="kpi-row" style="margin-bottom:20px;">
-        <div class="kpi-card" id="kpi-active-subs"><div class="kpi-label">Active Subscriptions</div><div class="kpi-value" style="font-size:36px;">—</div><div class="kpi-mom flat">Loading…</div></div>
-        <div class="kpi-card" id="kpi-retention"><div class="kpi-label">Subscribe &amp; Save Retention (90 Days)</div><div class="kpi-value" style="font-size:36px;">—</div><div class="kpi-mom flat">Loading…</div></div>
-      </div>
-      <div class="card" style="margin-bottom:20px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-          <div class="card-title" style="margin-bottom:0;">Active Subscriptions by Month</div>
-          <div id="legend-sns" style="display:flex;align-items:center;"></div>
-        </div>
-        <div style="position:relative;height:320px;"><canvas id="chart-sns"></canvas></div>
-      </div>
       </div>
 
       <div id="m-opp-accomplished-section">
@@ -12983,11 +12963,55 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const IMAGE_COUNTS = { 1: 3, 2: 2, 3: 0, 4: 0 };
 
+    // Real upload via /api/upload-insight-image, replacing the old
+    // paste-a-hosted-link-only text inputs — per Jaclyn 2026-10-01,
+    // ported from VBC's own upload-insight-image.js. Keeps the SAME
+    // hidden input id (textarea-acc${n}-image${i}) the save handler
+    // already reads .value from below, so only this editor UI changes —
+    // the save/load logic needs no changes at all.
+    async function uploadAccImage(n, i, fileInput) {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) return;
+      const hiddenInput = document.getElementById(`textarea-acc${n}-image${i}`);
+      const statusEl = document.getElementById(`acc-upload-status-${n}-${i}`);
+      const previewEl = document.getElementById(`acc-upload-preview-${n}-${i}`);
+      if (statusEl) { statusEl.textContent = 'Uploading…'; statusEl.style.color = 'var(--muted)'; }
+      try {
+        const base64 = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result.split(',')[1]);
+          reader.onerror = () => reject(new Error('Could not read file'));
+          reader.readAsDataURL(file);
+        });
+        const res = await fetch('/api/upload-insight-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ filename: file.name, mimeType: file.type, imageBase64: base64 }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || ('Upload failed: ' + res.status));
+        if (hiddenInput) hiddenInput.value = data.url;
+        if (previewEl) previewEl.innerHTML = `<img src="${data.url}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">`;
+        if (statusEl) { statusEl.textContent = '✓ Uploaded'; statusEl.style.color = 'var(--green)'; }
+      } catch (err) {
+        if (statusEl) { statusEl.textContent = '✗ ' + err.message; statusEl.style.color = 'var(--danger)'; }
+        console.error('[Accomplished image upload]', err);
+      }
+    }
+    window.__uploadAccImage = uploadAccImage;
+
     slotsEl.innerHTML = [1, 2, 3, 4].map(n => {
       const imgInputs = IMAGE_COUNTS[n]
         ? Array.from({ length: IMAGE_COUNTS[n] }, (_, i) => i + 1).map(i => `
-        <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">Image ${i} URL <span style="font-weight:400;">(optional — paste a hosted link)</span></div>
-        <input type="text" id="textarea-acc${n}-image${i}" style="width:100%;box-sizing:border-box;padding:6px 10px;border:1px solid rgba(0,31,96,.2);border-radius:var(--radius-sm);font-family:var(--font);font-size:11px;color:var(--navy);margin-bottom:8px;">`).join('')
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+          <div id="acc-upload-preview-${n}-${i}" style="flex-shrink:0;width:56px;height:56px;"></div>
+          <div style="flex:1;">
+            <div style="font-size:10px;color:var(--muted);margin-bottom:3px;">Image ${i} <span style="font-weight:400;">(optional)</span></div>
+            <input type="file" accept="image/jpeg,image/png,image/gif,image/webp" onchange="window.__uploadAccImage(${n},${i},this)" style="font-size:11px;">
+            <span id="acc-upload-status-${n}-${i}" style="font-size:10px;margin-left:6px;"></span>
+            <input type="hidden" id="textarea-acc${n}-image${i}">
+          </div>
+        </div>`).join('')
         : '';
       return `
       <div style="border-top:1px solid var(--border);padding-top:12px;margin-top:12px;">
@@ -13037,14 +13061,19 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const imgCount = IMAGE_COUNTS[n] || 0;
         const imagesEl = document.getElementById(`acc-images-${n}`);
+        const urls = [];
+        for (let i = 1; i <= imgCount; i++) {
+          const url = row ? (row[`accomplished${n}_image${i}`] || '') : '';
+          const taImg = document.getElementById(`textarea-acc${n}-image${i}`);
+          if (taImg) taImg.value = url;
+          // Populate the editor's own preview thumbnail too, not just the
+          // live (non-editing) card's images — otherwise opening Edit on
+          // an already-saved card looks like every image slot is empty.
+          const previewEl = document.getElementById(`acc-upload-preview-${n}-${i}`);
+          if (previewEl) previewEl.innerHTML = url ? `<img src="${url}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">` : '';
+          if (url) urls.push(url);
+        }
         if (imagesEl) {
-          const urls = [];
-          for (let i = 1; i <= imgCount; i++) {
-            const url = row ? (row[`accomplished${n}_image${i}`] || '') : '';
-            const taImg = document.getElementById(`textarea-acc${n}-image${i}`);
-            if (taImg) taImg.value = url;
-            if (url) urls.push(url);
-          }
           imagesEl.innerHTML = urls.map(u => `<img src="${u}" style="width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);">`).join('');
         }
       });
