@@ -1491,7 +1491,13 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
 
     <div class="channel-page active" id="ov-main">
-    <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;width:fit-content;margin-bottom:16px;"></div>
+    <!-- Period toggle row — matched to MiGuard's layout 2026-10-05: right-aligned
+         with a "PERIOD" label. Same pill container/id, so the existing toggle
+         logic is unchanged. -->
+    <div style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-bottom:14px;">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);">Period</span>
+      <div class="period-pills" id="ov-period-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;"></div>
+    </div>
 
     <!-- Goal Tracker — reordered 2026-09-17 per Jaclyn to sit below the
          MTD/Last Month toggle (was above it), so the toggle that controls
@@ -23128,7 +23134,7 @@ async function loadAuditResultsFromSheet() {
   function renderOverviewPeriodPills(activeKey) {
     const container = document.getElementById('ov-period-pills');
     if (!container) return;
-    const periods = [ ['mtd', 'MTD'], ['lastFull', 'Last Month'] ];
+    const periods = [ ['mtd', 'Month to Date'], ['lastFull', 'Last Month'] ]; // labels match MiGuard's
     container.innerHTML = periods.map(([key, label]) =>
       `<button class="period-pill${key === activeKey ? ' active' : ''}" onclick="window.__overviewSelectPeriod('${key}')">${label}</button>`
     ).join('');
