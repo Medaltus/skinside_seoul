@@ -2600,10 +2600,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         </div>
       </div>
 
-      <div class="evs-outlook">
-        <div class="evs-outlook-lbl">Strategic Outlook</div>
-        <div class="evs-outlook-text">Amazon Big Deal Days is the highest-traffic sales event of the year on Amazon. The brands that win invest in the 2–3 weeks prior and capitalize in the week after. <strong>Preparation, real-time agility, and disciplined follow-through are the three variables we control.</strong></div>
-      </div>
+      <!-- Strategic Outlook note removed 2026-10-05 per Jaclyn. -->
     </div>
 
     <div class="channel-page" id="ev-spring">
@@ -22310,8 +22307,9 @@ async function loadAuditResultsFromSheet() {
     const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
       pdfxHeaderBand(monthYear, 'Events', false, strategyEventOverride) +
       '<div class="pdfx-chlabel">Event Strategy</div>' +
-      leadUp + during + leadOut + outlook +
-      pdfxFooter(monthYear) +
+      // Strategic Outlook note and page footer removed 2026-10-05 per Jaclyn
+      // (Strategy page only — every other page keeps its footer).
+      leadUp + during + leadOut +
       '</div></div>';
     return page1;
   }
