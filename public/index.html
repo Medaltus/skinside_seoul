@@ -24052,14 +24052,17 @@ async function loadAuditResultsFromSheet() {
             ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px;">${cancelRate != null ? `adj. ${Math.round(cancelRate * 100)}% cancel rate` : 'no cancel-rate history yet'}</div>` : '';
 
           // Hero: Total Sales
-          function bigGauge(label, actual, goal) {
+          // shadedCenter: only the Total Sales ring gets the tinted center (per
+          // Jaclyn 2026-10-05); Organic/Ad leave the center unfilled, so it shows
+          // the card's own sand background.
+          function bigGauge(label, actual, goal, shadedCenter) {
             const st = gaugeState(actual, goal);
             const size = 170, stroke = 16;
             if (!st) {
               return `<div style="text-align:center;flex:0 0 auto;min-width:220px;">
                 <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:10px;">${label}</div>
                 <div style="position:relative;width:${size}px;height:${size}px;margin:0 auto;">
-                  ${buildGaugeSvg(0, '#ffffff', '#ffffff', size, stroke, 'rgba(255,255,255,.55)')}
+                  ${buildGaugeSvg(0, '#ffffff', '#ffffff', size, stroke, shadedCenter ? 'rgba(255,255,255,.55)' : null)}
                   <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);font-weight:600;">${goal == null ? 'No goal set' : 'Not available yet'}</div>
                 </div>
                 <div style="font-size:14px;color:var(--navy);margin-top:12px;">Goal <strong>${goal == null ? '—' : fmtD(goal)}</strong></div>
@@ -24067,7 +24070,7 @@ async function loadAuditResultsFromSheet() {
             }
             // Opaque tints (not transparent) so they read clearly against the sand panel:
             // ~30% of our red (#db372d) / green (#24e9a3) mixed with white.
-            const fill = st.onPace ? '#c4f6e4' : '#f4c3c0';
+            const fill = shadedCenter ? (st.onPace ? '#c4f6e4' : '#f4c3c0') : null;
             return `<div style="text-align:center;flex:0 0 auto;min-width:220px;">
               <div style="font-size:18px;font-weight:700;color:var(--navy);margin-bottom:10px;">${label}</div>
               <div style="position:relative;width:${size}px;height:${size}px;margin:0 auto;">
@@ -24085,9 +24088,9 @@ async function loadAuditResultsFromSheet() {
           // shaded center behind the % (light red = projecting to miss, light
           // green = on pace), spread evenly across the full panel width.
           return `<div style="display:flex;align-items:flex-start;justify-content:space-around;gap:24px;flex:1;flex-wrap:wrap;width:100%;">
-            ${bigGauge('Total Sales', actualOverall, overallGoal)}
-            ${bigGauge('Organic Sales', actualOrganic, organicGoal)}
-            ${bigGauge('Ad Sales', actualAds, adsGoal)}
+            ${bigGauge('Total Sales', actualOverall, overallGoal, true)}
+            ${bigGauge('Organic Sales', actualOrganic, organicGoal, false)}
+            ${bigGauge('Ad Sales', actualAds, adsGoal, false)}
           </div>`;
         }
 
