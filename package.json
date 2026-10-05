@@ -1,9 +1,10 @@
 {
-  "name": "just-bjorn-dashboard",
+  "name": "skinside-seoul-dashboard",
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@sparticuz/chromium": "153.0.0",
     "googleapis": "^140.0.0",
-    "xlsx": "^0.18.5"
+    "puppeteer-core": "25.11.0"
   }
 }
