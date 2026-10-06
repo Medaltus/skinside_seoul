@@ -23563,15 +23563,22 @@ async function loadAuditResultsFromSheet() {
       // cancelled" flag, so there was no clean way to net an order COUNT
       // against them).
 
-      // Pending Orders — a live snapshot, intentionally NOT date-scoped
-      // (an order still sitting in Pending from any date is still open and
-      // worth surfacing, not just ones placed this month). Amazon only,
-      // per Jaclyn's source (SHEET_ORDERS).
-      const pendingOrderIds = new Set(
-        amzRows.filter(r => (r.status || '').trim().toLowerCase() === 'pending')
-               .map(r => r.order_id).filter(Boolean)
-      );
-      setKpiPlain('ov-kpi-pending', pendingOrderIds.size.toLocaleString(), 'Currently open');
+      // Pending Orders — MATCHED TO COSMETTE 2026-10-05 per Jaclyn (was: unique
+      // pending order IDs from any date, "Currently open"). Now Cosmette's exact
+      // logic: raw sync-sheet rows (amzRows = SHEET_ORDERS, brand-filtered only —
+      // no validity filter, since that filter removes pending orders) whose
+      // status is pending AND whose order date is in the toggled month. Counts
+      // ROWS, as Cosmette does (one row per item). A live status read: on Last
+      // Month it's "placed last month, still pending as of the latest sync", so
+      // it shrinks toward zero as Amazon resolves them. No MoM comparison.
+      const isMtdPending = period !== 'lastFull';
+      const refPrefix = `${refDate.getFullYear()}-${String(refDate.getMonth() + 1).padStart(2, '0')}`;
+      const pendingCount = amzRows.filter(r => {
+        const d = ovNormalizeDate(r.date);
+        if (!d || d.substring(0, 7) !== refPrefix) return false;
+        return (r.status || '').trim().toLowerCase() === 'pending';
+      }).length;
+      setKpiPlain('ov-kpi-pending', pendingCount.toLocaleString(), isMtdPending ? 'Current month' : 'Last month');
 
       const heroRevEl = document.getElementById('ov-hero-revenue');
       if (heroRevEl) heroRevEl.textContent = mtd.revenue >= 1000 ? '$' + (mtd.revenue / 1000).toFixed(1) + 'K' : '$' + mtd.revenue.toFixed(0);
