@@ -7739,9 +7739,32 @@ async function initSns() {
         ltdEl.textContent = '$' + Math.round(ltdTotal).toLocaleString();
       }
 
-      // Amazon Fees KPI intentionally left as-is — pending a Finances/Product Fees
-      // API sync (net-new backend job), same shape as AD_SUMMARY. Do not overwrite
-      // with a guess in the meantime.
+      // Amazon Fees — WIRED UP 2026-10-05 per Jaclyn, ported from Cosmette's
+      // dashboard (its 2026-09-11 version): sum of the "Amazon Estimated fees"
+      // column (col P, filled by the fees-estimate cron) on this brand's tab of
+      // the orders sync sheet (SHEET_ORDERS) for the report month, excluding
+      // Cancelled rows, Newderm selling account only — same principles as every
+      // other "our performance" figure. MoM vs the prior month. (Previously this
+      // KPI was never populated at all, so it always showed "—".)
+      try {
+        const feesCsv = await fetch(sheetCsvUrl(window.SHEET_CFG.SHEET_ORDERS.fileId, window.SHEET_CFG.SHEET_ORDERS.gid) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+        const feesRows = isCsv(feesCsv) ? parseCsv(feesCsv) : [];
+        const sumFeesForMonth = (y, m) => {
+          const prefix = `${y}-${String(m).padStart(2, '0')}`;
+          return feesRows
+            .filter(r => (ovNormalizeDate(r.date) || '').substring(0, 7) === prefix)
+            .filter(r => (r.status || '').trim().toLowerCase() !== 'cancelled')
+            .filter(r => r.selling_account === 'Newderm')
+            .reduce((sum, r) => sum + parseAmt(r['Amazon Estimated fees']), 0);
+        };
+        const feesCurr = sumFeesForMonth(year, month);
+        const feesPrev = sumFeesForMonth(prevYear, prevMonth);
+        console.log('[StewardshipLive] Amazon Fees:', { year, month, feesCurr, feesPrev, rows: feesRows.length });
+        setKpiVal('kpi-amazon-fees', '$' + Math.round(feesCurr).toLocaleString());
+        setKpiMom('kpi-amazon-fees', feesPrev ? pct(feesCurr, feesPrev) : null);
+      } catch (feeErr) {
+        console.warn('[StewardshipLive] Amazon Fees fetch failed:', feeErr.message);
+      }
 
     } catch (err) {
       console.warn('[Skinside Seoul] initStewardshipLive failed, charts/KPIs remain at last rendered values:', err.message);
@@ -10799,9 +10822,32 @@ async function initSns() {
         ltdEl.textContent = '$' + Math.round(ltdTotal).toLocaleString();
       }
 
-      // Amazon Fees KPI intentionally left as-is — pending a Finances/Product Fees
-      // API sync (net-new backend job), same shape as AD_SUMMARY. Do not overwrite
-      // with a guess in the meantime.
+      // Amazon Fees — WIRED UP 2026-10-05 per Jaclyn, ported from Cosmette's
+      // dashboard (its 2026-09-11 version): sum of the "Amazon Estimated fees"
+      // column (col P, filled by the fees-estimate cron) on this brand's tab of
+      // the orders sync sheet (SHEET_ORDERS) for the report month, excluding
+      // Cancelled rows, Newderm selling account only — same principles as every
+      // other "our performance" figure. MoM vs the prior month. (Previously this
+      // KPI was never populated at all, so it always showed "—".)
+      try {
+        const feesCsv = await fetch(sheetCsvUrl(window.SHEET_CFG.SHEET_ORDERS.fileId, window.SHEET_CFG.SHEET_ORDERS.gid) + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+        const feesRows = isCsv(feesCsv) ? parseCsv(feesCsv) : [];
+        const sumFeesForMonth = (y, m) => {
+          const prefix = `${y}-${String(m).padStart(2, '0')}`;
+          return feesRows
+            .filter(r => (ovNormalizeDate(r.date) || '').substring(0, 7) === prefix)
+            .filter(r => (r.status || '').trim().toLowerCase() !== 'cancelled')
+            .filter(r => r.selling_account === 'Newderm')
+            .reduce((sum, r) => sum + parseAmt(r['Amazon Estimated fees']), 0);
+        };
+        const feesCurr = sumFeesForMonth(year, month);
+        const feesPrev = sumFeesForMonth(prevYear, prevMonth);
+        console.log('[StewardshipExternal] Amazon Fees:', { year, month, feesCurr, feesPrev, rows: feesRows.length });
+        setKpiVal('mx-kpi-amazon-fees', '$' + Math.round(feesCurr).toLocaleString());
+        setKpiMom('mx-kpi-amazon-fees', feesPrev ? pct(feesCurr, feesPrev) : null);
+      } catch (feeErr) {
+        console.warn('[StewardshipExternal] Amazon Fees fetch failed:', feeErr.message);
+      }
 
     } catch (err) {
       console.warn('[Skinside Seoul] initStewardshipExternal failed, charts/KPIs remain at last rendered values:', err.message);
