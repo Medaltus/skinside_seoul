@@ -2608,10 +2608,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     </div>
 
     <div class="channel-page" id="ev-spring">
-      <div class="page-hd" style="margin-bottom:4px;">
-        <div><div class="page-title" style="font-size:18px;" id="bss-event-title">Big Spring Sale</div></div>
+      <!-- Header styled like the Strategy tab's (2026-10-08 per Jaclyn): title
+           hard-coded for this event; dates = this event's most recent row on
+           the Events tab (filled by the event loader). -->
+      <div class="evs-hero">
+        <div>
+          <div class="evs-eyebrow">Event Report</div>
+          <div class="evs-headline" id="bss-event-title">Big Spring Sale</div>
+          <div class="evs-dates" id="bss-event-dates">Loading event dates…</div>
+        </div>
       </div>
-      <div class="pd-event-dates" id="bss-event-dates">Loading event dates…</div>
 
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -2651,10 +2657,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
     <div class="channel-page" id="ev-primeday">
-      <div class="page-hd" style="margin-bottom:4px;">
-        <div><div class="page-title" style="font-size:18px;" id="pd-event-title">Prime Day</div></div>
+      <!-- Header styled like the Strategy tab's (2026-10-08 per Jaclyn): title
+           hard-coded for this event; dates = this event's most recent row on
+           the Events tab (filled by the event loader). -->
+      <div class="evs-hero">
+        <div>
+          <div class="evs-eyebrow">Event Report</div>
+          <div class="evs-headline" id="pd-event-title">Prime Day</div>
+          <div class="evs-dates" id="pd-event-dates">Loading event dates…</div>
+        </div>
       </div>
-      <div class="pd-event-dates" id="pd-event-dates">Loading event dates…</div>
 
       <!-- Executive summary — title + single body, per-event (not the 2-column monthly format) -->
       <div class="card" style="margin-bottom:16px;">
@@ -2695,10 +2707,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
     <div class="channel-page" id="ev-pbdd">
-      <div class="page-hd" style="margin-bottom:4px;">
-        <div><div class="page-title" style="font-size:18px;" id="pbdd-event-title">Prime Big Deal Days</div></div>
+      <!-- Header styled like the Strategy tab's (2026-10-08 per Jaclyn): title
+           hard-coded for this event; dates = this event's most recent row on
+           the Events tab (filled by the event loader). -->
+      <div class="evs-hero">
+        <div>
+          <div class="evs-eyebrow">Event Report</div>
+          <div class="evs-headline" id="pbdd-event-title">Prime Big Deal Days</div>
+          <div class="evs-dates" id="pbdd-event-dates">Loading event dates…</div>
+        </div>
       </div>
-      <div class="pd-event-dates" id="pbdd-event-dates">Loading event dates…</div>
 
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -2738,10 +2756,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
       </div>
     </div>
     <div class="channel-page" id="ev-bfcm">
-      <div class="page-hd" style="margin-bottom:4px;">
-        <div><div class="page-title" style="font-size:18px;" id="bfcm-event-title">Black Friday &amp; Cyber Monday</div></div>
+      <!-- Header styled like the Strategy tab's (2026-10-08 per Jaclyn): title
+           hard-coded for this event; dates = this event's most recent row on
+           the Events tab (filled by the event loader). -->
+      <div class="evs-hero">
+        <div>
+          <div class="evs-eyebrow">Event Report</div>
+          <div class="evs-headline" id="bfcm-event-title">Black Friday &amp; Cyber Monday</div>
+          <div class="evs-dates" id="bfcm-event-dates">Loading event dates…</div>
+        </div>
       </div>
-      <div class="pd-event-dates" id="bfcm-event-dates">Loading event dates…</div>
 
       <div class="card" style="margin-bottom:16px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
@@ -12586,12 +12610,12 @@ document.addEventListener('DOMContentLoaded', function () {
           getProductNames(),
         ]);
 
+        // Header dates = this event's most recent occurrence only, same format
+        // as the Strategy header ("Oct 7, 2026 – Oct 8, 2026") — 2026-10-08.
         const dateEl = document.getElementById('pd-event-dates');
-        if (dates.current) {
-          if (dateEl) dateEl.innerHTML = eventDatesHtml(dates.current, dates.previous);
-        } else if (dateEl) {
-          dateEl.textContent = 'Event dates not found on Events tab.';
-        }
+        if (dateEl) dateEl.textContent = dates.current
+          ? `${fmtDate(dates.current.start_date)} – ${fmtDate(dates.current.end_date)}`
+          : 'Dates TBD';
 
         if (!isCsv(ordersCsv) || !dates.current) {
           ['pd-kpi-total-units','pd-kpi-total-orders','pd-kpi-avg-order','pd-kpi-units-ads','pd-kpi-units-organic'].forEach(id => {
@@ -12996,12 +13020,12 @@ document.addEventListener('DOMContentLoaded', function () {
             getProductNames(),
           ]);
 
+          // Header dates = this event's most recent occurrence only, same format
+          // as the Strategy header ("Oct 7, 2026 – Oct 8, 2026") — 2026-10-08.
           const dateEl = document.getElementById(`${cfg.prefix}-event-dates`);
-          if (dates.current) {
-            if (dateEl) dateEl.innerHTML = eventDatesHtml(dates.current, dates.previous);
-          } else if (dateEl) {
-            dateEl.textContent = 'Event dates not found on Events tab.';
-          }
+          if (dateEl) dateEl.textContent = dates.current
+            ? `${fmtDate(dates.current.start_date)} – ${fmtDate(dates.current.end_date)}`
+            : 'Dates TBD';
 
           const kpiIds = [`${cfg.prefix}-kpi-total-units`, `${cfg.prefix}-kpi-total-orders`, `${cfg.prefix}-kpi-avg-order`, `${cfg.prefix}-kpi-units-ads`, `${cfg.prefix}-kpi-units-organic`];
           if (!isCsv(ordersCsv) || !dates.current) {
@@ -22357,9 +22381,11 @@ async function loadAuditResultsFromSheet() {
     const page1 = '<div class="pdfx-page"><div class="pdfx-inner">' +
       pdfxHeaderBand(monthYear, 'Events', false, strategyEventOverride) +
       '<div class="pdfx-chlabel">Event Strategy</div>' +
-      // Strategic Outlook note and page footer removed 2026-10-05 per Jaclyn
-      // (Strategy page only — every other page keeps its footer).
+      // Strategic Outlook note removed 2026-10-05 per Jaclyn. The footer was
+      // removed then too; 2026-10-08 it moved HERE from the event pages,
+      // pinned to the bottom of the page (Strategy now exports after events).
       leadUp + during + leadOut +
+      '<div class="pdfx-pin-bottom">' + pdfxFooter(monthYear) + '</div>' +
       '</div></div>';
     return page1;
   }
@@ -22372,16 +22398,14 @@ async function loadAuditResultsFromSheet() {
   function buildEventPage(prefix, eventLabel, monthYear) {
     const headline = pdfxText('#' + prefix + '-exec-summary-headline') || eventLabel;
     const body = pdfxHTML('#' + prefix + '-exec-summary-body') || '<span style="color:var(--muted);font-style:italic;">No summary added yet.</span>';
-    const dates = pdfxById(prefix + '-event-dates') ? pdfxHTML('#' + prefix + '-event-dates') : '';
+    // Header band like the Strategy page (2026-10-08): this event's name +
+    // its most recent dates, read from the live tab's header.
+    const eventOverride = {
+      name: eventLabel,
+      dates: pdfxText('#' + prefix + '-event-dates') || 'Dates TBD',
+    };
 
-    // Orange-background callout, matching .pdfx-insight exactly (same
-    // sand background + orange left border) — this is the actual "pop"
-    // treatment asked for. Corrected 2026-07-21: coloring the date TEXT
-    // itself orange (the previous attempt) was explicitly not what was
-    // wanted; the background callout is.
-    const datesHtml = dates
-      ? '<div class="pdfx-insight" style="margin-bottom:10px;">' + dates + '</div>'
-      : '';
+    // (Orange dates callout removed 2026-10-08 — the dates are in the header band now.)
 
     const hasKpis = !!pdfxById(prefix + '-kpi-total-units');
     const kpisHtml = hasKpis
@@ -22391,19 +22415,29 @@ async function loadAuditResultsFromSheet() {
             .map(pdfxKpiCardHtml).join('') +
         '</div>'
       : '';
+    // Year legend (e.g. 2025 / 2026) — added 2026-10-08 per Jaclyn. It's an HTML
+    // legend beside the chart on the live tab (#<prefix>-legend), NOT drawn on
+    // the canvas, so the chart image alone never carried it. Copied into the
+    // card header here, same position as the live tab (title left, legend right).
+    const legendHtml = pdfxLegendHtml(prefix + '-legend');
     const chartHtml = hasKpis
-      ? '<div class="pdfx-card" style="margin-top:14px;"><div class="pdfx-card-title">Top Sellers — Units Sold</div>' + pdfxChartBlock('_' + prefix + 'TopSellersChart') + '</div>'
+      ? '<div class="pdfx-card" style="margin-top:14px;">' +
+          '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;">' +
+            '<div class="pdfx-card-title" style="margin-bottom:0;">Top Sellers — Units Sold</div>' +
+            (legendHtml ? '<div class="pd-legend">' + legendHtml + '</div>' : '') +
+          '</div>' +
+          pdfxChartBlock('_' + prefix + 'TopSellersChart') +
+        '</div>'
       : '';
 
     return '' +
       '<div class="pdfx-page">' +
         '<div class="pdfx-inner">' +
-          pdfxHeaderBand(monthYear, 'Events') +
+          pdfxHeaderBand(monthYear, 'Events', false, eventOverride) +
           '<div class="pdfx-chlabel">' + pdfxEscape(eventLabel) + '</div>' +
-          datesHtml +
           '<div class="pdfx-card"><div class="pdfx-card-title">' + pdfxEscape(headline) + '</div><div style="font-size:11.5px;color:#48557a;line-height:1.6;">' + body + '</div></div>' +
           kpisHtml + chartHtml +
-          pdfxFooter(monthYear) +
+          // Footer moved to the bottom of the Strategy page (2026-10-08 per Jaclyn).
         '</div>' +
       '</div>';
   }
