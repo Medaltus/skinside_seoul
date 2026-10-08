@@ -31,7 +31,11 @@
   --font:'GT Walsheim Pro Light','DM Sans',system-ui,sans-serif; --mono:'DM Mono','Fira Mono',monospace;
   --font-header:'GT Walsheim Pro Medium','DM Sans',system-ui,sans-serif;
   --font-bold:'GT Walsheim Pro Bold','DM Sans',system-ui,sans-serif;
-  --font-subheader:'Plantin MT Pro Italic',Georgia,'Times New Roman',serif;
+  /* Georgia for ALL serif text and KPI numbers, dashboard + reports (confirmed
+     2026-10-08 per Jaclyn). Was Plantin MT Pro Italic first, but that file never
+     decodes in the browser, so Georgia was already what showed on screen —
+     now it's explicit and can't change if the Plantin file ever loads. */
+  --font-subheader:Georgia,'Times New Roman',serif;
   --font-body-light:'GT Walsheim Pro Light','DM Sans',system-ui,sans-serif;
   --radius:10px; --radius-sm:6px;
 }
@@ -22531,19 +22535,32 @@ async function loadAuditResultsFromSheet() {
       if (png) img.setAttribute('src', png);
     }
   }
-  const PDFX_GEORGIA_SUBSTITUTE_CSS = 'https://fonts.googleapis.com/css2?family=Gelasio:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=block';
-  let pdfxGeorgiaAliasCss = null;
-  async function pdfxGetGeorgiaAliasCss() {
-    if (pdfxGeorgiaAliasCss !== null) return pdfxGeorgiaAliasCss;
-    try {
-      const res = await fetch(PDFX_GEORGIA_SUBSTITUTE_CSS);
-      const css = res.ok ? await res.text() : '';
-      pdfxGeorgiaAliasCss = css.replace(/font-family:\s*['"]?Gelasio['"]?/g, "font-family: 'Georgia'");
-    } catch (err) {
-      console.warn('[pdf-export] Georgia substitute font CSS failed to load:', err && err.message);
-      pdfxGeorgiaAliasCss = '';
-    }
-    return pdfxGeorgiaAliasCss;
+  // REAL GEORGIA in the PDF — ported 2026-10-08 from évolis's 2026-10-07 fix,
+  // per Jaclyn: reports use Georgia, the font the dashboard shows, never the
+  // Gelasio stand-in that was here before (ported from VBC). The PDF server
+  // (render-pdf.js, headless Chrome on Linux) has no Georgia installed, so it
+  // can only print Georgia if Georgia's font files are served from this site;
+  // render-pdf.js already allows requests to this deployment's own host.
+  // Regular + Bold cover every weight the dashboard uses (600 resolves to Bold).
+  // Returns the @font-face CSS when both files are reachable, or null — on
+  // null, the export skips the server and renders in the viewer's own browser
+  // (which has real Georgia), so a PDF is never printed in a substitute font.
+  const PDFX_GEORGIA_FILES = [
+    { path: '/Georgia.ttf', weight: 400 },
+    { path: '/Georgia-Bold.ttf', weight: 700 },
+  ];
+  async function pdfxGetGeorgiaFontCss() {
+    const checks = await Promise.all(PDFX_GEORGIA_FILES.map(async f => {
+      try {
+        const res = await fetch(location.origin + f.path, { method: 'HEAD', cache: 'no-store' });
+        const type = (res.headers.get('content-type') || '').toLowerCase();
+        return res.ok && !type.includes('text/html') && !type.includes('text/plain');
+      } catch (e) { return false; }
+    }));
+    if (!checks.every(Boolean)) return null;
+    return PDFX_GEORGIA_FILES.map(f =>
+      "@font-face{font-family:'Georgia';src:url('" + location.origin + encodeURI(f.path) + "') format('truetype');font-weight:" + f.weight + ";font-style:normal;}"
+    ).join('');
   }
 
   async function pdfxBuildRenderDocument(root, pageEls) {
@@ -22562,7 +22579,10 @@ async function loadAuditResultsFromSheet() {
     });
     pdfxWrapSymbolGlyphs(clone);
     await pdfxRasterizeSvgImages(clone);
-    const georgiaAlias = await pdfxGetGeorgiaAliasCss();
+    const georgiaFontCss = await pdfxGetGeorgiaFontCss();
+    if (!georgiaFontCss) {
+      throw new Error('Georgia font files not found at ' + PDFX_GEORGIA_FILES.map(f => f.path).join(' and ') + ' — rendering in the browser instead so headings stay in real Georgia');
+    }
     const css = Array.from(document.querySelectorAll('style')).map(function (st) { return st.textContent; }).join('\n');
     const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'))
       .map(function (l) { return '<link rel="stylesheet" href="' + pdfxEscape(l.href) + '">'; }).join('');
@@ -22572,7 +22592,7 @@ async function loadAuditResultsFromSheet() {
       '.pdfx-page{width:8.5in;height:11in;min-height:0;overflow:hidden;break-after:page;page-break-after:always}\n' +
       '.pdfx-page:last-child{break-after:auto;page-break-after:auto}';
     return '<!doctype html><html><head><meta charset="utf-8"><base href="' + pdfxEscape(location.href) + '">' + links +
-      '<link rel="stylesheet" href="' + PDFX_SYMBOL_FONT_CSS + '"><style>' + georgiaAlias + '</style><style>' + css + '</style><style>' + printCss + '</style></head>' +
+      '<link rel="stylesheet" href="' + PDFX_SYMBOL_FONT_CSS + '"><style>' + georgiaFontCss + '</style><style>' + css + '</style><style>' + printCss + '</style></head>' +
       '<body><div id="pdfx-root">' + clone.innerHTML + '</div></body></html>';
   }
 
