@@ -11992,18 +11992,38 @@ document.addEventListener('DOMContentLoaded', function () {
     out.push(cur);
     return out;
   }
+  // FIXED 2026-10-08 per Jaclyn: this used to split the CSV on every "\n",
+  // so any saved text with a line break (a recap with paragraphs) was cut off
+  // at its first line — Google quotes such a cell and keeps the line break
+  // INSIDE the quotes, but a line split can't tell. Now parsed character by
+  // character: a newline only ends a row when it's outside quotes. Feeds every
+  // editable block on the dashboard (exec summary, insights, opportunities,
+  // accomplished, event recaps), so all of them keep their full text.
   function parseCsv(text) {
-    const lines = text.trim().split('\n');
-    const headers = parseCsvLine(lines[0]).map(h => h.replace(/^"|"$/g,'').trim());
-    const rows = [];
-    for (let i = 1; i < lines.length; i++) {
-      if (!lines[i].trim()) continue;
-      const cols = parseCsvLine(lines[i]);
-      const row = {};
-      headers.forEach((h, idx) => { row[h] = (cols[idx] || '').replace(/^"|"$/g,'').trim(); });
-      rows.push(row);
+    const records = [];
+    let row = [], cur = '', inQ = false;
+    const src = String(text || '');
+    for (let i = 0; i < src.length; i++) {
+      const c = src[i];
+      if (inQ) {
+        if (c === '"') { if (src[i + 1] === '"') { cur += '"'; i++; } else inQ = false; }
+        else cur += c;
+      } else if (c === '"') inQ = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\n' || c === '\r') {
+        if (c === '\r' && src[i + 1] === '\n') i++;
+        row.push(cur); records.push(row); row = []; cur = '';
+      } else cur += c;
     }
-    return rows;
+    if (cur !== '' || row.length) { row.push(cur); records.push(row); }
+    const nonEmpty = records.filter(r => r.some(v => v.trim() !== ''));
+    if (!nonEmpty.length) return [];
+    const headers = nonEmpty[0].map(h => h.trim());
+    return nonEmpty.slice(1).map(cols => {
+      const obj = {};
+      headers.forEach((h, idx) => { obj[h] = (cols[idx] || '').replace(/\r\n?/g, '\n').trim(); });
+      return obj;
+    });
   }
   function getLastFullMonth() {
     const now = new Date();
