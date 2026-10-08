@@ -1321,6 +1321,10 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     <div class="topbar-right">
       <div class="pdf-events-picker" id="pdf-events-picker" style="display:none;font-size:10.5px;color:var(--muted);align-items:center;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;max-width:60vw;">
         <span style="flex-shrink:0;">Include in PDF:</span>
+        <!-- Overview = the cover / Executive Summary page. Added 2026-10-08 per
+             Jaclyn so an export can be JUST an event page (+ Strategy).
+             Checked by default, so the normal monthly report is unchanged. -->
+        <label style="display:flex;align-items:center;gap:4px;cursor:pointer;flex-shrink:0;"><input type="checkbox" id="pdf-include-overview" checked style="margin:0;"> Overview</label>
         <!-- Sales pages — Website/Walmart default UNCHECKED 2026-08-28 per
              Jaclyn: Skinside Seoul doesn't include these in exports yet
              (Website has no channel at all for this brand; Walmart's
@@ -22744,6 +22748,7 @@ async function loadAuditResultsFromSheet() {
         stewardship:   !!document.getElementById('pdf-include-stewardship')   && document.getElementById('pdf-include-stewardship').checked,
         opportunities: !!document.getElementById('pdf-include-opportunities') && document.getElementById('pdf-include-opportunities').checked,
         strategy: !!document.getElementById('pdf-include-strategy') && document.getElementById('pdf-include-strategy').checked,
+        overview: !!document.getElementById('pdf-include-overview') && document.getElementById('pdf-include-overview').checked,
         bss:  !!document.getElementById('pdf-include-bss')  && document.getElementById('pdf-include-bss').checked,
         pd:   !!document.getElementById('pdf-include-pd')   && document.getElementById('pdf-include-pd').checked,
         pbdd: !!document.getElementById('pdf-include-pbdd') && document.getElementById('pdf-include-pbdd').checked,
@@ -22867,14 +22872,17 @@ async function loadAuditResultsFromSheet() {
       ].join('');
 
       const eventPages = [
-        includeSections.strategy ? buildStrategyPage(monthYear) : '',
+        // Strategy ALWAYS comes after the event pages (2026-10-08 per Jaclyn):
+        // with one event + Strategy checked, the event is page 1, Strategy page 2.
         includeSections.bss  ? buildEventPage('bss',  'Big Spring Sale',             monthYear) : '',
         includeSections.pd   ? buildEventPage('pd',   'Prime Day',                   monthYear) : '',
         includeSections.pbdd ? buildEventPage('pbdd', 'Prime Big Deal Days',         monthYear) : '',
         includeSections.bfcm ? buildEventPage('bfcm', 'Black Friday & Cyber Monday', monthYear) : '',
+        includeSections.strategy ? buildStrategyPage(monthYear) : '',
       ].join('');
 
-      root.innerHTML = buildCoverPage(monthYear) + salesMarketingPages + eventPages;
+      // Cover / Executive Summary only when the Overview checkbox is on.
+      root.innerHTML = (includeSections.overview ? buildCoverPage(monthYear) : '') + salesMarketingPages + eventPages;
 
       // Positioned off-screen (not display:none, so it still has real layout
       // for html2canvas to measure/paint) rather than visible on top of
