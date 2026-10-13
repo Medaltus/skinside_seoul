@@ -24579,20 +24579,21 @@ async function loadHomeTotalSkus() {
 document.addEventListener('DOMContentLoaded', loadHomeTotalSkus);
 
 // CLERK AUTH — internal-section gating only, NOT a page-wide gate.
-// Org-membership check, matching Cosmette's own getOrganizationMemberships()
-// pattern — confirmed 2026-07-22 that this Clerk account uses per-org
-// invites, not a plain email-domain check, so membership in Évolis's own
-// org (not just having a @medaltus.com email) is what actually gates
-// internal access.
-// Unlike Cosmette's dashboard (which requires sign-in to see ANYTHING),
-// this dashboard is internal-first: non-org-member users can see
-// everything except the internal-only nav section, which stays hidden
-// by default (see inline style on #nav-internal-section) and is only
-// revealed here if the signed-in user belongs to Évolis's org.
-// If Clerk fails to load, isn't signed in, or membership check fails, the
-// safe fallback is simply "internal section stays hidden" — never a
-// broken or blank page.
-const SKINUVA_ORG_ID = 'org_3HbWzHJgiP3n5zZcgWArovipI5Y';
+// Internal pages unlock when the signed-in account is a member of SKINSIDE
+// SEOUL's own Clerk org (per-org invites, not an email-domain check). Non-
+// members see everything except the internal-only nav section, which stays
+// hidden by default (inline style on #nav-internal-section).
+// If Clerk fails to load, isn't signed in, or the check fails, the safe
+// fallback is simply "internal section stays hidden" — never a blank page.
+//
+// FIXED 2026-10-13 per Jaclyn (two bugs):
+//  1. Wrong org — this checked Skinuva's org (org_3HbWzHJgiP3n5zZcgWArovipI5Y),
+//     carried over from the Skinuva template. Now skinside SEOUL's own org.
+//  2. Only the first 10 memberships were checked — Clerk returns memberships
+//     10 at a time, alphabetically, and accounts in 11+ brand orgs never had
+//     the later ones checked. Same fix as Skinuva's dashboard: ask for 100 at
+//     a time and keep paging until the org is found or the list ends.
+const SKINSIDE_ORG_ID = 'org_3IVflJ8y99PF4AEr9LddN453pQj';
 
 window.addEventListener('load', async () => {
   try {
@@ -24601,8 +24602,13 @@ window.addEventListener('load', async () => {
     const user = window.Clerk.user;
     if (!user) return; // not signed in — safe default (internal hidden)
 
-    const memberships = await window.Clerk.user.getOrganizationMemberships();
-    const hasAccess = memberships.data.some(m => m.organization.id === SKINUVA_ORG_ID);
+    let hasAccess = false;
+    for (let page = 1; page <= 20 && !hasAccess; page++) {
+      const res = await window.Clerk.user.getOrganizationMemberships({ initialPage: page, pageSize: 100 });
+      const rows = (res && res.data) || [];
+      hasAccess = rows.some(m => m.organization && m.organization.id === SKINSIDE_ORG_ID);
+      if (rows.length < 100) break;
+    }
 
     if (hasAccess) {
       const internalNav = document.getElementById('nav-internal-section');
