@@ -968,11 +968,22 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .pdfx-pill-sand{background:var(--sand);border:1px solid rgba(200,125,47,.35);color:var(--warn);}
 .pdfx-opp-images{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap;}
 .pdfx-opp-img{width:56px;height:56px;object-fit:cover;border-radius:5px;border:1px solid var(--border);}
-/* PDF-only Brand Momentum tightening (ported from Cosmette/VBC) — denser cards so
-   the pages fit 11in; the subcategory label is hidden in the PDF only. */
-.pdfx-momentum-tight .momentum-cards-grid{gap:14px;}
-.pdfx-momentum-tight .momentum-pcard-body{padding:16px 20px;}
-.pdfx-momentum-tight .momentum-pcard-subcategory{display:none;}
+/* PDF-only Brand Momentum card sizing — MATCHED TO ÉVOLIS 2026-11-04 per
+   Jaclyn (Skinside's were too big). Copied verbatim from évolis's rules
+   ("condense so 5 fit on a page with no other KPIs", 2026-09-29): sized to fit
+   5 cards + gaps in the ~900px of a no-KPI Brand Momentum page; the first page
+   carries the top-3 KPIs and holds 4. Only applies inside the PDF — the live
+   dashboard's card spacing is untouched. Like évolis, the BSR subcategory now
+   prints (small, 9.5px) instead of being hidden. */
+.pdfx-momentum-tight .momentum-cards-grid{gap:8px;}
+.pdfx-momentum-tight .momentum-pcard-hd{padding:7px 14px;}
+.pdfx-momentum-tight .momentum-pcard-name{font-size:13px;}
+.pdfx-momentum-tight .momentum-pcard-rating{font-size:11px;}
+.pdfx-momentum-tight .momentum-pcard-body{padding:9px 16px;}
+.pdfx-momentum-tight .momentum-pcard-label{font-size:9px;}
+.pdfx-momentum-tight .momentum-pcard-value{font-size:19px;}
+.pdfx-momentum-tight .momentum-pcard-subcategory{font-size:9.5px;}
+.pdfx-momentum-tight .momentum-pill{font-size:9px;padding:2px 7px;}
 .pdfx-cover-headline{font-family:var(--font-subheader);font-size:20px;font-weight:600;color:var(--navy);line-height:1.35;margin-bottom:28px;}
 .pdfx-cover-cols{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:8px;}
 .pdfx-cover-col{font-size:12px;color:#48557a;line-height:1.75;}
