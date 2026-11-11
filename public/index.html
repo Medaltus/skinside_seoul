@@ -1207,6 +1207,47 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
    (2026-11-04 per Jaclyn). PDF only — the dashboard is unchanged. */
 .pdfx-inner-reviews .review-card-text.long{font-size:calc(11px - 1pt);}
 .momentum-pending{color:var(--muted);font-size:12px;padding:12px 0;}
+/* Goal Tracker LIVE line (2026-10-27) */
+.gt-live{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--navy);margin-top:4px;}
+.gt-live strong{font-weight:700;}
+.gt-live-dot{width:7px;height:7px;border-radius:50%;background:#1db88a;box-shadow:0 0 0 0 rgba(29,184,138,.6);animation:gtLivePulse 1.8s ease-out infinite;}
+@keyframes gtLivePulse{0%{box-shadow:0 0 0 0 rgba(29,184,138,.55);}70%{box-shadow:0 0 0 7px rgba(29,184,138,0);}100%{box-shadow:0 0 0 0 rgba(29,184,138,0);}}
+/* Overview KPI cards — LIVE tag + Projecting line (2026-11-02) */
+.kpi-live-tag{display:inline-flex;align-items:center;gap:5px;color:#1db88a;font-weight:700;}
+.kpi-live-tag .gt-live-dot{width:6px;height:6px;}
+.kpi-proj{font-size:14px;margin-top:3px;color:var(--navy);}
+.kpi-proj .up{color:#1db88a;}
+.kpi-proj .dn{color:var(--danger);}
+.kpi-proj .flat{color:var(--muted);}
+/* Traffic page (2026-10-27) — VBC's Insights → Traffic styles */
+.trf-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px;}
+.trf-seg{display:inline-flex;background:var(--bg);border:1px solid var(--border2);border-radius:999px;padding:3px;gap:2px;}
+.trf-seg button{border:0;background:transparent;border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;font-family:inherit;}
+.trf-seg button.active{background:var(--navy);color:#fff;}
+.trf-seg-lg button{padding:8px 18px;font-size:12.5px;}
+.trf-source{font-size:11px;color:var(--muted);flex:1;min-width:220px;text-align:right;}
+.trf-card{margin-bottom:18px;}
+.trf-card-hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+.trf-card-ctrls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.trf-note{font-size:12px;color:var(--muted);}
+.trf-media{margin-top:12px;display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--navy);}
+.trf-media:empty{display:none;}
+.trf-media-hd{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;}
+.trf-media-item{display:flex;gap:8px;align-items:flex-start;line-height:1.45;}
+.trf-ev-swatch{flex:0 0 18px;height:12px;border-radius:3px;margin-top:3px;}
+/* Traffic annotations — listing changes + out-of-stock (2026-11-02) */
+.trf-media-hd + .trf-media-item{margin-top:0;}
+.trf-media-item + .trf-media-hd{margin-top:10px;}
+.trf-chg-dot{flex:0 0 18px;height:18px;border-radius:50%;background:#001F60;color:#fff;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;margin-top:0;}
+.trf-oos-swatch{flex:0 0 18px;height:6px;border-radius:2px;margin-top:6px;}
+.trf-chg{margin-top:3px;}
+.trf-chg summary{cursor:pointer;font-size:11px;color:var(--muted);font-weight:600;}
+.trf-chg-field{font-size:11px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;margin:8px 0 4px;}
+.trf-chg-row{display:flex;gap:8px;font-size:11.5px;line-height:1.45;margin-bottom:4px;color:var(--navy);}
+.trf-chg-lbl{flex:0 0 46px;font-weight:700;color:var(--muted);}
+.trf-chg-row.new .trf-chg-lbl{color:#1db88a;}
+.trf-anno-key{display:inline-flex;align-items:center;gap:6px;margin-left:16px;font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;}
+.trf-select{font-family:inherit;font-size:13px;padding:8px 12px;border:1px solid var(--border2);border-radius:8px;min-width:320px;max-width:100%;color:var(--navy);background:#fff;} /* from VBC */
 /* Brand Manager KPIs tab (Overview) — added 2026-10-05 */
 #ov-bm-kpis .kpi-card.bmk-pending .kpi-value{color:var(--muted);font-size:18px;}
 #ov-bm-kpis .bmk-needs{display:inline-block;font-size:11px;color:var(--warn);background:rgba(244,223,208,.55);border:1px solid rgba(200,125,47,.25);border-radius:4px;padding:2px 8px;}
@@ -1324,6 +1365,9 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
     <button class="nav-btn" onclick="showPage('insights',this)">
       <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5"/><path d="M8 7v4M8 5.5v.5"/></svg>Insights
       <span class="nav-badge">3</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('traffic',this)">
+      <svg viewBox="0 0 16 16"><path d="M1 13l4-5 3 3 6-8"/><path d="M1 15h14"/></svg>Traffic
     </button>
     <button class="nav-btn" onclick="showPage('listing',this)">
       <svg viewBox="0 0 16 16"><path d="M2 2h12v12H2z"/><path d="M5 6h6M5 9h4"/></svg>Listing Audit
@@ -1637,8 +1681,16 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
          window.initProjections(). -->
     <div class="channel-page" id="ov-projections">
       <div class="card">
-        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:4px;">
-          <div class="card-title" style="margin-bottom:0;">Share of Sales</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
+          <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+            <div class="card-title" id="proj-ads-title" style="margin-bottom:0;">Share of Sales</div>
+            <!-- View toggle — added 2026-11-02 per Jaclyn -->
+            <div class="period-pills" id="proj-ads-pills" style="display:flex;background:var(--white);border:1px solid var(--border);border-radius:999px;padding:4px;gap:2px;">
+              <button class="period-pill active" data-view="share" onclick="window._projAdsView && window._projAdsView('share')">Share of Sales</button>
+              <button class="period-pill" data-view="organic" onclick="window._projAdsView && window._projAdsView('organic')">Organic Sales</button>
+              <button class="period-pill" data-view="ad" onclick="window._projAdsView && window._projAdsView('ad')">Ad Sales</button>
+            </div>
+          </div>
           <div id="legend-proj-ads" style="display:flex;align-items:center;"></div>
         </div>
         <div style="height:10px;"></div>
@@ -3574,6 +3626,57 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
   </div>
 
   <!-- ══ LISTING AUDIT (internal only) ══ -->
+  <!-- ══ TRAFFIC (internal) — added 2026-11-10 per Jaclyn, same build as PB & Jay:
+       VBC's three-chart layout (Overall → By Category pills → By Product
+       dropdown), each with its own Sessions / Conv Rate / Units toggle, and
+       MiGuard's annotations (listing-change pins, out-of-stock strips, event
+       shading) on every chart, limited to that chart's products. ══ -->
+  <div class="page" id="page-traffic">
+    <div class="page-hd">
+      <div><div class="page-title">Traffic</div><div class="page-sub">Sessions · Conversion rate · Units — overall, by category and by product</div></div>
+    </div>
+    <div class="trf-toolbar">
+      <div class="trf-seg trf-seg-lg" id="trf-view"><button onclick="trfSetView('daily')">Daily</button><button onclick="trfSetView('monthly')">Monthly</button></div>
+      <div class="trf-seg" id="trf-window"><button data-days="7" onclick="trfSetWindow(7)">7 days</button><button data-days="30" onclick="trfSetWindow(30)">30 days</button><button data-days="60" onclick="trfSetWindow(60)">60 days</button><button data-days="90" onclick="trfSetWindow(90)">90 days</button><button data-days="120" onclick="trfSetWindow(120)">120 days</button><button data-days="365" onclick="trfSetWindow(365)">1 year</button></div>
+      <div class="trf-source" id="trf-source"></div>
+    </div>
+    <div class="card trf-card">
+      <div class="trf-card-hd">
+        <div><div class="card-title" style="margin-bottom:2px;" id="trf-overall-title">All Products</div><div class="trf-note" id="trf-overall-note">Loading…</div></div>
+        <div class="trf-card-ctrls">
+          <div class="trf-seg" id="trf-overall-metric"><button class="active" data-metric="sessions" onclick="trfSetMetric('overall','sessions')">Sessions</button><button data-metric="conv" onclick="trfSetMetric('overall','conv')">Conv Rate</button><button data-metric="units" onclick="trfSetMetric('overall','units')">Units</button></div>
+          <div id="trf-legend-overall" style="display:flex;align-items:center;"></div>
+        </div>
+      </div>
+      <div style="position:relative;height:300px;"><canvas id="trf-overall-chart"></canvas></div>
+      <div class="trf-media" id="trf-overall-media"></div>
+    </div>
+    <div class="card trf-card">
+      <div class="trf-card-hd">
+        <div><div class="card-title" style="margin-bottom:2px;" id="trf-cat-title">By Category</div><div class="trf-note" id="trf-cat-note">Loading…</div></div>
+        <div class="trf-card-ctrls">
+          <div class="trf-seg" id="trf-cat-metric"><button class="active" data-metric="sessions" onclick="trfSetMetric('cat','sessions')">Sessions</button><button data-metric="conv" onclick="trfSetMetric('cat','conv')">Conv Rate</button><button data-metric="units" onclick="trfSetMetric('cat','units')">Units</button></div>
+          <div id="trf-legend-cat" style="display:flex;align-items:center;"></div>
+        </div>
+      </div>
+      <div class="trf-seg" id="trf-cat-tabs" style="margin:10px 0 14px;"></div>
+      <div style="position:relative;height:300px;"><canvas id="trf-cat-chart"></canvas></div>
+      <div class="trf-media" id="trf-cat-media"></div>
+    </div>
+    <div class="card trf-card">
+      <div class="trf-card-hd">
+        <div><div class="card-title" style="margin-bottom:2px;" id="trf-prod-title">By Product</div><div class="trf-note" id="trf-prod-note">Loading…</div></div>
+        <div class="trf-card-ctrls">
+          <div class="trf-seg" id="trf-prod-metric"><button class="active" data-metric="sessions" onclick="trfSetMetric('prod','sessions')">Sessions</button><button data-metric="conv" onclick="trfSetMetric('prod','conv')">Conv Rate</button><button data-metric="units" onclick="trfSetMetric('prod','units')">Units</button></div>
+          <div id="trf-legend-prod" style="display:flex;align-items:center;"></div>
+        </div>
+      </div>
+      <div style="margin:10px 0 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;"><select id="trf-prod-select" class="trf-select" onchange="trfSetProduct(this.value)"><option>Loading…</option></select></div>
+      <div style="position:relative;height:300px;"><canvas id="trf-prod-chart"></canvas></div>
+      <div class="trf-media" id="trf-prod-media"></div>
+    </div>
+  </div>
+
   <div class="page" id="page-listing">
     <div class="sheet-link-menu">
       <button class="sheet-link-btn" onclick="document.getElementById('listing-sheet-dropdown').classList.toggle('open')">🔗 Source Sheets <span style="font-size:9px;">▾</span></button>
@@ -5020,6 +5123,7 @@ function showPage(id, btn) {
   // click into Rank Tracker first. initRankTracker caches internally, so
   // this is a no-op on subsequent visits to the page.
   if (id === 'organic' && typeof window.initRankTracker === 'function') window.initRankTracker('heartleaf');
+  if (id === 'traffic' && typeof window.loadTraffic === 'function') window.loadTraffic();
 
   // Inventory (external) — replaced 2026-09-17 with Cosmette's Reviews-by-
   // category structure (no more channel sub-tabs here, so this can't be
@@ -15813,38 +15917,108 @@ window.initProjections = function () {
         }
         return { label: `${MONTHS[dt.getMonth()]} '${String(dt.getFullYear()).slice(2)}`, ym, pct, orgPct, adSales, total };
       });
-      const canvas = document.getElementById('proj-ads-pct-chart');
-      if (canvas && typeof Chart === 'function') {
+      // ── Share of Sales / Organic Sales / Ad Sales toggle (2026-11-02 per Jaclyn) ──
+      // Share of Sales = the original 12-month Ad % vs Organic % chart.
+      // Organic Sales / Ad Sales = monthly $, Jan–Dec on the x-axis, one line
+      // per year for every year with data (same layout + colors as the Sales
+      // page chart: current year green/filled, then navy, sand, grey).
+      // Same sources and rules as Share of Sales: ad $ = Stewardship Summary
+      // ad_sales, organic $ = Amazon order total − ad $. Full months only (the
+      // month in progress is left off, like the Sales page); a month with no
+      // ad_sales value is a gap on both views, never a 0.
+      const PROJ_YEAR_COLORS = [
+        { border: '#24e9a3', bg: 'rgba(36,233,163,0.08)', fill: true },
+        { border: '#001f60', bg: 'transparent', fill: false },
+        { border: '#f4dfd0', bg: 'transparent', fill: false },
+        { border: '#ccd3d5', bg: 'transparent', fill: false },
+      ];
+      const PROJ_VIEW_TITLES = { share: 'Share of Sales', organic: 'Organic Sales', ad: 'Ad Sales' };
+      const lastFullYm = ymOf(lastFull);
+      function renderProjAdsChart(view) {
+        const canvas = document.getElementById('proj-ads-pct-chart');
+        if (!canvas || typeof Chart !== 'function') return;
         if (window._projAdsPctChart) window._projAdsPctChart.destroy();
-        const fmt$ = v => '$' + Math.round(v || 0).toLocaleString();
+        const titleEl = document.getElementById('proj-ads-title');
+        if (titleEl) titleEl.textContent = PROJ_VIEW_TITLES[view];
+        document.querySelectorAll('#proj-ads-pills .period-pill').forEach(btn => btn.classList.toggle('active', btn.dataset.view === view));
+        const noteEl = document.getElementById('proj-ads-note');
+
+        if (view === 'share') {
+        {
+          const fmt$ = v => '$' + Math.round(v || 0).toLocaleString();
+          window._projAdsPctChart = new Chart(canvas, {
+            type: 'line',
+            data: { labels: pts.map(p => p.label), datasets: [
+              { label: 'Ad sales %', data: pts.map(p => p.pct), borderColor: '#24e9a3', backgroundColor: 'rgba(36,233,163,0.08)', fill: true, pointRadius: 3, tension: 0.3, borderWidth: 2.5, spanGaps: false },
+              { label: 'Organic sales %', data: pts.map(p => p.orgPct), borderColor: '#001f60', backgroundColor: 'transparent', fill: false, pointRadius: 3, tension: 0.3, borderWidth: 2.5, spanGaps: false },
+            ] },
+            options: {
+              responsive: true, maintainAspectRatio: false,
+              interaction: { mode: 'index', intersect: false },
+              plugins: {
+                legend: { display: false }, // external legend in #legend-proj-ads
+                tooltip: { callbacks: { label: ctx => {
+                  const p = pts[ctx.dataIndex];
+                  if (ctx.datasetIndex === 0) return ` Ad: ${p.pct}% (${fmt$(p.adSales)})`;
+                  return ` Organic: ${p.orgPct}% (${fmt$(Math.max(0, p.total - p.adSales))} of ${fmt$(p.total)})`;
+                } } },
+              },
+              scales: {
+                x: { grid: { color: 'rgba(0,0,0,0.04)' } },
+                y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: v => v + '%' } },
+              },
+            },
+          });
+          if (typeof window.renderExternalLegend === 'function') window.renderExternalLegend(window._projAdsPctChart, 'legend-proj-ads');
+        }
+        const gaps = pts.filter(p => p.pct == null).map(p => p.label);
+        if (noteEl) noteEl.textContent = 'ℹ Ad sales from the Stewardship Summary sheet (ad_sales, column O); total sales from Amazon orders, same as the table below.' + (gaps.length ? ' No ad_sales value yet for: ' + gaps.join(', ') + ' — those months are left blank.' : '');
+          return;
+        }
+
+        // Organic Sales / Ad Sales — one line per year.
+        const byYear = {};
+        Object.keys(adByMonth).forEach(ym => {
+          if (ym > lastFullYm) return;
+          const total = monthTotal[ym], ad = adByMonth[ym];
+          let v;
+          if (view === 'ad') v = ad;
+          else { if (!(total > 0)) return; v = Math.max(0, total - ad); }
+          const y = parseInt(ym.substring(0, 4), 10), m = parseInt(ym.substring(5, 7), 10);
+          (byYear[y] = byYear[y] || Array(12).fill(null))[m - 1] = v;
+        });
+        const years = Object.keys(byYear).map(Number).sort((x, y) => y - x); // newest first
+        const fmtK = v => v == null ? '' : '$' + (v >= 1000 ? (v / 1000).toFixed(1) + 'k' : Math.round(v));
+        const fmtFull = v => '$' + Math.round(v || 0).toLocaleString();
+        const datasets = years.map((yr, i) => {
+          const c = PROJ_YEAR_COLORS[Math.min(i, PROJ_YEAR_COLORS.length - 1)];
+          return { label: String(yr), data: byYear[yr], borderColor: c.border, backgroundColor: c.bg, fill: c.fill, pointRadius: 2, tension: 0.3, borderWidth: 2.5, spanGaps: false };
+        });
         window._projAdsPctChart = new Chart(canvas, {
           type: 'line',
-          data: { labels: pts.map(p => p.label), datasets: [
-            { label: 'Ad sales %', data: pts.map(p => p.pct), borderColor: '#24e9a3', backgroundColor: 'rgba(36,233,163,0.08)', fill: true, pointRadius: 3, tension: 0.3, borderWidth: 2.5, spanGaps: false },
-            { label: 'Organic sales %', data: pts.map(p => p.orgPct), borderColor: '#001f60', backgroundColor: 'transparent', fill: false, pointRadius: 3, tension: 0.3, borderWidth: 2.5, spanGaps: false },
-          ] },
+          data: { labels: MONTHS, datasets },
           options: {
             responsive: true, maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             plugins: {
-              legend: { display: false }, // external legend in #legend-proj-ads
-              tooltip: { callbacks: { label: ctx => {
-                const p = pts[ctx.dataIndex];
-                if (ctx.datasetIndex === 0) return ` Ad: ${p.pct}% (${fmt$(p.adSales)})`;
-                return ` Organic: ${p.orgPct}% (${fmt$(Math.max(0, p.total - p.adSales))} of ${fmt$(p.total)})`;
-              } } },
+              legend: { display: false },
+              tooltip: { callbacks: {
+                label: ctx => ctx.parsed.y == null ? null : ` ${ctx.dataset.label}: ${fmtFull(ctx.parsed.y)}`,
+              } },
             },
             scales: {
               x: { grid: { color: 'rgba(0,0,0,0.04)' } },
-              y: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: v => v + '%' } },
+              y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { callback: fmtK } },
             },
           },
         });
         if (typeof window.renderExternalLegend === 'function') window.renderExternalLegend(window._projAdsPctChart, 'legend-proj-ads');
+        if (noteEl) noteEl.textContent = view === 'ad'
+          ? 'ℹ Monthly ad sales from the Stewardship Summary sheet (ad_sales, column O), full months only. Months with no ad_sales value are left blank.'
+          : 'ℹ Monthly organic sales = Amazon order total (same as the table below) − ad sales from the Stewardship Summary sheet, full months only. Months with no ad_sales value are left blank.';
       }
-      const gaps = pts.filter(p => p.pct == null).map(p => p.label);
-      const noteEl = document.getElementById('proj-ads-note');
-      if (noteEl) noteEl.textContent = 'ℹ Ad sales from the Stewardship Summary sheet (ad_sales, column O); total sales from Amazon orders, same as the table below.' + (gaps.length ? ' No ad_sales value yet for: ' + gaps.join(', ') + ' — those months are left blank.' : '');
+      window._projAdsView = renderProjAdsChart;
+      renderProjAdsChart('share');
 
       // ── 2) Sales by Quarter ──
       // Inventory Available = latest Products Cache snapshot, same formula as the Inventory page.
@@ -16351,6 +16525,435 @@ window.initBmKpis = function () {
     }
   })();
   return window._bmkPromise;
+};
+
+// ═══════════════════════════════════════════════════════════════════
+// TRAFFIC PAGE (internal) — added 2026-11-10 per Jaclyn, same build as
+// PB & Jay. Layout from VBC's Traffic page (Overall → By Category pills →
+// By Product dropdown, a Sessions / Conv Rate / Units toggle per chart,
+// shared Daily / Monthly view and day window). Annotations and data rules
+// copied from MiGuard's Traffic page: listing-change pins, out-of-stock
+// strips (dark = all inventory, light = FBA only), Amazon event shading,
+// "same days last year" line, dashed still-settling days. Every chart
+// shows the annotations for its own products only.
+// Sources: NewDerm Daily Business Report (skinside-seoul tab), the
+// Business Report sheet (monthly), Listing Change Log + Out Of Stock
+// Historical Log (skinside-seoul tabs), Events tab.
+// ═══════════════════════════════════════════════════════════════════
+const TRF_DAILY = { fileId: '1QLjUvYg-JR6jQmdFlykypkNarqsZvTCOgA3bFagDlVg', gid: '313603347' }; // NewDerm Daily Business Report → skinside-seoul
+const TRF_EVENT_COLORS = { amazon: '#FF9900', ours: '#A66DFF' };
+// Listing changes + out-of-stock annotations — added 2026-11-02 per Jaclyn.
+// Both are shared multi-brand workbooks (one tab per brand), so they're
+// literals here like TRF_DAILY above, and every row is still checked for
+// brand = skinside-seoul in case a tab ever gets pointed at the wrong brand.
+const TRF_LISTING_LOG = { fileId: '1UUBGtUsE_nUPBSH9MyuEu27CqJI-XWJBh5wpT2DsEOk', gid: '1168491887' }; // Listing Change Log → skinside-seoul
+const TRF_OOS_LOG = { fileId: '1lbvdt8qcSRItrkWGjWnaJHcoBhjY275b1M6fM5_dKAM', gid: '290280801' };     // Out Of Stock Historical Log → skinside-seoul
+const TRF_ANNO = { listing: '#001F60', oosAll: '#db372d', oosFba: '#f08c84' };
+const TRF_FIELD_LABEL = { title: 'Title', item_highlights: 'Item Highlights', description: 'Description', backend_keywords: 'Backend keywords', offers: 'Price', bullet_points: 'Bullets', bullets: 'Bullets' };
+function trfFieldLabel(f) {
+  f = String(f || '').trim().toLowerCase();
+  if (TRF_FIELD_LABEL[f]) return TRF_FIELD_LABEL[f];
+  const b = f.match(/^bullet[_\s-]*(?:point[_\s-]*)?(\d+)$/);
+  if (b) return 'Bullet ' + b[1];
+  return f.replace(/_/g, ' ').replace(/^./, c => c.toUpperCase());
+}
+const TRF_FINAL_AFTER = 4; // days still settling — matches the daily report cron
+const TRF_MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const TRF_YOY = {
+  0: { border: '#24e9a3', bg: 'rgba(36,233,163,0.08)', fill: true },
+  1: { border: '#001f60', bg: 'transparent', fill: false },
+  2: { border: '#f4dfd0', bg: 'transparent', fill: false },
+  3: { border: '#ccd3d5', bg: 'transparent', fill: false },
+};
+// Three charts (VBC layout): per-chart metric, shared view/window.
+const TRF_CATS = ['Cleansers', 'Serums', 'Creams', 'Masks']; // same 4 groups as the Reviews pages (SS_REVIEW_CATEGORY_BY_SKU)
+const _trf = { loading: null, view: null, win: 90, cat: 'Serums', asin: null,
+               metric: { overall: 'sessions', cat: 'sessions', prod: 'sessions' }, charts: {} };
+
+function trfNormDate(v) {
+  v = String(v || '').trim();
+  let m = v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) return `${m[1]}-${m[2].padStart(2, '0')}-${m[3].padStart(2, '0')}`;
+  m = v.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+  if (m) return `${m[3].length === 2 ? '20' + m[3] : m[3]}-${m[1].padStart(2, '0')}-${m[2].padStart(2, '0')}`;
+  return '';
+}
+const trfYm = (y, m) => `${y}-${String(m).padStart(2, '0')}`;
+function trfAddDays(iso, n) { const d = new Date(iso + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
+function trfShiftYear(iso, n) { // same month/day in another year; Feb 29 → Feb 28
+  const [y, m, d] = iso.split('-').map(Number), yy = y + n;
+  const last = new Date(Date.UTC(yy, m, 0)).getUTCDate();
+  return `${yy}-${String(m).padStart(2, '0')}-${String(Math.min(d, last)).padStart(2, '0')}`;
+}
+function trfTodayPT() { return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Los_Angeles', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); }
+function trfLastFullMonth() { const n = new Date(); const d = new Date(n.getFullYear(), n.getMonth() - 1, 1); return { year: d.getFullYear(), month: d.getMonth() + 1 }; }
+
+// ── Load: everything keyed by ASIN so each chart can sum / annotate just its
+// own products. Catalog = the 7 CATALOG SKUs (same set as Brand Momentum);
+// bundle ASINs in the daily report are left out of every chart. Same parsing
+// rules as MiGuard's loader (2026-11-02) for listing changes and OOS.
+function trfLoad() {
+  if (_trf.loading) return _trf.loading;
+  _trf.loading = (async () => {
+    const cfgOf = k => window.SHEET_CFG[k] || {};
+    const get = (fid, gid, what) => fetch(ovCsvUrl(fid || '', gid || '') + `&_cb=${Date.now()}`)
+      .then(r => r.ok ? r.text() : '').catch(e => { console.warn('[Traffic]', what, e.message); return ''; });
+    const [dailyCsv, bizCsv, evCsv, listCsv, oosCsv] = await Promise.all([
+      get(TRF_DAILY.fileId, TRF_DAILY.gid, 'daily business report'),
+      get(cfgOf('SHEET_BUSINESS_REPORT').fileId, cfgOf('SHEET_BUSINESS_REPORT').gid, 'business report'),
+      get('1NNRTRQxQl2r4XivAvH700CC39p49GD2xfZlyRNqahGA', '347530381', 'events tab'), // same Events tab as Events > Strategy
+      get(TRF_LISTING_LOG.fileId, TRF_LISTING_LOG.gid, 'listing change log'),
+      get(TRF_OOS_LOG.fileId, TRF_OOS_LOG.gid, 'out-of-stock log'),
+    ]);
+    const num = v => parseFloat(String(v || '0').replace(/[^0-9.-]/g, '')) || 0;
+    const asins = Object.keys(SS_MOMENTUM_ASIN_MAP);
+    _trf.asins = asins;
+    _trf.nameOf = Object.assign({}, SS_MOMENTUM_ASIN_MAP);
+    _trf.skuOf = {}; _trf.catOf = {};
+    asins.forEach(a => { const sku = SS_MOMENTUM_SKU_BY_ASIN[a] || ''; _trf.skuOf[a] = sku; _trf.catOf[a] = SS_REVIEW_CATEGORY_BY_SKU[sku] || 'Other'; });
+    const add = (map, key, asin, s, u) => { const e = ((map[key] = map[key] || {})[asin] = map[key][asin] || { s: 0, u: 0 }); e.s += s; e.u += u; };
+    // daily: date -> asin -> { s, u }
+    const byDate = {};
+    parseCsvToRows(dailyCsv).forEach(r => {
+      const d = trfNormDate(r.date), a = String(r.asin || '').trim().toUpperCase();
+      if (!d || !a) return;
+      add(byDate, d, a, num(r.sessions), num(r.units_ordered));
+    });
+    // monthly: 'YYYY-MM' -> asin -> { s, u } (Business Report, one row per ASIN per month)
+    const br = {};
+    parseCsvToRows(bizCsv).forEach(r => {
+      const y = Math.round(num(r.year)), m = Math.round(num(r.month)), a = String(r.asin || '').trim().toUpperCase();
+      if (!y || !m || !a) return;
+      add(br, trfYm(y, m), a, num(r.sessions), num(r.units_ordered));
+    });
+    const col = (r, ...names) => { const k = Object.keys(r).find(h => names.includes(h.trim().toLowerCase())); return k ? String(r[k] || '').trim() : ''; };
+    _trf.events = parseCsvToRows(evCsv).map(r => {
+      const start = trfNormDate(col(r, 'start_date', 'start date')), end0 = trfNormDate(col(r, 'end_date', 'end date')) || start;
+      const flag = col(r, 'amazon featured event', 'amazon event').toUpperCase();
+      return { name: col(r, 'event name', 'event'), start, end: end0 < start ? start : end0, amazon: flag ? flag.startsWith('Y') : true };
+    }).filter(e => e.name && e.start).sort((a, b) => a.start.localeCompare(b.start));
+    // Listing changes → asin -> date -> [items] (MiGuard's skip rules: baseline captures + encoding-only diffs)
+    const isMine = r => { const b = (r.brand || '').trim().toLowerCase(); return !b || b === 'skinside-seoul'; };
+    const plain = v => String(v || '').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/gi, ' ').replace(/\s+/g, ' ').trim();
+    const sameText = (a, b) => { const n = v => plain(v).replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, ' ').trim().toLowerCase(); return n(a) === n(b); };
+    _trf.chg = {};
+    parseCsvToRows(listCsv).forEach(r => {
+      if (!isMine(r)) return;
+      const a = String(r.asin || '').trim().toUpperCase(); if (!a) return;
+      const d = trfNormDate(r.date) || trfNormDate(r.logged_at); if (!d) return;
+      if (!plain(r.old_value) || sameText(r.old_value, r.new_value)) return;
+      const byD = _trf.chg[a] = _trf.chg[a] || {};
+      (byD[d] = byD[d] || []).push({ field: trfFieldLabel(r.field), sku: (r.sku || '').trim(), oldV: plain(r.old_value), newV: plain(r.new_value) });
+    });
+    // Out of stock → asin -> { kindOf: date -> 'all'|'fba', runs, sku } (MiGuard's run logic, per ASIN)
+    const todayPT = trfTodayPT();
+    const ps = {};
+    parseCsvToRows(oosCsv).forEach(r => {
+      if (!isMine(r)) return;
+      if ((r.status || '').trim().toLowerCase() === 'closed_discontinued') return;
+      const type = (r.type || '').trim().toLowerCase();
+      if (type !== 'fba' && type !== 'all_inventory') return;
+      const a = String(r.asin || '').trim().toUpperCase(); if (!a) return;
+      const s0 = trfNormDate(r.start_date); if (!s0) return;
+      const e0 = trfNormDate(r.end_date);
+      (ps[a] = ps[a] || { sku: (r.sku || '').trim() || a, list: [] }).list.push({ type, s: s0, e: e0 ? (e0 < s0 ? s0 : e0) : todayPT, open: !e0 });
+    });
+    _trf.oos = {};
+    Object.entries(ps).forEach(([a, o]) => {
+      const kindOf = {};
+      o.list.forEach(pp => { for (let d = pp.s; d <= pp.e; d = trfAddDays(d, 1)) { if (pp.type === 'all_inventory') kindOf[d] = 'all'; else if (!kindOf[d]) kindOf[d] = 'fba'; } });
+      const hasOpen = o.list.some(pp => pp.open), runs = [];
+      let run = null;
+      Object.keys(kindOf).sort().forEach(d => {
+        const k = kindOf[d];
+        if (run && run.kind === k && trfAddDays(run.end, 1) === d) run.end = d;
+        else { run = { sku: o.sku, kind: k, start: d, end: d }; runs.push(run); }
+      });
+      runs.forEach(rn => { rn.ongoing = hasOpen && rn.end === todayPT; });
+      _trf.oos[a] = { kindOf, runs, sku: o.sku };
+    });
+    _trf.daily = { byDate, dates: Object.keys(byDate).sort() };
+    _trf.br = br;
+    return _trf;
+  })();
+  _trf.loading.catch(() => { _trf.loading = null; });
+  return _trf.loading;
+}
+
+window.loadTraffic = async function () {
+  try { await trfLoad(); }
+  catch (err) { ['overall', 'cat', 'prod'].forEach(k => { const n = document.getElementById(`trf-${k}-note`); if (n) n.textContent = 'Error loading traffic data: ' + err.message; }); return; }
+  if (!_trf.view) _trf.view = _trf.daily.dates.length >= 7 ? 'daily' : 'monthly';
+  if (!_trf.asin) _trf.asin = _trf.asins[0];
+  trfRenderControls();
+  trfRenderAll();
+};
+function trfRenderControls() {
+  if (!_trf.daily) return;
+  document.querySelectorAll('#trf-view button').forEach(b => b.classList.toggle('active', b.textContent.toLowerCase() === _trf.view));
+  const win = document.getElementById('trf-window');
+  win.style.display = _trf.view === 'daily' ? '' : 'none';
+  win.querySelectorAll('button').forEach(b => b.classList.toggle('active', Number(b.dataset.days) === _trf.win));
+  const dd = _trf.daily.dates;
+  document.getElementById('trf-source').textContent = _trf.view === 'daily'
+    ? (dd.length ? `Daily: NewDerm Daily Business Report · ${dd.length} day${dd.length === 1 ? '' : 's'} available (${dd[0]} → ${dd[dd.length - 1]}) · dashed = still settling` : 'Daily: no data in the Daily Business Report yet')
+    : 'Monthly: skinside SEOUL Business Report · current year runs through the last full month';
+  ['overall', 'cat', 'prod'].forEach(k => document.querySelectorAll(`#trf-${k}-metric button`).forEach(b => b.classList.toggle('active', b.dataset.metric === _trf.metric[k])));
+  const cats = TRF_CATS.filter(c => _trf.asins.some(a => _trf.catOf[a] === c));
+  document.getElementById('trf-cat-tabs').innerHTML = cats.map(c => `<button class="${c === _trf.cat ? 'active' : ''}" onclick="trfSetCat('${c}')">${trfEsc(c)}</button>`).join('');
+  const sel = document.getElementById('trf-prod-select');
+  if (sel && !sel.dataset.ready) {
+    sel.innerHTML = _trf.asins.map(a => `<option value="${a}">${trfEsc(_trf.nameOf[a])} (${trfEsc(_trf.skuOf[a])})</option>`).join('');
+    sel.dataset.ready = '1';
+  }
+  if (sel) sel.value = _trf.asin;
+}
+window.trfSetView = v => { _trf.view = v; trfRenderControls(); trfRenderAll(); };
+window.trfSetWindow = n => { _trf.win = n; trfRenderControls(); trfRenderAll(); };
+window.trfSetMetric = (k, m) => { _trf.metric[k] = m; trfRenderControls(); trfRender(k); };
+window.trfSetCat = c => { _trf.cat = c; trfRenderControls(); trfRender('cat'); };
+window.trfSetProduct = a => { _trf.asin = a; trfRender('prod'); };
+function trfRenderAll() { ['overall', 'cat', 'prod'].forEach(trfRender); }
+function trfAsinSet(key) {
+  if (key === 'cat') return _trf.asins.filter(a => _trf.catOf[a] === _trf.cat);
+  if (key === 'prod') return _trf.asin ? [_trf.asin] : [];
+  return _trf.asins.slice();
+}
+
+const trfVal = (t, metric) => !t ? null : metric === 'sessions' ? t.s : metric === 'units' ? t.u : (t.s ? t.u / t.s * 100 : null);
+const TRF_METRIC_LABEL = { sessions: 'Sessions', conv: 'Conv Rate', units: 'Units' };
+const trfFmtNum = v => v == null ? '' : Math.abs(v) >= 1000 ? (v / 1000).toFixed(v >= 10000 ? 0 : 1).replace(/\.0$/, '') + 'k' : Math.round(v).toLocaleString();
+const trfFmtPct = v => v == null ? '' : v.toFixed(1) + '%';
+function trfPctChg(a, b, metric) {
+  if (a == null || b == null || !b) return '';
+  if (metric === 'conv') { const d = a - b; return `<b style="color:${d > 0 ? '#1db88a' : d < 0 ? '#db372d' : 'var(--muted)'};">${d > 0 ? '▲ +' : d < 0 ? '▼ ' : ''}${d.toFixed(1)} pts</b>`; }
+  const v = Math.round((a - b) / b * 100); return `<b style="color:${v > 0 ? '#1db88a' : v < 0 ? '#db372d' : 'var(--muted)'};">${v > 0 ? '▲ +' : v < 0 ? '▼ ' : ''}${v}%</b>`;
+}
+function trfEsc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+function trfRender(key) {
+  if (!_trf.daily) return;
+  // This chart's products, and the data / annotations summed over them.
+  const set = trfAsinSet(key), inSet = new Set(set);
+  const sumFor = byAsin => { if (!byAsin) return undefined; let s = 0, u = 0, hit = false; set.forEach(a => { const t = byAsin[a]; if (t) { s += t.s; u += t.u; hit = true; } }); return hit ? { s, u } : undefined; };
+  const brS = ym => sumFor(_trf.br[ym]);
+  const byDateS = {}; _trf.daily.dates.forEach(d => { const t = sumFor(_trf.daily.byDate[d]); if (t) byDateS[d] = t; });
+  const lmap = {}; set.forEach(a => Object.entries(_trf.chg[a] || {}).forEach(([d, items]) => { (lmap[d] = lmap[d] || []).push(...items); }));
+  const listingS = Object.keys(lmap).sort().map(date => ({ date, items: lmap[date] }));
+  const oosDayS = {}, oosRunsS = [];
+  set.forEach(a => { const o = _trf.oos[a]; if (!o) return;
+    Object.entries(o.kindOf).forEach(([d, k]) => { const od = oosDayS[d] = oosDayS[d] || { kind: 'fba', skus: [] }; if (k === 'all') od.kind = 'all'; od.skus.push(o.sku + (k === 'all' ? '' : ' (FBA)')); });
+    oosRunsS.push(...o.runs); });
+  oosRunsS.sort((a, b) => a.start.localeCompare(b.start) || a.sku.localeCompare(b.sku));
+  const multi = set.length > 1;
+  const chartTitle = key === 'overall' ? 'All Products' : key === 'cat' ? _trf.cat : (_trf.nameOf[_trf.asin] || 'Product');
+  const metric = _trf.metric[key];
+  const fmt = metric === 'conv' ? trfFmtPct : trfFmtNum;
+  const fmtBig = v => metric === 'conv' ? fmt(v) : Math.round(v).toLocaleString() + (metric === 'units' ? ' units' : ' sessions');
+  document.getElementById(`trf-${key}-title`).textContent = `${chartTitle} — ${TRF_METRIC_LABEL[metric]}`;
+  const noteEl = document.getElementById(`trf-${key}-note`);
+  let labels = [], datasets = [], note = '', bands = [];
+  // Listing-change pins + out-of-stock strips (2026-11-02): { pins:[{i,c,yr}], oos:[{i,kind,skus|counts,yr}] },
+  // plus the items to list under the chart for the visible range.
+  const annos = { pins: [], oos: [] }, annoList = { listing: [], oos: [] };
+  if (_trf.view === 'monthly') {
+    const now = new Date(), cy = now.getFullYear(), stop = now.getMonth();
+    for (let off = 0; off <= 3; off++) {
+      const yr = cy - off, c = TRF_YOY[off];
+      const arr = TRF_MONTHS.map((_, i) => { if (yr === cy && i + 1 > stop) return null; const t = brS(trfYm(yr, i + 1)); return t && t.s ? trfVal(t, metric) : null; });
+      if (arr.every(v => v == null)) continue;
+      datasets.push({ label: String(yr), data: arr, borderColor: c.border, backgroundColor: c.bg, fill: c.fill, pointRadius: 2, tension: 0.3, borderWidth: 2.5, spanGaps: false });
+    }
+    labels = TRF_MONTHS;
+    (_trf.events || []).forEach(e => {
+      const [y, m0] = e.start.split('-').map(Number), [y1, m1] = e.end.split('-').map(Number);
+      const ds = datasets.find(x => x.label === String(y)); if (!ds) return;
+      const i0 = m0 - 1, i1 = y1 === y ? m1 - 1 : 11;
+      if (ds.data.slice(i0, i1 + 1).every(v => v == null)) return;
+      bands.push({ i0, i1, e, ly: y !== cy, yr: y });
+    });
+    // Monthly: a pin on the month a listing change happened, and a strip
+    // under any month with out-of-stock days (tooltip gives the day count).
+    const dsFor = y => datasets.find(x => x.label === String(y));
+    const hasData = (y, i) => { const ds = dsFor(y); return ds && ds.data[i] != null; };
+    (listingS || []).forEach(c => {
+      const [y, m] = c.date.split('-').map(Number);
+      if (!hasData(y, m - 1)) return;
+      annos.pins.push({ i: m - 1, c, yr: y }); annoList.listing.push(c);
+    });
+    const oosMonth = {};
+    Object.entries(oosDayS || {}).forEach(([d, o]) => { const k = d.slice(0, 7); const e = oosMonth[k] = oosMonth[k] || { all: 0, fba: 0 }; e[o.kind]++; });
+    Object.entries(oosMonth).forEach(([k, n]) => {
+      const [y, m] = k.split('-').map(Number);
+      if (!hasData(y, m - 1)) return;
+      annos.oos.push({ i: m - 1, kind: n.all ? 'all' : 'fba', counts: n, yr: y });
+    });
+    annoList.oos = (oosRunsS || []).filter(r => { const [y, m] = r.start.split('-').map(Number), [y1, m1] = r.end.split('-').map(Number); return hasData(y, m - 1) || hasData(y1, m1 - 1); });
+    const { year, month } = trfLastFullMonth();
+    const pm = month === 1 ? { year: year - 1, month: 12 } : { year, month: month - 1 };
+    const v = trfVal(brS(trfYm(year, month)), metric), vp = trfVal(brS(trfYm(pm.year, pm.month)), metric), vy = trfVal(brS(trfYm(year - 1, month)), metric);
+    const ab = TRF_MONTHS[month - 1];
+    if (v != null) note = [`${ab} ${year}: <b>${fmtBig(v)}</b>`, vp != null ? `${trfPctChg(v, vp, metric)} vs ${TRF_MONTHS[pm.month - 1]}` : '', vy != null ? `${trfPctChg(v, vy, metric)} vs ${ab} ${year - 1}` : ''].filter(Boolean).join(' &nbsp;·&nbsp; ');
+  } else {
+    const all = _trf.daily.dates, byDate = byDateS;
+    if (!all.length) { note = 'No daily data yet — the Daily Business Report is still filling in.'; }
+    else {
+      const end = all[all.length - 1];
+      const start = [trfAddDays(end, -(_trf.win - 1)), all[0]].sort()[1]; // never before the first synced day
+      const days = []; for (let d = start; d <= end; d = trfAddDays(d, 1)) days.push(d);
+      const cur = days.map(d => trfVal(byDate[d], metric));
+      const ly = days.map(d => trfVal(byDate[trfShiftYear(d, -1)], metric));
+      const finalCut = trfAddDays(trfTodayPT(), -TRF_FINAL_AFTER);
+      const firstProv = days.findIndex(d => d > finalCut);
+      labels = days.map(d => { const [y, m, dd] = d.split('-').map(Number); return `${TRF_MONTHS[m - 1]} ${dd}` + (days.length > 120 ? ` '${String(y).slice(2)}` : ''); });
+      datasets = [{ label: 'This year', data: cur, borderColor: TRF_YOY[0].border, backgroundColor: TRF_YOY[0].bg, fill: TRF_YOY[0].fill,
+        pointRadius: days.length > 60 ? 0 : days.length > 30 ? 1.5 : 2.5, tension: 0.25, borderWidth: 2.5, spanGaps: false,
+        segment: { borderDash: ctx => (firstProv >= 0 && ctx.p1DataIndex >= firstProv) ? [5, 4] : undefined } }];
+      const hasLy = ly.some(v => v != null);
+      const span = (a, b) => { const i0 = days.findIndex(d => d >= a), last = days.length - 1 - [...days].reverse().findIndex(d => d <= b);
+        return (i0 < 0 || last >= days.length || last < i0) ? null : [i0, last]; };
+      (_trf.events || []).forEach(e => {
+        const t = span(e.start, e.end); if (t) bands.push({ i0: t[0], i1: t[1], e });
+        if (hasLy) { const l = span(trfShiftYear(e.start, 1), trfShiftYear(e.end, 1)); if (l) bands.push({ i0: l[0], i1: l[1], e, ly: true }); }
+      });
+      // Daily: a pin on each listing-change day, a strip under each out-of-stock day.
+      (listingS || []).forEach(c => { const i = days.indexOf(c.date); if (i >= 0) { annos.pins.push({ i, c }); annoList.listing.push(c); } });
+      days.forEach((d, i) => { const o = (oosDayS || {})[d]; if (o) annos.oos.push({ i, kind: o.kind, skus: o.skus }); });
+      annoList.oos = (oosRunsS || []).filter(r => r.end >= days[0] && r.start <= days[days.length - 1]);
+      if (hasLy) datasets.push({ label: 'Same days last year', data: ly, borderColor: TRF_YOY[1].border, backgroundColor: 'transparent', fill: false, pointRadius: 0, tension: 0.25, borderWidth: 2, spanGaps: false });
+      // This window vs the same number of days just before it (sessions summed; conversion pooled)
+      const pool = arr => { let s = 0, u = 0, n = 0; arr.forEach(d => { const t = byDate[d]; if (t) { s += t.s; u += t.u; n++; } }); return n ? { s, u, n } : null; };
+      const N = days.length;
+      const prevDays = []; for (let i = N; i >= 1; i--) prevDays.push(trfAddDays(days[0], -i));
+      const lw = pool(days), pw = pool(prevDays);
+      const a = trfVal(lw, metric), b = trfVal(pw, metric);
+      const synced = lw ? lw.n : 0;
+      const short = synced < _trf.win ? ` <span style="color:var(--muted);">(${synced} of ${_trf.win} days synced so far)</span>` : '';
+      if (a != null) note = [`Last ${N} days: <b>${fmtBig(a)}</b>${short}`, (b != null && pw.n === N) ? `${trfPctChg(a, b, metric)} vs the ${N} days before` : ''].filter(Boolean).join(' &nbsp;·&nbsp; ');
+    }
+  }
+  noteEl.innerHTML = note || 'No data for this selection yet.';
+
+  const canvas = document.getElementById(`trf-${key}-chart`);
+  if (!canvas || typeof Chart === 'undefined') return;
+  const opts = {
+    responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+    layout: { padding: { top: annos.pins.length ? 22 : 4 } },
+    plugins: {
+      legend: { display: false },
+      trfBands: { bands },
+      trfAnno: annos,
+      tooltip: {
+        backgroundColor: '#fff', borderColor: 'rgba(0,31,96,0.1)', borderWidth: 1, titleColor: '#001F60', bodyColor: '#6B7BA2', footerColor: '#001F60',
+        titleFont: { family: 'DM Sans, sans-serif', size: 11, weight: '600' }, bodyFont: { family: 'DM Sans, sans-serif', size: 11 }, padding: 12, boxWidth: 8, boxHeight: 8,
+        callbacks: {
+          label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}`,
+          footer: items => { const i = items.length ? items[0].dataIndex : -1;
+            const out = bands.filter(b => i >= b.i0 && i <= b.i1).map(b => `🛒 ${b.e.name}${b.yr ? ' ' + b.yr : (b.ly ? ' (last year)' : '')} — ${b.e.amazon ? 'Amazon event' : 'our sale'}`);
+            annos.pins.filter(pn => pn.i === i).forEach(pn => out.push(`✏️ Listing change${pn.yr ? ' ' + TRF_MONTHS[i] + ' ' + pn.yr : ''}: ${[...new Set(pn.c.items.map(x => x.field))].join(', ')}`));
+            annos.oos.filter(o => o.i === i).forEach(o => {
+              if (o.counts) { const parts = []; if (o.counts.all) parts.push(`${o.counts.all} day${o.counts.all === 1 ? '' : 's'} all inventory`); if (o.counts.fba) parts.push(`${o.counts.fba} day${o.counts.fba === 1 ? '' : 's'} FBA only`); out.push(`⛔ Out of stock ${TRF_MONTHS[i]} ${o.yr}: ${parts.join(', ')}`); }
+              else out.push(`⛔ Out of stock — ${o.kind === 'all' ? 'all inventory' : 'FBA only'}${multi ? ' (' + o.skus.join(', ') + ')' : ''}`);
+            });
+            return out; },
+        },
+      },
+    },
+    scales: {
+      x: { border: { display: false }, grid: { display: false }, ticks: { font: { family: 'DM Sans, sans-serif', size: 10 }, color: '#6B7BA2', autoSkip: true, maxTicksLimit: 12 } },
+      y: { beginAtZero: metric !== 'conv', border: { display: false }, grid: { color: 'rgba(0,31,96,0.05)' }, ticks: { font: { family: 'DM Sans, sans-serif', size: 10 }, color: '#6B7BA2', callback: fmt } },
+    },
+  };
+  if (_trf.charts[key]) { _trf.charts[key].data.labels = labels; _trf.charts[key].data.datasets = datasets; _trf.charts[key].options = opts; _trf.charts[key].update(); }
+  else _trf.charts[key] = new Chart(canvas, { type: 'line', data: { labels, datasets }, options: opts, plugins: [TRF_BANDS_PLUGIN, TRF_ANNO_PLUGIN] });
+  window['_traffic_' + key + 'Chart'] = _trf.charts[key];
+  // Legend (same look as VBC's renderYoyLegend)
+  const lg = document.getElementById(`trf-legend-${key}`);
+  if (lg) lg.innerHTML = datasets.map(ds => '<span style="display:inline-flex;align-items:center;gap:6px;margin-left:16px;font-size:13px;font-weight:600;color:var(--navy);white-space:nowrap;"><span style="width:16px;height:3px;border-radius:2px;background:' + ds.borderColor + ';display:inline-block;flex-shrink:0;"></span>' + trfEsc(ds.label) + '</span>').join('')
+    + (annos.pins.length ? `<span class="trf-anno-key"><span class="trf-chg-dot" style="flex:0 0 14px;height:14px;font-size:0;"></span>Listing change</span>` : '')
+    + (annos.oos.length ? `<span class="trf-anno-key"><span style="width:16px;height:6px;border-radius:2px;background:${TRF_ANNO.oosAll};display:inline-block;"></span>Out of stock</span>` : '');
+  // Events list under the chart
+  const mediaEl = document.getElementById(`trf-${key}-media`);
+  if (mediaEl) {
+    const fmtD = iso => { const [y, m, d] = iso.split('-').map(Number); return `${TRF_MONTHS[m - 1]} ${d}, ${y}`; };
+    const fmtR = e => e.start === e.end ? fmtD(e.start) : `${fmtD(e.start).replace(/, \d{4}$/, '')} – ${fmtD(e.end)}`;
+    const seen = new Set(), evs = bands.slice().sort((x, y) => x.i0 - y.i0 || (x.yr || 0) - (y.yr || 0)).filter(b => { const k = b.e.name + b.e.start + (b.ly ? 'L' : ''); if (seen.has(k)) return false; seen.add(k); return true; });
+    const evHtml = evs.length ? `<div class="trf-media-hd">Amazon events &amp; sales</div>` + evs.map(b => `<div class="trf-media-item"><span class="trf-ev-swatch" style="background:${b.e.amazon ? TRF_EVENT_COLORS.amazon : TRF_EVENT_COLORS.ours};opacity:${b.ly ? 0.45 : 0.75};"></span><span><b>${trfEsc(b.e.name)}</b> · ${fmtR(b.e)}${b.ly ? ' <span style="color:var(--muted);">(last year, shown on the same dates)</span>' : ''}</span></div>`).join('') : '';
+    // Listing changes (2026-11-02) — one line per date, before/after behind a toggle.
+    const clip = (v, n) => v.length > n ? v.slice(0, n).trimEnd() + '…' : v;
+    const chgHtml = annoList.listing.length ? `<div class="trf-media-hd">Listing changes</div>` + annoList.listing.map(c => {
+      const fields = [...new Set(c.items.map(x => x.field))];
+      const detail = c.items.map(x => `<div class="trf-chg-field">${trfEsc(x.field)}${multi && x.sku ? ' · ' + trfEsc(x.sku) : ''}</div>`
+        + `<div class="trf-chg-row"><span class="trf-chg-lbl">Before</span><span>${trfEsc(clip(x.oldV, 700))}</span></div>`
+        + `<div class="trf-chg-row new"><span class="trf-chg-lbl">After</span><span>${trfEsc(clip(x.newV, 700)) || '<i>(removed)</i>'}</span></div>`).join('');
+      return `<div class="trf-media-item"><span class="trf-chg-dot">${c.items.length}</span><div style="flex:1;min-width:0;"><b>${fmtD(c.date)}</b> · ${trfEsc(fields.join(', '))}<details class="trf-chg"><summary>Before / after</summary>${detail}</details></div></div>`;
+    }).join('') : '';
+    // Out of stock (2026-11-02)
+    const dayN = (a, b) => Math.round((new Date(b + 'T12:00:00Z') - new Date(a + 'T12:00:00Z')) / 86400000) + 1;
+    const oosHtml = annoList.oos.length ? `<div class="trf-media-hd">Out of stock</div>` + annoList.oos.map(r => {
+      const n = dayN(r.start, r.end);
+      const range = r.ongoing ? `${fmtD(r.start)} → today` : fmtR({ start: r.start, end: r.end });
+      const what = r.kind === 'all' ? 'Out of stock — all inventory' : 'FBA out of stock (other inventory still on hand)';
+      return `<div class="trf-media-item"><span class="trf-oos-swatch" style="background:${r.kind === 'all' ? TRF_ANNO.oosAll : TRF_ANNO.oosFba};"></span><span><b>${range}</b> · ${multi ? trfEsc(r.sku) + ' · ' : ''}${what} · ${n} day${n === 1 ? '' : 's'}${r.ongoing ? ' <span class="oos-pill ongoing" style="margin-left:4px;">Ongoing</span>' : ''}</span></div>`;
+    }).join('') : '';
+    mediaEl.innerHTML = evHtml + chgHtml + oosHtml;
+  }
+}
+// Listing-change pins + out-of-stock strips (2026-11-02). OOS: a light
+// tint over the day plus a solid strip along the bottom of the chart (dark
+// red = all inventory out, light red = FBA only). Listing change: a dashed
+// navy line with a numbered pin above the plot (number = fields changed).
+const TRF_ANNO_PLUGIN = {
+  id: 'trfAnno',
+  beforeDatasetsDraw(chart, _args, opts) {
+    const oos = (opts && opts.oos) || [];
+    if (!oos.length) return;
+    const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+    const step = x.getPixelForValue(1) - x.getPixelForValue(0) || 0;
+    oos.forEach(o => {
+      const x0 = Math.max(left, x.getPixelForValue(o.i) - step / 2), x1 = Math.min(right, x.getPixelForValue(o.i) + step / 2);
+      ctx.save();
+      ctx.fillStyle = o.kind === 'all' ? TRF_ANNO.oosAll : TRF_ANNO.oosFba;
+      ctx.globalAlpha = 0.07; ctx.fillRect(x0, top, Math.max(1, x1 - x0), bottom - top);
+      ctx.globalAlpha = 0.9; ctx.fillRect(x0, bottom - 6, Math.max(2, x1 - x0), 6);
+      ctx.restore();
+    });
+  },
+  afterDatasetsDraw(chart, _args, opts) {
+    const pins = (opts && opts.pins) || [];
+    if (!pins.length) return;
+    const { ctx, chartArea: { top, bottom }, scales: { x } } = chart;
+    const byI = {};
+    pins.forEach(pn => { byI[pn.i] = (byI[pn.i] || 0) + pn.c.items.length; });
+    Object.entries(byI).forEach(([i, n]) => {
+      const px = x.getPixelForValue(Number(i));
+      ctx.save();
+      ctx.strokeStyle = TRF_ANNO.listing; ctx.globalAlpha = 0.5; ctx.lineWidth = 1; ctx.setLineDash([4, 3]);
+      ctx.beginPath(); ctx.moveTo(px, top); ctx.lineTo(px, bottom); ctx.stroke();
+      ctx.globalAlpha = 1; ctx.setLineDash([]);
+      ctx.fillStyle = TRF_ANNO.listing; ctx.beginPath(); ctx.arc(px, top - 10, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = '700 10px DM Sans, sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(n), px, top - 10);
+      ctx.restore();
+    });
+  },
+};
+// Shades each event's days (VBC's TRF_MEDIA_PLUGIN band half).
+const TRF_BANDS_PLUGIN = {
+  id: 'trfBands',
+  beforeDatasetsDraw(chart, _args, opts) {
+    const bands = (opts && opts.bands) || [];
+    if (!bands.length) return;
+    const { ctx, chartArea: { top, bottom, left, right }, scales: { x } } = chart;
+    const step = x.getPixelForValue(1) - x.getPixelForValue(0) || 0;
+    bands.forEach(b => {
+      const x0 = Math.max(left, x.getPixelForValue(b.i0) - step / 2), x1 = Math.min(right, x.getPixelForValue(b.i1) + step / 2);
+      const colr = b.e.amazon ? TRF_EVENT_COLORS.amazon : TRF_EVENT_COLORS.ours;
+      ctx.save();
+      ctx.globalAlpha = b.ly ? 0.08 : 0.16; ctx.fillStyle = colr; ctx.fillRect(x0, top, Math.max(2, x1 - x0), bottom - top);
+      if (b.ly) { ctx.globalAlpha = 0.5; ctx.strokeStyle = colr; ctx.setLineDash([3, 3]); ctx.lineWidth = 1; ctx.strokeRect(x0, top, Math.max(2, x1 - x0), bottom - top); }
+      ctx.restore();
+    });
+  },
 };
 
 /* ══════════════════════ Sales → Brand Momentum ══════════════════════
@@ -23195,6 +23798,69 @@ async function loadAuditResultsFromSheet() {
   function parseAmt(v) { if (!v) return 0; return parseFloat(String(v).replace(/[$,]/g, '')) || 0; }
   function fmtDateStr(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
   function pctChange(curr, prevVal) { if (!prevVal) return null; return Math.round(((curr - prevVal) / prevVal) * 100); }
+  // ── Overview KPI cards — LIVE tag + Projecting line, ported 2026-11-10 from MiGuard ──
+  // ADDED 2026-11-02 per Jaclyn — the KPI cards built only from settled
+  // orders (pending + cancelled excluded by isValidAmazonRow) get the Goal
+  // Tracker's LIVE marker on their label, in both periods, and in Month to
+  // Date a "Projecting" line under the change line. Pending-inclusive /
+  // ad-report cards (Ad Spend, ACOS, Ad-Driven Units, Ad Sales) and the
+  // Pending Orders card itself are left as they were.
+  const OV_LIVE_CARDS = {
+    'ov-kpi-total-sales': 'Total Sales',
+    'ov-kpi-units': 'Total Units Sold',
+    'ov-kpi-orders': 'Total Orders',
+    'ov-kpi-aov': 'Blended AOV',
+    'ov-kpi-organic-orders': 'Organic Units',
+    'ov-kpi-organic-sales': 'Organic Sales',
+  };
+  // Same rules as the Goal Tracker's goalsIsValidAmazonRow / computeAmzCancelRate
+  // (2026-11-02) — duplicated at this scope because those two live inside the
+  // Goal Tracker's own try block and aren't reachable from the KPI cards.
+  function ovPendingInclValid(r) {
+    const status = (r.status || '').toLowerCase().trim();
+    if (status === 'cancelled') return false; // pending IS kept
+    if ((r.promotion_ids || '').toLowerCase().includes('vine')) return false;
+    return true;
+  }
+  // Orders (unique order_id, Vine excluded) cancelled ÷ all orders. With
+  // onlyYear/onlyMonth: that month only. With excludeYear/excludeMonth: every
+  // OTHER month pooled — the historical rate the projections use (an
+  // in-progress month's own rate runs low because its orders haven't had
+  // time to cancel yet).
+  function ovCancelRate(rows, y, m, onlyThatMonth) {
+    const byOrder = new Map();
+    rows.forEach(r => {
+      if ((r.promotion_ids || '').toLowerCase().includes('vine')) return;
+      const d = normalizeDate(r.date);
+      if (!d || !r.order_id) return;
+      const isThat = parseInt(d.substring(0, 4), 10) === y && parseInt(d.substring(5, 7), 10) === m;
+      if (onlyThatMonth ? !isThat : isThat) return;
+      const cancelled = (r.status || '').toLowerCase().trim() === 'cancelled';
+      byOrder.set(r.order_id, cancelled || byOrder.get(r.order_id) === true);
+    });
+    if (!byOrder.size) return null;
+    let c = 0; byOrder.forEach(v => { if (v) c++; });
+    return { rate: c / byOrder.size, orders: byOrder.size, cancelled: c };
+  }
+
+  function setKpiLiveLabel(cardId, text) {
+    const lbl = document.querySelector('#' + cardId + ' .kpi-label');
+    if (lbl) lbl.innerHTML = `${text} &bull; <span class="kpi-live-tag"><span class="gt-live-dot"></span>LIVE</span>`;
+  }
+  function setKpiProjection(cardId, html, title) {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    let el = card.querySelector('.kpi-proj');
+    if (!html) { if (el) el.remove(); return; }
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'kpi-proj';
+      const momEl = card.querySelector('.kpi-mom');
+      if (momEl) momEl.insertAdjacentElement('afterend', el); else card.appendChild(el);
+    }
+    el.innerHTML = html;
+    el.title = title || '';
+  }
 
   function isEvolisRow(row) {
     const brand = (row.brand || '').toLowerCase().trim();
@@ -24122,10 +24788,21 @@ async function loadAuditResultsFromSheet() {
         // one should, since it hasn't been returned).
         const amzGoalsActual = aggregateRange(amzRows, mtdStartStr, mtdEndStr, goalsIsValidAmazonRow).totalRevenue - amzReturnsMtd.totalAmt;
 
-        let amzAdActual = null;
-        if (isCsv(adOrdersCsv)) {
-          const adRowsForGoals = parseCsv(adOrdersCsv).filter(r => parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1);
-          amzAdActual = adRowsForGoals.reduce((s, r) => s + parseAmt(r.sales), 0);
+        // CHANGED 2026-11-10 to match the Medaltus Hub (and MiGuard): ad sales
+        // AND ad units come from the Advertising summary sheet (SP + SB + SD,
+        // SHEET_ADVERTISING — the same sheet the hub reads for this brand),
+        // not the Sponsored-Products-only Ad Orders sheet. Booked, never
+        // cancel-discounted. A month with no row = not available yet.
+        let amzAdActual = null, amzAdUnitsGT = null;
+        if (isCsv(adSummaryCsv)) {
+          const adRowsForGoals = parseCsv(adSummaryCsv).filter(r => {
+            const b = (r.brand || '').trim().toLowerCase();
+            return (!b || b === 'skinside-seoul') && parseInt(r.year, 10) === refDate.getFullYear() && parseInt(r.month, 10) === refDate.getMonth() + 1;
+          });
+          if (adRowsForGoals.length) {
+            amzAdActual = adRowsForGoals.reduce((s, r) => s + parseAmt(r.sales), 0);
+            amzAdUnitsGT = adRowsForGoals.reduce((s, r) => s + (parseInt(String(r.ad_units || '').replace(/[^0-9.-]/g, ''), 10) || 0), 0);
+          }
         }
         const amzOrganicActual = amzAdActual != null ? Math.max(0, amzGoalsActual - amzAdActual) : null;
 
@@ -24205,7 +24882,9 @@ async function loadAuditResultsFromSheet() {
           </svg>`;
         }
 
-        function renderGoalsGroup(actualOverall, actualAds, actualOrganic, goalRow, cancelRate) {
+        function renderGoalsGroup(actualOverall, actualAds, actualOrganic, goalRow, cancelRate, units) {
+          units = units || {};
+          const fmtU = u => u == null ? '' : ` (${Math.round(u).toLocaleString()} unit${Math.round(u) === 1 ? '' : 's'})`;
           if (!goalRow) return `<div style="color:var(--muted);font-size:13px;flex:1;text-align:center;padding:20px;">No goals row found for this month.</div>`;
           // This brand's goals tab (confirmed by Jaclyn): Total Sales Goal =
           // col P (15), Organic Sales Goal = col S (18), Ad Sales Goal = col AB (27).
@@ -24216,33 +24895,49 @@ async function loadAuditResultsFromSheet() {
           const GREEN = '#1db88a', RED = '#db372d';
 
           // Shared math for one gauge — unchanged rules from the previous version.
-          function gaugeState(actual, goal) {
+          // REVISED 2026-11-10 to match the Medaltus Hub (ported from MiGuard's
+          // 2026-11-02 version): `actual` arrives already cancel-adjusted
+          // (settled orders in full + pending × (1 − cancel rate); Ad Sales as
+          // booked), so the MTD projection is a plain run-rate on it — the
+          // cancel rate is no longer applied a second time to the whole total
+          // (that used to discount Ad Sales and shipped orders too). Units are
+          // projected alongside the dollars. Ring fill = actual ÷ goal; color
+          // = projected ÷ goal (MTD) or final result (Last Month).
+          function gaugeState(actual, goal, u) {
             if (goal == null || actual == null) return null;
             const actualPct = goal > 0 ? Math.round((actual / goal) * 100) : 0;
             let projected = actual, onPace, statusText;
             if (period === 'mtd') {
-              // MTD — run-rate projection, discounted by the historical cancel rate.
               const daysInMonth = new Date(refDate.getFullYear(), refDate.getMonth() + 1, 0).getDate();
               const dayOfMonth = new Date().getDate();
-              const rawProjected = dayOfMonth > 0 ? (actual / dayOfMonth) * daysInMonth : actual;
-              projected = cancelRate != null ? rawProjected * (1 - cancelRate) : rawProjected;
+              projected = dayOfMonth > 0 ? (actual / dayOfMonth) * daysInMonth : actual;
               onPace = goal > 0 && projected >= goal;
-              statusText = `Projecting ${fmtD(projected)}`;
+              const uProj = u == null ? null : (dayOfMonth > 0 ? (u / dayOfMonth) * daysInMonth : u);
+              statusText = `Projecting ${fmtD(projected)}${fmtU(uProj)}`;
             } else {
               onPace = actualPct >= 100;
-              statusText = onPace ? 'Hit goal' : 'Missed goal';
+              // Last Month: the actual total reached (green = hit, red = missed), as on the hub.
+              statusText = fmtD(actual) + fmtU(u);
             }
             return { actualPct, onPace, statusText, color: onPace ? GREEN : RED };
           }
-          const cancelLine = () => period === 'mtd'
-            ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px;">${cancelRate != null ? `adj. ${Math.round(cancelRate * 100)}% cancel rate` : 'no cancel-rate history yet'}</div>` : '';
+          // Shown in both periods while anything is still pending (matches the Medaltus Hub card).
+          const cancelLine = () => (units.pendingOrders > 0)
+            ? `<div style="font-size:10.5px;color:var(--muted);margin-top:3px;">${units.pendingOrders} pending · ${cancelRate != null ? `adj. ${(cancelRate * 100).toFixed(1)}%` : 'no cancel-rate history yet'}</div>` : '';
+          // LIVE line (matches the Medaltus Hub cards): sales booked so far this
+          // month — already cancel-adjusted for Total/Organic, Ad as booked.
+          // Month to Date only.
+          function liveLine(actual, u) {
+            if (period !== 'mtd') return '';
+            return `<div class="gt-live"><span class="gt-live-dot"></span>LIVE: <strong>${actual == null ? '—' : fmtD(actual)}</strong>${actual == null || u == null ? '' : fmtU(u)}</div>`;
+          }
 
           // Hero: Total Sales
           // shadedCenter: only the Total Sales ring gets the tinted center (per
           // Jaclyn 2026-10-05); Organic/Ad leave the center unfilled, so it shows
           // the card's own sand background.
-          function bigGauge(label, actual, goal, shadedCenter) {
-            const st = gaugeState(actual, goal);
+          function bigGauge(label, actual, goal, shadedCenter, u) {
+            const st = gaugeState(actual, goal, u);
             const size = 170, stroke = 16;
             if (!st) {
               return `<div style="text-align:center;flex:0 0 auto;min-width:220px;">
@@ -24252,6 +24947,7 @@ async function loadAuditResultsFromSheet() {
                   <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);font-weight:600;">${goal == null ? 'No goal set' : 'Not available yet'}</div>
                 </div>
                 <div style="font-size:14px;color:var(--navy);margin-top:12px;">Goal <strong>${goal == null ? '—' : fmtD(goal)}</strong></div>
+                ${liveLine(actual, u)}
               </div>`;
             }
             // Opaque tints (not transparent) so they read clearly against the sand panel:
@@ -24265,6 +24961,7 @@ async function loadAuditResultsFromSheet() {
               </div>
               <div style="font-size:15px;font-weight:600;color:${st.color};margin-top:12px;">${st.statusText}</div>
               <div style="font-size:15px;color:var(--navy);margin-top:2px;">Goal <strong>${fmtD(goal)}</strong></div>
+              ${liveLine(actual, u)}
               ${cancelLine()}
             </div>`;
           }
@@ -24274,9 +24971,9 @@ async function loadAuditResultsFromSheet() {
           // shaded center behind the % (light red = projecting to miss, light
           // green = on pace), spread evenly across the full panel width.
           return `<div style="display:flex;align-items:flex-start;justify-content:space-around;gap:24px;flex:1;flex-wrap:wrap;width:100%;">
-            ${bigGauge('Total Sales', actualOverall, overallGoal, true)}
-            ${bigGauge('Organic Sales', actualOrganic, organicGoal, false)}
-            ${bigGauge('Ad Sales', actualAds, adsGoal, false)}
+            ${bigGauge('Total Sales', actualOverall, overallGoal, true, units.overall)}
+            ${bigGauge('Organic Sales', actualOrganic, organicGoal, false, units.organic)}
+            ${bigGauge('Ad Sales', actualAds, adsGoal, false, units.ads)}
           </div>`;
         }
 
@@ -24285,7 +24982,24 @@ async function loadAuditResultsFromSheet() {
         // viewed is excluded from the rate (its orders haven't had time to cancel).
         const amzCancelRate = computeAmzCancelRate(amzRows, refDate.getFullYear(), refDate.getMonth() + 1);
         console.log('[GoalTracker][qa] cancel rate (pooled, excl. viewed month):', amzCancelRate);
-        if (goalsBodyAmzEl) goalsBodyAmzEl.innerHTML = renderGoalsGroup(amzGoalsActual, amzAdActual, amzOrganicActual, goalsRowAmz, amzCancelRate);
+        // Cancel-adjusted actuals (2026-11-10, ported from MiGuard's 2026-11-02
+        // version — the Medaltus Hub rule): settled orders count in full; only
+        // PENDING orders are discounted by the historical cancel rate, since
+        // shipped orders can't cancel anymore. Ad Sales / ad units stay as
+        // booked; organic = adjusted total − ad. Rings, LIVE line, Last Month
+        // total and the MTD run-rate projection all use these.
+        const gtKeep = amzCancelRate != null ? 1 - amzCancelRate : 1;
+        const gtSettled = aggregateRange(amzRows, mtdStartStr, mtdEndStr, isValidAmazonRow);
+        const gtBooked = aggregateRange(amzRows, mtdStartStr, mtdEndStr, goalsIsValidAmazonRow);
+        const gtPendRev = Math.max(0, gtBooked.totalRevenue - gtSettled.totalRevenue);
+        const gtPendUnits = Math.max(0, gtBooked.totalUnits - gtSettled.totalUnits);
+        const gtPendOrders = new Set(gtBooked.filteredRows.filter(r => (r.status || '').toLowerCase().trim() === 'pending').map(r => r.order_id).filter(Boolean)).size;
+        const gtAdjTotal = (gtSettled.totalRevenue - amzReturnsMtd.totalAmt) + gtPendRev * gtKeep;
+        const gtAdjOrganic = amzAdActual != null ? Math.max(0, gtAdjTotal - amzAdActual) : null;
+        const gtAdjUnits = Math.max(0, gtSettled.totalUnits - amzReturnsMtd.totalQty) + gtPendUnits * gtKeep;
+        const gtAdjOrgUnits = amzAdUnitsGT != null ? Math.max(0, gtAdjUnits - amzAdUnitsGT) : null;
+        console.log('[GoalTracker][qa] adjusted actuals:', { gtAdjTotal, amzAdActual, gtAdjOrganic, gtAdjUnits, amzAdUnitsGT, gtAdjOrgUnits, gtPendOrders, gtKeep });
+        if (goalsBodyAmzEl) goalsBodyAmzEl.innerHTML = renderGoalsGroup(gtAdjTotal, amzAdActual, gtAdjOrganic, goalsRowAmz, amzCancelRate, { overall: gtAdjUnits, ads: amzAdUnitsGT, organic: gtAdjOrgUnits, pendingOrders: gtPendOrders });
       } catch (err) {
         console.warn('[GoalTracker] failed:', err.message);
         const goalsBodyAmzEl = document.getElementById('ov-goals-body-amz');
@@ -24415,6 +25129,83 @@ async function loadAuditResultsFromSheet() {
       const organicSalesPrev = Math.max(0, prev.revenue - blendedSalesPrev);
       setKpi('ov-kpi-ad-sales', '$' + blendedSales.toLocaleString(undefined, { maximumFractionDigits: 0 }), pctChange(blendedSales, blendedSalesPrev), comparisonSuffixEst);
       setKpi('ov-kpi-organic-sales', '$' + organicSales.toLocaleString(undefined, { maximumFractionDigits: 0 }), pctChange(organicSales, organicSalesPrev), comparisonSuffixEst);
+      // ── LIVE tag + Projecting line (2026-11-10, ported from MiGuard's
+      // 2026-11-02 version — the Medaltus Hub rule) ──
+      // The six cards built from orders get the LIVE marker on their label in
+      // both periods. While the selected month still has pending orders, a
+      // "Projecting" line is added under the change line:
+      //   base     = settled orders in full + pending × (1 − historical cancel rate), net of returns
+      //   MTD      = base ÷ days elapsed × days in month   (Last Month: base, no run-rate)
+      // Organic = base − the Advertising summary's ad units / ad sales for the
+      // month (ad numbers as booked, never discounted). AOV = projected revenue
+      // ÷ projected orders. The % compares to the PRIOR month's full settled total.
+      try {
+        Object.entries(OV_LIVE_CARDS).forEach(([id, text]) => { setKpiLiveLabel(id, text); setKpiProjection(id, ''); });
+        const pyY = refDate.getFullYear(), pyM = refDate.getMonth() + 1;
+        const isPartial = period !== 'lastFull';
+        const pendIds = new Set(amzRows.filter(r => {
+          if ((r.status || '').toLowerCase().trim() !== 'pending') return false;
+          const d = normalizeDate(r.date); return d && d >= mtdStartStr && d <= mtdEndStr;
+        }).map(r => r.order_id).filter(Boolean));
+        if (pendIds.size > 0) {
+          const crHist = ovCancelRate(amzRows, pyY, pyM, false);
+          const keep = crHist ? 1 - crHist.rate : 1;
+          const dim = new Date(pyY, pyM, 0).getDate();
+          const dayNow = now.getDate();
+          const f = isPartial && dayNow > 0 ? dim / dayNow : 1;
+          const pi = aggregateRange(amzRows, mtdStartStr, mtdEndStr, ovPendingInclValid);
+          const st = aggregateRange(amzRows, mtdStartStr, mtdEndStr, isValidAmazonRow);
+          const piRevenue = (st.totalRevenue - amzReturnsMtd.totalAmt) + Math.max(0, pi.totalRevenue - st.totalRevenue) * keep;
+          const piUnits = Math.max(0, st.totalUnits - amzReturnsMtd.totalQty) + Math.max(0, pi.totalUnits - st.totalUnits) * keep;
+          const piOrders = st.totalOrders + Math.max(0, pi.totalOrders - st.totalOrders) * keep;
+          const adMonth = (y, m) => (isCsv(adSummaryCsv) ? parseCsv(adSummaryCsv) : []).filter(r => {
+            const b = (r.brand || '').trim().toLowerCase();
+            return (!b || b === 'skinside-seoul') && parseInt(r.year, 10) === y && parseInt(r.month, 10) === m;
+          });
+          const adU = rows => rows.reduce((s, r) => s + (parseInt(String(r.ad_units || '').replace(/[^0-9.-]/g, ''), 10) || 0), 0);
+          const adS = rows => rows.reduce((s, r) => s + parseAmt(r.sales), 0);
+          const curAd = adMonth(pyY, pyM);
+          const projRevenue = piRevenue * f, projUnits = piUnits * f, projOrders = piOrders * f;
+          const projOrgUnits = Math.max(0, piUnits - adU(curAd)) * f;
+          const projOrgSales = Math.max(0, piRevenue - adS(curAd)) * f;
+          // Prior month, full and settled (pending/cancelled excluded), net of returns.
+          const pmDate = new Date(pyY, pyM - 2, 1);
+          const pmStartStr = fmtDateStr(pmDate), pmEndStr = fmtDateStr(new Date(pmDate.getFullYear(), pmDate.getMonth() + 1, 0));
+          const amzPF = aggregateRange(amzRows, pmStartStr, pmEndStr, isValidAmazonRow);
+          const amzRetPF = aggregateReturnsRange(amzReturnsCsv, pmStartStr, pmEndStr, 'return_date', { useAsinPrice: true });
+          const pfRevenue = amzPF.totalRevenue - amzRetPF.totalAmt;
+          const pfUnits = Math.max(0, amzPF.totalUnits - amzRetPF.totalQty);
+          const pfOrders = amzPF.totalOrders;
+          const pfAov = pfOrders ? pfRevenue / pfOrders : 0;
+          const pfAd = adMonth(pmDate.getFullYear(), pmDate.getMonth() + 1);
+          const pfOrganicUnits = Math.max(0, pfUnits - adU(pfAd));
+          const pfOrganicSales = Math.max(0, pfRevenue - adS(pfAd));
+          const pmAbbr = monthNames[pmDate.getMonth()];
+          const fmtCount = v => Math.round(v).toLocaleString();
+          const fmtUsd0 = v => '$' + Math.round(v).toLocaleString();
+          const fmtUsd2 = v => '$' + v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          const projHtml = (projVal, pfVal, fmt, pctFn) => {
+            const pct = (pctFn || pctChange)(projVal, pfVal);
+            const chg = pct == null ? '' : (() => {
+              const cls = pct === 0 ? 'flat' : pct > 0 ? 'up' : 'dn';
+              const arrow = pct === 0 ? '' : pct > 0 ? '\u25b2 ' : '\u25bc ';
+              return ` <span class="${cls}">(${arrow}${Math.abs(pct)}% vs ${pmAbbr})</span>`;
+            })();
+            return `Projecting ${fmt(projVal)}${chg}`;
+          };
+          const projTitle = `Includes ${pendIds.size} pending order${pendIds.size === 1 ? '' : 's'}`
+            + (isPartial ? `, run-rate to ${dim} days` : '')
+            + (crHist ? `, pending orders discounted by ${(crHist.rate * 100).toFixed(1)}% historical cancel rate` : ', no cancel-rate history yet');
+          setKpiProjection('ov-kpi-total-sales', projHtml(projRevenue, pfRevenue, fmtUsd0), projTitle);
+          setKpiProjection('ov-kpi-units', projHtml(projUnits, pfUnits, fmtCount), projTitle);
+          setKpiProjection('ov-kpi-orders', projHtml(projOrders, pfOrders, fmtCount), projTitle);
+          setKpiProjection('ov-kpi-aov', projHtml(projOrders ? projRevenue / projOrders : 0, pfAov, fmtUsd2, (a, b) => pctChange(Math.round(a * 100), Math.round(b * 100))), projTitle);
+          setKpiProjection('ov-kpi-organic-orders', projHtml(projOrgUnits, pfOrganicUnits, fmtCount), projTitle);
+          setKpiProjection('ov-kpi-organic-sales', projHtml(projOrgSales, pfOrganicSales, fmtUsd0), projTitle);
+          console.log('[Overview][qa] projections:', { pending: pendIds.size, keep, f, projRevenue, projUnits, projOrders, projOrgUnits, projOrgSales, pfRevenue, pfUnits });
+        }
+      } catch (e) { console.warn('[Overview] LIVE/projection lines failed:', e.message); }
+
 
       // -- Trend: trailing 6 COMPLETED months, blended revenue across channels --
       // ROOT CAUSE of the blank chart: these revenue-history sheets use
