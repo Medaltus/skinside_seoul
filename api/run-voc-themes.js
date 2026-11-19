@@ -1,3 +1,5 @@
+// COMBINED skinside SEOUL • PB & Jay repo (2026-11-19): runs for either brand ({ brand: 'skinside-seoul' | 'pbj' });
+// each brand has its own product map below. Skinside's map and behavior are unchanged.
 /**
  * api/run-voc-themes.js
  * GET/POST /api/run-voc-themes
@@ -125,6 +127,46 @@ const SS_REVIEW_PRODUCT_BY_SKU = {
   'SSS0022': 'Coconut Gel Mask',
 };
 
+// PB & Jay (2026-11-19). Values MUST match pbj_index.html's
+// PBJ_REVIEW_PRODUCT_BY_SKU exactly — the Inventory page's VOC Themes card
+// looks themes up by these names. The 13 Purenature sheet-mask SKUs share one
+// group (only the Variety Pack has reviews today). The expired Cleancare
+// Makeup Wipes (PBJ0001–0012) are deliberately absent and skipped — never
+// analyzed, never shown.
+const PBJ_REVIEW_PRODUCT_BY_SKU = {};
+['PBJ0013','PBJ0014','PBJ0015','PBJ0016','PBJ0017','PBJ0018','PBJ0019','PBJ0020','PBJ0021','PBJ0022','PBJ0023','PBJ0024','PBJ0025']
+  .forEach(k => { PBJ_REVIEW_PRODUCT_BY_SKU[k] = 'Purenature Facial Mask'; });
+Object.assign(PBJ_REVIEW_PRODUCT_BY_SKU, {
+  PBJ0026: 'Hydrogel Face Mask',
+  PBJ0027: 'Cleanspot Treatment Patches',
+  PBJ0028: 'Cleanspot Healing Patches',
+  PBJ0029: 'Donut Dots Patches',
+  PBJ0030: 'Fruity Spot Patches',
+  PBJ0031: 'CatchPatch Patches',
+  PBJ0032: 'PawPatch Patches',
+});
+
+// Which product map each brand uses, and whether SKUs missing from it are
+// skipped (PB & Jay — the expired wipes) or grouped as "Uncategorized"
+// (skinside — its behavior before the merge, unchanged).
+const PRODUCT_MAP_BY_BRAND = {
+  'skinside-seoul': { map: SS_REVIEW_PRODUCT_BY_SKU, skipUnmapped: false },
+  pbj:              { map: PBJ_REVIEW_PRODUCT_BY_SKU, skipUnmapped: true },
+};
+
+// Some review dates in the sheet are spreadsheet serial numbers ("46231" =
+// 2026-07-27). Date.parse reads those as the year 46231 — always "recent" —
+// so serials are converted first. Every other format parses as before.
+function reviewTime(r) {
+  const v = String((r && r.date) || '').trim();
+  if (/^\d{5}(\.\d+)?$/.test(v)) return Date.UTC(1899, 11, 30) + parseFloat(v) * 86400000;
+  return Date.parse(v);
+}
+function reviewDateForPrompt(r) {
+  const v = String((r && r.date) || '').trim();
+  return /^\d{5}(\.\d+)?$/.test(v) ? new Date(reviewTime(r)).toISOString().slice(0, 10) : r.date;
+}
+
 // Hard cap on themes returned per product — see file header point 1.
 const MAX_THEMES_PER_PRODUCT = 5;
 
@@ -197,11 +239,13 @@ function baseSku(s) {
 // loadInsightsReviewsVocThemes() reads by (SS_REVIEW_PRODUCT_BY_SKU) —
 // a theme written under any other product key would simply never be
 // found by the VOC Themes card, which reads by this exact name.
-function groupByProduct(reviews) {
+function groupByProduct(reviews, brand) {
+  const cfg = PRODUCT_MAP_BY_BRAND[brand.id] || PRODUCT_MAP_BY_BRAND['skinside-seoul'];
   const byProduct = new Map();
   reviews.forEach(r => {
     const sku = baseSku(r.sku);
-    const product = SS_REVIEW_PRODUCT_BY_SKU[sku] || 'Uncategorized';
+    if (cfg.skipUnmapped && !cfg.map[sku]) return; // e.g. PB & Jay's expired wipes
+    const product = cfg.map[sku] || 'Uncategorized';
     if (!byProduct.has(product)) byProduct.set(product, []);
     byProduct.get(product).push(r);
   });
@@ -213,7 +257,7 @@ function splitRecentVsOlder(productReviews) {
   const cutoff = now - RECENT_WINDOW_DAYS * MS_PER_DAY;
   const recent = [], older = [];
   productReviews.forEach(r => {
-    const t = Date.parse(r.date);
+    const t = reviewTime(r);
     if (!isNaN(t) && t >= cutoff) recent.push(r);
     else older.push(r);
   });
@@ -244,7 +288,7 @@ function trimReviewForPrompt(r) {
   // a product with many reviews, and avoids sending reviewer PII (name)
   // that has no bearing on theme extraction.
   return {
-    date: r.date,
+    date: reviewDateForPrompt(r),
     rating: r.star_rating,
     title: (r.review_title || '').slice(0, 200),
     text: (r.review_text || '').slice(0, 600),
@@ -274,7 +318,7 @@ async function runVocThemesForBrand(brand, apiKey) {
   ]);
   console.log(`[run-voc-themes] ${brand.id} — reviewRows:${reviewRows.length} themeHistoryRows:${themeHistoryRows.length}`);
 
-  const byProduct = groupByProduct(reviewRows);
+  const byProduct = groupByProduct(reviewRows, brand);
   const today = new Date().toISOString().slice(0, 10);
   const results = [];
 
