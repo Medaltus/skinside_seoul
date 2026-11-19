@@ -25554,7 +25554,26 @@ window.addEventListener('load', async () => {
     if (!window.Clerk) return; // Clerk script failed to load — stay on safe default
     await window.Clerk.load();
     const user = window.Clerk.user;
-    if (!user) return; // not signed in — safe default (internal hidden)
+    if (!user) {
+      // Not signed in (2026-11-19): show a Sign in button where the user button goes, so a
+      // signed-out visitor can see their state and sign in without leaving the page. Opens
+      // Clerk's sign-in over the dashboard; afterwards the page reloads and the checks
+      // below run. Falls back to the Medaltus sign-in page if the modal isn't available.
+      const signInEl = document.getElementById('clerk-user');
+      if (signInEl) {
+        signInEl.innerHTML = `<button class="topbar-user-btn" id="clerk-signin-btn" style="padding:6px 14px;">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 2h3a1 1 0 011 1v10a1 1 0 01-1 1h-3M5 11l-3-3 3-3M2 8h8"/></svg>
+            <span>Sign in</span></button>`;
+        document.getElementById('clerk-signin-btn').addEventListener('click', () => {
+          try {
+            if (typeof window.Clerk.openSignIn === 'function') window.Clerk.openSignIn({ forceRedirectUrl: window.location.href, fallbackRedirectUrl: window.location.href });
+            else window.location.href = 'https://reports.medaltus.com';
+          } catch (e) { window.location.href = 'https://reports.medaltus.com'; }
+        });
+      }
+      console.log('[Clerk] not signed in on this page — Internal pages hidden; Sign in button shown');
+      return; // safe default (internal hidden)
+    }
 
     // Signed-in user button + Sign out — ported from Just Bjorn 2026-11-19. Shown to
     // anyone signed in; the org check below still decides the Internal pages.
