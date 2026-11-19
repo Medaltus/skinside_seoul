@@ -1,68 +1,39 @@
 /**
- * api/write-report-insights.js
+ * api/write-report-insights.js  (combined repo — brands 'skinside-seoul' and 'pbj'; tabs '{brand}' / '{brand}_events')
+ * 2026-11-19: MONTHLY_HEADERS below verified column-for-column against BOTH live tabs
+ * (skinside-seoul gid 476216380 and pbj gid 595060543 — 58 identical columns, same order).
  * POST /api/write-report-insights
  *
- * Skinside Seoul backend for the internal dashboard's editable report
- * content (Executive Summary, Amazon Key Insight, What's Been Accomplished
- * cards + images, Opportunity cards, and the per-event summaries on the
- * Events pages). Adapted from Évolis's own write-report-insights.js — same
- * file name, same POST contract, same upsert/approval behavior. All of
- * Évolis's original design notes still apply unchanged:
- *   - No staging/live workflow on individual content blocks — Edit, add
- *     content, Save. One "Approved & Ready" button per scope (once on
- *     the Sales Overview tab for the monthly row, once per event tab).
- *   - Multiple months/events can sit at status=Approved simultaneously —
- *     whatever (not-yet-built) view consumes this is responsible for
- *     picking the most recent Approved row.
- *   - UPSERTS, never blind-appends — reads existing rows, finds the
- *     matching key, merges in only the fields provided, writes the full
- *     set back.
- *   - Any content save reverts an already-Approved row back to Draft;
- *     only action:'approve' sets Approved. Deliberate — an edit after
- *     approval shouldn't silently stay live without a fresh review.
+ * Backend for the internal dashboard's editable report content (Executive
+ * Summary, Amazon/Website/Walmart Key Insights, Opportunity and Accomplished cards, and the
+ * per-event summaries on the Events page). Reads/writes SHEET_REPORT_INSIGHTS,
+ * one pair of tabs per brand:
+ *   {brand}         — one row per month.  Exec Summary, 3 Key Insights,
+ *                     4 Opportunity and 4 Accomplished card slots, plus status/approval.
+ *   {brand}_events  — one row per (event_name, event_year). Per-event
+ *                     summary title/body, plus its own status/approval.
  *
- * Reads/writes the shared "Report Insights" spreadsheet — the SAME
- * spreadsheet Évolis, Skinuva, Just Bjorn, and Cosmette already use, just
- * one more tab pair. UNCONFIRMED for this brand — I don't have a verified
- * tab name/gid for skinside-seoul on that shared sheet (unlike the Dazzle
- * Dry / Vivian Valenty Skincare example this was adapted from, which had
- * a live-checked confirmation). Needs the same read-only check before
- * this is trusted: confirm a "skinside-seoul" (or however it's actually
- * named) tab and "skinside-seoul_events" tab exist, no data rows yet.
+ * Per Jaclyn 2026-07-17/18:
+ * - No staging/live workflow on individual content blocks — just Edit, add
+ *   content, Save. The only approval gate is a single "Approved & Ready"
+ *   button per scope (once on the Sales Overview tab for the monthly row,
+ *   once per event tab for that event's row).
+ * - Multiple months/events can sit at status=Approved simultaneously — the
+ *   (not-yet-built) external dashboard is responsible for picking the most
+ *   recent Approved row for whatever it's displaying.
+ * - This endpoint UPSERTS — every save reads the existing rows for that
+ *   brand tab, finds the matching key (year+month, or event_name+event_year),
+ *   merges in only the fields provided, and writes the full set back. It
+ *   does NOT blind-append, since the same month/event gets edited repeatedly
+ *   before it's ever approved.
+ * - ASSUMPTION (flag if wrong): saving any field via action:'save' resets
+ *   status back to 'Draft', even if that row was previously Approved. This
+ *   is deliberate — an edit after approval shouldn't silently stay live
+ *   without a fresh review. Only action:'approve' sets status to 'Approved'.
  *
- * MONTHLY_HEADERS below is NOT "Évolis's 26 columns + this brand's own
- * addition at the end" the way the first version of this file was —
- * that was wrong. FIXED 2026-09-04: Jaclyn's actual physical sheet has
- * category_key_insight and opp5/opp6 columns too (copied from the same
- * Dazzle Dry / Vivian Valenty Skincare reference this whole file was
- * adapted from, even though Skinside Seoul's dashboard doesn't have UI
- * for those fields yet). Since replaceRows() writes positionally against
- * this array, having a shorter schema than the real sheet meant every
- * field from accomplished1_title onward was landing 2 columns off from
- * where it actually belongs — exactly why saved Accomplished content
- * never showed up on load. The array below now matches the real sheet's
- * column order exactly, confirmed against Jaclyn's own header list. A
- * new field ALWAYS goes at the end and ALWAYS gets added to the real
- * sheet's header row at the same time, or this breaks again the same way.
- *
- * ⚠ ASSUMES config/_sheets_client.js (ensureTab/readRows/replaceRows,
- * same (sheetId, tabName, headers, rows, token) signature already
- * established elsewhere in this codebase) and config/sheets.js already
- * exist in this project, matching Évolis's. If either doesn't exist yet,
- * say so and I'll build a self-contained version that talks to the
- * Google Sheets API directly instead — no shared config needed.
- *
- * config/brands.js needs one new entry (exact tabName match required —
- * confirm the real tab name first, per the note above):
- *   { id: 'skinside-seoul', name: 'Skinside Seoul', tabName: 'skinside-seoul', active: true }
- * I don't have visibility into this brand's config/brands.js itself, so
- * if it already has a different id or tabName reserved, use that instead
- * — the dashboard's REPORT_BRAND_ID constant needs to match exactly or
- * every save 400s.
- *
- * POST body (unchanged from Évolis):
- *   Monthly: { brand, scope:'monthly', year, month, fields:{...}, action:'save'|'approve', actor }
- *   Event:   { brand, scope:'event', eventName, eventYear, fields:{...}, action:'save'|'approve', actor }
+ * POST body:
+ *   Monthly: { brand, scope:'monthly', year, month, fields:{...}, action:'save'|'approve' }
+ *   Event:   { brand, scope:'event', eventName, eventYear, fields:{...}, action:'save'|'approve' }
  *   fields is optional on action:'approve' (approving doesn't require new content).
  */
 
@@ -70,42 +41,48 @@ const { ensureTab, readRows, replaceRows } = require('./config/_sheets_client');
 const sheets = require('./config/sheets');
 const brands = require('./config/brands');
 
+// PB & Jay — EXACT physical column order of the {brand} tab, per Jaclyn
+// 2026-10-06. replaceRows() writes values POSITIONALLY under the existing
+// header row and readRows() keys by that header row, so this array must
+// match the sheet column-for-column (A..BF, 58 columns). New columns only
+// ever get appended at the END — never inserted — or every existing row's
+// data shifts into the wrong columns on the next save.
+//
+// Accomplished cards use the sheet's own accomplished{n}_* names (the PB &
+// Jay dashboard reads/writes those same names). The older acc{n}_* names
+// are still accepted on input via FIELD_ALIASES below, so a dashboard
+// still sending acc1_title etc. lands in the right column instead of being
+// silently dropped.
 const MONTHLY_HEADERS = [
-  // ── Évolis's original 26 columns — exact existing order, unchanged ──
-  'year', 'month',
-  'exec_summary_title', 'exec_summary_left', 'exec_summary_right',
-  'amazon_key_insight', 'website_key_insight', 'walmart_key_insight',
-  'opp1_title', 'opp1_subtitle', 'opp1_body',
-  'opp2_title', 'opp2_subtitle', 'opp2_body',
-  'opp3_title', 'opp3_subtitle', 'opp3_body',
-  'opp4_title', 'opp4_subtitle', 'opp4_body',
-  'status', 'approved_by', 'approved_at', 'last_updated', 'last_updated_by',
-  'ad_impressions_note',
-
-  // ── Confirmed present on the real physical sheet (2026-09-04, from
-  // Jaclyn's own header list) — this dashboard doesn't currently read/
-  // write category_key_insight or opp5/opp6, but the columns exist on
-  // the sheet and everything after them has to count them to land in
-  // the right position. Do not remove just because nothing uses them
-  // yet. ──
-  'category_key_insight',
-
+  'year', 'month', 'exec_summary_title',
+  'exec_summary_left', 'exec_summary_right', 'amazon_key_insight',
+  'website_key_insight', 'walmart_key_insight', 'opp1_title',
+  'opp1_subtitle', 'opp1_body', 'opp2_title',
+  'opp2_subtitle', 'opp2_body', 'opp3_title',
+  'opp3_subtitle', 'opp3_body', 'opp4_title',
+  'opp4_subtitle', 'opp4_body', 'status',
+  'approved_by', 'approved_at', 'last_updated',
+  'last_updated_by', 'ad_impressions_note', 'category_key_insight',
   'accomplished1_title', 'accomplished1_subtitle', 'accomplished1_body',
   'accomplished1_image1', 'accomplished1_image2', 'accomplished1_image3',
   'accomplished2_title', 'accomplished2_subtitle', 'accomplished2_body',
-  'accomplished2_image1', 'accomplished2_image2',
-  'accomplished3_title', 'accomplished3_subtitle', 'accomplished3_body',
-  'accomplished4_title', 'accomplished4_subtitle', 'accomplished4_body',
-
-  'opp5_title', 'opp5_subtitle', 'opp5_body',
-  'opp6_title', 'opp6_subtitle', 'opp6_body',
-
-  // Added 2026-10-05 — the sheet gained 6 image slots for Accomplished 1 and 2.
-  // Appended in the sheet's own column order; without these, Save silently
-  // dropped images 4-6 (card 1) and 3-6 (card 2).
-  'accomplished1_image4', 'accomplished1_image5', 'accomplished1_image6',
-  'accomplished2_image3', 'accomplished2_image4', 'accomplished2_image5', 'accomplished2_image6',
+  'accomplished2_image1', 'accomplished2_image2', 'accomplished3_title',
+  'accomplished3_subtitle', 'accomplished3_body', 'accomplished4_title',
+  'accomplished4_subtitle', 'accomplished4_body', 'opp5_title',
+  'opp5_subtitle', 'opp5_body', 'opp6_title',
+  'opp6_subtitle', 'opp6_body', 'accomplished1_image4',
+  'accomplished1_image5', 'accomplished1_image6', 'accomplished2_image3',
+  'accomplished2_image4', 'accomplished2_image5', 'accomplished2_image6',
+  'subscriptions_key_insight', // column BF — added to the sheet by Jaclyn 2026-10-07
 ];
+
+// acc{n}_* (older dashboards) -> accomplished{n}_* (this sheet's real columns).
+const FIELD_ALIASES = {};
+[1, 2, 3, 4].forEach(n => {
+  ['title', 'subtitle', 'body', 'image1', 'image2', 'image3', 'image4', 'image5', 'image6'].forEach(f => {
+    FIELD_ALIASES[`acc${n}_${f}`] = `accomplished${n}_${f}`;
+  });
+});
 
 const EVENT_HEADERS = [
   'event_name', 'event_year',
@@ -138,9 +115,9 @@ module.exports = async function handler(req, res) {
       const monthStr = String(month ?? '').trim();
       if (!yearStr || !monthStr) return res.status(400).json({ error: 'year and month are required for scope=monthly' });
       // Extra sanity check: month should be a real 1-12 value. Catches
-      // anything that survived the trim (e.g. a non-numeric string)
-      // before it gets written to the sheet, rather than silently
-      // upserting a row keyed on garbage.
+      // anything that survived the trim (e.g. a non-numeric string) before
+      // it gets written to the sheet, rather than silently upserting a
+      // row keyed on garbage.
       const monthNum = Number(monthStr);
       if (!Number.isInteger(monthNum) || monthNum < 1 || monthNum > 12) {
         return res.status(400).json({ error: `month must be an integer 1-12, got '${month}'` });
@@ -187,9 +164,15 @@ async function upsertRow({ tabName, headers, matchFields, fields, action, actor 
   }
 
   if (fields) {
+    const dropped = [];
     Object.entries(fields).forEach(([k, v]) => {
-      if (headers.includes(k)) row[k] = v == null ? '' : String(v);
+      const key = headers.includes(k) ? k : (FIELD_ALIASES[k] && headers.includes(FIELD_ALIASES[k]) ? FIELD_ALIASES[k] : null);
+      if (key) row[key] = v == null ? '' : String(v);
+      else dropped.push(k);
     });
+    // Unknown field names used to vanish silently — log them so a header
+    // mismatch shows up in the Vercel logs instead of as "Save worked but nothing changed."
+    if (dropped.length) console.warn(`[write-report-insights] ${tabName}: ignored unknown field(s): ${dropped.join(', ')}`);
   }
 
   const nowIso = new Date().toISOString();
@@ -198,9 +181,8 @@ async function upsertRow({ tabName, headers, matchFields, fields, action, actor 
     row.approved_by = actor || '';
     row.approved_at = nowIso;
   } else {
-    // Any content save reverts an already-approved row to Draft — see
-    // the ASSUMPTION note in the file header. Approving is a separate,
-    // explicit action.
+    // Any content save reverts an already-approved row to Draft — see the
+    // ASSUMPTION note in the file header. Approving is a separate, explicit action.
     row.status = row.status === 'Approved' ? 'Draft' : (row.status || 'Draft');
   }
   row.last_updated = nowIso;
