@@ -5197,6 +5197,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 // Loads /pbj_index.html once into #pbj-frame, then calls PB & Jay's own
 // showPage() inside it with PB & Jay's matching nav button (its showPage
 // needs one). Same origin, so the frame shares the Clerk sign-in.
+const PBJ_FRAME_VERSION = '2026-11-19b';
 window.showPbjPage = function (pid, btn) {
   showPage('pbj', btn);
   const tb = document.getElementById('global-topbar'); if (tb) tb.style.display = 'none'; // PB & Jay's own top bar (incl. its PDF export) shows inside the frame
@@ -5214,7 +5215,7 @@ window.showPbjPage = function (pid, btn) {
   if (!fr.dataset.loading) {
     fr.dataset.loading = '1';
     fr.addEventListener('load', () => { fr.dataset.loaded = '1'; go(fr.dataset.want); }, { once: true });
-    fr.src = '/pbj_index.html?embed=1';
+    fr.src = '/pbj_index.html?embed=1&v=' + PBJ_FRAME_VERSION; // bump on every pbj_index.html deploy so browsers never keep an old copy
   }
 };
 
@@ -25603,13 +25604,40 @@ window.addEventListener('load', async () => {
     }
 
 
-    let hasAccess = false;
-    for (let page = 1; page <= 20 && !hasAccess; page++) {
-      const res = await window.Clerk.user.getOrganizationMemberships({ initialPage: page, pageSize: 100 });
-      const rows = (res && res.data) || [];
-      hasAccess = rows.some(m => m.organization && m.organization.id === SKINSIDE_ORG_ID);
-      if (rows.length < 100) break;
+    // HARDENED 2026-11-19 — accounts in 10+ Clerk orgs (e.g. hello@medaltus.com).
+    // Clerk returns memberships a page at a time; skinside SEOUL's org can sit past
+    // the first page. Three tries, each fully paged, and a console line saying
+    // exactly what was checked:
+    //   1. pages of 100        2. pages of 10 (if Clerk rejects 100)
+    //   3. the membership list Clerk already loaded with the session
+    // Previously a single rejected call threw straight to "internal hidden".
+    const ssOrgMatch = m => m && m.organization && m.organization.id === SKINSIDE_ORG_ID;
+    async function ssScanMemberships(pageSize) {
+      let seen = 0;
+      for (let page = 1; page <= 50; page++) {
+        const res = await window.Clerk.user.getOrganizationMemberships({ initialPage: page, pageSize });
+        const rows = (res && res.data) || [];
+        seen += rows.length;
+        if (rows.some(ssOrgMatch)) return { found: true, seen };
+        if (rows.length < pageSize) break;
+      }
+      return { found: false, seen };
     }
+    let hasAccess = false, how = '';
+    for (const size of [100, 10]) {
+      try {
+        const r = await ssScanMemberships(size);
+        how = `checked ${r.seen} org membership(s) in pages of ${size}`;
+        if (r.found) { hasAccess = true; break; }
+        // not found → always retry in pages of 10 too: Clerk may cap a page at 10
+        // without saying so, which would make the 100-at-a-time scan stop early.
+      } catch (e) { console.warn(`[Clerk] membership lookup (pages of ${size}) failed:`, e && e.message); }
+    }
+    if (!hasAccess) {
+      const pre = (window.Clerk.user && window.Clerk.user.organizationMemberships) || [];
+      if (pre.some(ssOrgMatch)) { hasAccess = true; how = `found in the session's own membership list (${pre.length})`; }
+    }
+    console.log(`[Clerk] ${user.primaryEmailAddress?.emailAddress || 'user'} — skinside SEOUL org ${hasAccess ? 'FOUND' : 'NOT found'} (${how || 'no membership data returned'}) → Internal pages ${hasAccess ? 'shown' : 'hidden'}`);
 
     if (hasAccess) {
       const internalNav = document.getElementById('nav-internal-section');
