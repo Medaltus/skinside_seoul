@@ -1,3 +1,4 @@
+// COMBINED skinside SEOUL • PB & Jay repo (2026-11-19): serves both brands; per-brand bits are keyed by brand.id.
 /**
  * api/run-ppc-strategy-analysis.js
  * POST /api/run-ppc-strategy-analysis
@@ -181,6 +182,18 @@
 const { readRows, ensureTab, appendRows, replaceRows, getSheetsToken } = require('./config/_sheets_client');
 const sheets = require('./config/sheets');
 const brands = require('./config/brands');
+// Per-brand example sentences for the PPC prompt (combined repo, 2026-11-19) — each brand keeps
+// exactly the examples its own file used before the merge.
+const PPC_PROMPT_EXAMPLES = {
+  'skinside-seoul': `"PPC on 'snail mucin serum' + 'snail mucin essence' + '96 snail mucin' — 96% Snail Mucin Essence converts at 18.4% but only sees 140 sessions. At current conversion, adding 250 incremental sessions = +46 units/month = +$920 revenue."
+"Do not scale PPC on Vitamin C Serum until Bullet 1 is rewritten. Spending more money to send 900+ monthly visitors to a listing that converts at 2.8% is burning budget."
+"Spicule Serum had 12 sessions and 0 units last month. This product has no organic rank signal on any keyword. Zero revenue means zero organic velocity."`,
+  pbj: `"PPC on 'hair growth serum' + 'scalp serum' + 'scalp treatment' — Reverse converts at 22.95% but only sees 122 sessions. At current conversion, adding 300 incremental sessions = +68 units/month = +$3,399 revenue."
+"Do not scale PPC on Promote until Bullet 1 is rewritten. Spending more money to send 1,125+ monthly visitors to a listing that converts at 3.2% is burning budget."
+"Prevent had 15 sessions and 0 units in April. This product has no organic rank signal on any keyword. Zero revenue means zero organic velocity."`,
+};
+const PPC_QUOTE_EXAMPLE = { 'skinside-seoul': 'snail mucin serum', pbj: 'hair growth serum' };
+
 
 // Same sheet already used for the per-keyword tracker elsewhere in this
 // project (run-analysis.js, and the dashboard's own live BSR/keyword
@@ -468,7 +481,10 @@ function applyBundleOosOverrides(bySkuMap, bundleComponentsBySku) {
 const BRAND_DESCRIPTIONS = {
   evolis:  'évolis (EVO) — a clinically tested hair growth brand using FGF5-inhibiting botanicals',
   skinuva: 'Skinuva (SVA) — a scar, bruise, and skin recovery brand',
+  cosmette: 'Cosmette Skincare (COS) — an Amazon-only skincare brand', // ADDED for Cosmette
+  'just-bjorn': 'Just Bjorn (JBJ) — a marine collagen peptides supplement brand', // ADDED for Just Bjorn 2026-08-26
   'skinside-seoul': 'Skinside Seoul (SSS) — a Korean-inspired (K-beauty) skincare brand built around a signature four-molecule Cica complex',
+  pbj: 'PB & Jay (PBJ) — a Korean skincare brand selling on Amazon and Walmart: Purenature sheet face masks, a hydrogel face mask, and PawPatch / Fruity Spot / Donut Dots / Cleanspot hydrocolloid blemish patches. The Cleancare makeup remover wipes (PBJ0001–PBJ0012) expired and are being phased out as of August 2026 — never recommend promoting, advertising or optimizing them.', // ADDED for PB & Jay 2026-10-09
   default: 'a Medaltus brand',
 };
 
@@ -480,6 +496,22 @@ const BRAND_DESCRIPTIONS = {
 function findField(row, candidates) {
   for (const c of candidates) {
     if (row[c] !== undefined && row[c] !== null && row[c] !== '') return row[c];
+  }
+  // FALLBACK — added 2026-09-04 per Jaclyn: readRows() builds each row's
+  // keys from the sheet's raw header cells with zero trimming or case
+  // normalization (confirmed directly in _sheets_client.js), so a single
+  // stray trailing space or a casing drift on a header cell would make
+  // every one of the exact-match candidates above silently fail, and
+  // this would return null — which callers then treat as "0 sessions" /
+  // "0 units" rather than "couldn't find this column." This does one
+  // more pass, trimmed and lowercased on both sides, before giving up for
+  // real.
+  const normalizedCandidates = candidates.map(c => c.trim().toLowerCase());
+  for (const key of Object.keys(row)) {
+    const normalizedKey = key.trim().toLowerCase();
+    if (normalizedCandidates.includes(normalizedKey) && row[key] !== undefined && row[key] !== null && row[key] !== '') {
+      return row[key];
+    }
   }
   return null;
 }
@@ -654,6 +686,19 @@ function buildSkuSnapshots(kwRows, bizRowsFull, sqpRows, ppcByAsin, oosMaps, cro
     const bizRow = bizEntry ? bizEntry.row : null;
     const asin = bizRow ? (findField(bizRow, BIZ_FIELD_CANDIDATES.asin) || '').toString().trim().toUpperCase() : '';
 
+    // DIAGNOSTIC — added 2026-09-04 per Jaclyn: the Strategy by Product page
+    // was showing "0 sessions, 0 units" for several SKUs that the real
+    // Business Report sheet shows real, non-zero traffic for. Rather than
+    // guess at a fix sight-unseen, this logs exactly what row (if any) was
+    // matched for this SKU and every raw header key on it, so the next
+    // real run's Vercel logs show definitively whether this is a SKU-
+    // matching miss (bizRow null), a header-name mismatch (bizRow exists
+    // but sessions/units come back null), or something else entirely
+    // (bizRow has real sessions/units already, meaning the bug is
+    // downstream of this function, not here).
+    console.log(`[run-ppc-strategy-analysis][qa] SKU ${sku} — bizRow found: ${!!bizRow}` +
+      (bizRow ? ` — raw header keys: ${Object.keys(bizRow).join(' | ')} — sortKey used: ${bizEntry._sortKey}` : ' — this SKU has no matching row in the Business Report sheet at all'));
+
     const topKeywords = (kwBySku.get(sku) || [])
       .filter(r => r.keyword)
       .map(r => ({
@@ -669,6 +714,12 @@ function buildSkuSnapshots(kwRows, bizRowsFull, sqpRows, ppcByAsin, oosMaps, cro
 
     const sessions = bizRow ? parseNumericCell(findField(bizRow, BIZ_FIELD_CANDIDATES.sessions)) : null;
     const units = bizRow ? parseNumericCell(findField(bizRow, BIZ_FIELD_CANDIDATES.units)) : null;
+    // DIAGNOSTIC (cont'd) — the resolved values themselves, so a header-
+    // name mismatch (raw value found but not parsed) is distinguishable
+    // from a genuine "column not found at all" case.
+    if (bizRow) {
+      console.log(`[run-ppc-strategy-analysis][qa] SKU ${sku} — raw SESSIONS candidate value: ${JSON.stringify(findField(bizRow, BIZ_FIELD_CANDIDATES.sessions))} -> parsed: ${sessions} — raw UNITS candidate value: ${JSON.stringify(findField(bizRow, BIZ_FIELD_CANDIDATES.units))} -> parsed: ${units}`);
+    }
     const revenue = bizRow ? parseNumericCell(findField(bizRow, BIZ_FIELD_CANDIDATES.revenue)) : null;
     const conversionPct = bizRow ? parseConversionPct(findField(bizRow, BIZ_FIELD_CANDIDATES.conversion)) : null;
 
@@ -790,9 +841,7 @@ CRITICAL: Respond with a single valid JSON object only. No markdown fences, no p
 
   const userPrompt = `For each SKU below, write a PPC strategy recommendation in the same tone as these real examples:
 
-"PPC on 'snail mucin serum' + 'snail mucin essence' + '96 snail mucin' — 96% Snail Mucin Essence converts at 18.4% but only sees 140 sessions. At current conversion, adding 250 incremental sessions = +46 units/month = +$920 revenue."
-"Do not scale PPC on Vitamin C Serum until Bullet 1 is rewritten. Spending more money to send 900+ monthly visitors to a listing that converts at 2.8% is burning budget."
-"Spicule Serum had 12 sessions and 0 units last month. This product has no organic rank signal on any keyword. Zero revenue means zero organic velocity."
+${PPC_PROMPT_EXAMPLES[brand.id] || PPC_PROMPT_EXAMPLES.pbj}
 
 Return ONLY this JSON structure:
 {"<SKU>":{"headline":"string","recommended_bullets":[{"priority":"HIGH|MED|LOW","text":"string"}],"suggested_exact_match_targets":["string"]}}
@@ -808,7 +857,7 @@ Rules:
 - suggested_exact_match_targets: 3-7 keyword strings pulled ONLY from that SKU's own top_keywords list — do not invent keywords. (Empty for an out-of-stock SKU — see above.)
 - Do not mention wasted_spend_terms in prose — that's rendered separately by the dashboard from the same data you're seeing here, no need to restate it.
 - No apostrophes in string values — use "does not" not "doesn't".
-- NEVER use a double-quote character anywhere inside a string value, including around keyword phrases — your entire response must itself be valid JSON, and an un-escaped double quote inside a JSON string breaks the whole response. Use single quotes for any quoted phrase instead (e.g. write 'snail mucin serum', never "snail mucin serum").
+- NEVER use a double-quote character anywhere inside a string value, including around keyword phrases — your entire response must itself be valid JSON, and an un-escaped double quote inside a JSON string breaks the whole response. Use single quotes for any quoted phrase instead (e.g. write '${PPC_QUOTE_EXAMPLE[brand.id] || PPC_QUOTE_EXAMPLE.pbj}', never "${PPC_QUOTE_EXAMPLE[brand.id] || PPC_QUOTE_EXAMPLE.pbj}").
 - Keep all string values under 200 characters.
 
 PER-SKU SNAPSHOT:
