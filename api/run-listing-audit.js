@@ -1,3 +1,4 @@
+// COMBINED skinside SEOUL • PB & Jay repo (2026-11-19): serves both brands; per-brand bits are keyed by brand.id.
 /**
  * api/run-listing-audit.js
  * POST /api/run-listing-audit
