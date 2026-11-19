@@ -1,3 +1,4 @@
+// COMBINED skinside SEOUL • PB & Jay repo (2026-11-19): serves both brands; per-brand bits are keyed by brand.id.
 /**
  * api/run-analysis.js
  * POST /api/run-analysis
@@ -113,6 +114,12 @@
 const { readRows, ensureTab, appendRows } = require('./config/_sheets_client');
 const sheets = require('./config/sheets');
 const brands = require('./config/brands');
+// Per-brand example sentence for the per-SKU snapshot prompt (combined repo, 2026-11-19) —
+// each brand keeps exactly the example its own file used before the merge.
+const ANALYSIS_SKU_EXAMPLE = {
+  'skinside-seoul': `"PPC on 'snail mucin serum' + 'snail mucin essence' — 96% Snail Mucin Essence converts at 18.4% but only sees 140 sessions. At current conversion, adding 250 incremental sessions = +46 units/month."`,
+  pbj: `"PPC on 'hair growth serum' + 'scalp serum' — Reverse converts at 22.95% but only sees 122 sessions. At current conversion, adding 300 incremental sessions = +68 units/month."`,
+};
 
 // Confirmed directly (screenshot of the live sheet + upload-keyword-tracker.js's
 // own example) — see the header comment above for why this bypasses
@@ -123,6 +130,7 @@ const BRAND_DESCRIPTIONS = {
   evolis:  'évolis (EVO) — a clinically tested hair growth brand using FGF5-inhibiting botanicals',
   skinuva: 'Skinuva (SVA) — a scar, bruise, and skin recovery brand',
   'skinside-seoul': 'Skinside Seoul (SSS) — a Korean-inspired (K-beauty) skincare brand built around a signature four-molecule Cica complex',
+  pbj: 'PB & Jay (PBJ) — a Korean skincare brand selling on Amazon and Walmart: Purenature sheet face masks, a hydrogel face mask, and PawPatch / Fruity Spot / Donut Dots / Cleanspot hydrocolloid blemish patches. The Cleancare makeup remover wipes (PBJ0001–PBJ0012) expired and are being phased out as of August 2026 — never recommend promoting, advertising or optimizing them.', // ADDED for PB & Jay 2026-10-09
   default: 'a Medaltus brand'
 };
 
@@ -919,7 +927,7 @@ CRITICAL — ARRAY FORMAT: every JSON array must contain ONLY plain comma-separa
   // changes/page1 opportunities above: numbers computed here, Claude only
   // writes the prose (see ppc.strategy_by_sku in the schema below).
   const skuStrategySection = Object.keys(skuStrategySnapshots).length
-    ? `\n\nPER-SKU BUSINESS + KEYWORD SNAPSHOT — replaces the old hand-authored "Strategy by Product" cards (already computed; write 2-4 prioritized recommendation bullets per SKU plus a short list of suggested exact-match keyword targets, same style as the old cards: "PPC on 'snail mucin serum' + 'snail mucin essence' — 96% Snail Mucin Essence converts at 18.4% but only sees 140 sessions. At current conversion, adding 250 incremental sessions = +46 units/month."):\n${JSON.stringify(skuStrategySnapshots)}`
+    ? `\n\nPER-SKU BUSINESS + KEYWORD SNAPSHOT — replaces the old hand-authored "Strategy by Product" cards (already computed; write 2-4 prioritized recommendation bullets per SKU plus a short list of suggested exact-match keyword targets, same style as the old cards: ${ANALYSIS_SKU_EXAMPLE[brand.id] || ANALYSIS_SKU_EXAMPLE['skinside-seoul']}):\n${JSON.stringify(skuStrategySnapshots)}`
     : '';
 
   const userPrompt = `Analyze this week vs history. Return ONLY this JSON structure, nothing else:
