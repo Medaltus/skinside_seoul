@@ -54,13 +54,21 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .sb-brand{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07);}
 .sb-brand-logo{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.3px;}
 .sb-brand-logo span{color:var(--green);}
+/* Signed-in user button + sign-out (from Just Bjorn, 2026-11-19) */
+#clerk-user .cl-userButtonBox{display:flex;align-items:center;}
+#clerk-user .cl-avatarBox{width:30px;height:30px;}
+.topbar-user-btn{display:flex;align-items:center;gap:8px;background:none;border:1px solid var(--border);border-radius:20px;padding:5px 12px 5px 6px;cursor:pointer;font-family:var(--font);font-size:12px;color:var(--navy);transition:all .13s;}
+.topbar-user-btn:hover{border-color:var(--navy);background:var(--bg);}
+.topbar-user-avatar{width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .combo-logo-pbj{height:16px;} /* PB & Jay sidebar logo — tune vs skinside's 18px */
 .home-hero-logos{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
 .home-hero-logos .home-hero-dot{color:var(--green);font-size:28px;line-height:1;}
 .home-hero-logos .home-hero-logo-pbj{height:44px;width:auto;filter:brightness(0) invert(1);} /* PB & Jay home logo — tune vs skinside */
 .sb-footer-logo{padding:18px 16px 22px;display:flex;justify-content:center;border-top:1px solid rgba(255,255,255,0.07);margin-top:auto;}
 .sb-footer-logo img{height:18px;width:auto;opacity:.9;}
-.nav-brand-head{font-size:10.5px;font-weight:700;color:#fff;letter-spacing:.06em;text-transform:uppercase;padding:14px 10px 2px;opacity:.95;}
+.nav-brand-head{font-size:12.5px;font-weight:800;color:#fff;letter-spacing:.06em;text-transform:uppercase;padding:16px 10px 3px;}
+/* Brand names in the Internal section — brand green so they stand out (2026-11-19) */
+#nav-internal-section .nav-brand-head{color:var(--green);}
 #page-pbj{padding:0 !important;}
 #pbj-frame{display:block;width:100%;height:100vh;border:0;background:var(--bg);}
 .sb-brand-sub{font-size:10px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.08em;margin-top:3px;}
@@ -1457,7 +1465,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 <div class="main">
 
   <!-- Topbar -->
-  <div class="topbar" id="global-topbar" style="display:none;">
+  <div class="topbar" id="global-topbar" style="display:flex;">
     <span class="topbar-title" id="topbar-title"></span>
     <div class="topbar-right">
       <div class="pdf-events-picker" id="pdf-events-picker" style="display:none;font-size:10.5px;color:var(--muted);align-items:center;gap:6px;flex-wrap:nowrap;white-space:nowrap;overflow-x:auto;max-width:60vw;">
@@ -1495,6 +1503,8 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
         <span class="pdfx-spin"></span>
         <span class="pdfx-label-text">Export PDF Report</span>
       </button>
+      <!-- Signed-in user + Sign out (from Just Bjorn, 2026-11-19) -->
+      <div id="clerk-user"></div>
       <span class="staging-pill" style="display:none;">Staging</span>
       <span class="topbar-date" id="topbar-date" style="display:none;">📅 May 1 – May 31, 2026</span>
       <span class="confidential-badge" style="display:none;">Confidential</span>
@@ -5220,7 +5230,9 @@ function showPage(id, btn) {
   // hidden entirely on every other page rather than sitting there empty.
   const exportablePages = ['sales', 'marketing', 'events'];
   const topbarEl = document.getElementById('global-topbar');
-  if (topbarEl) topbarEl.style.display = exportablePages.includes(id) ? 'flex' : 'none';
+  // CHANGED 2026-11-19: the top bar now shows on every page (it holds the signed-in user
+  // button / Sign out). The PDF controls inside it still only show on exportable pages.
+  if (topbarEl) topbarEl.style.display = 'flex';
   document.getElementById('topbar-title').textContent = '';
 
   if (id === 'overview' && !window._overviewLiveInit && typeof window.initOverviewLive === 'function') window.initOverviewLive();
@@ -25542,6 +25554,54 @@ window.addEventListener('load', async () => {
     await window.Clerk.load();
     const user = window.Clerk.user;
     if (!user) return; // not signed in — safe default (internal hidden)
+
+    // Signed-in user button + Sign out — ported from Just Bjorn 2026-11-19. Shown to
+    // anyone signed in; the org check below still decides the Internal pages.
+    const SIGN_IN_URL = 'https://reports.medaltus.com';
+    // Render the user button (sign-out) regardless of staff/client status —
+    // anyone signed in should be able to see who they are and sign out.
+    const userEl = document.getElementById('clerk-user');
+    if (userEl) {
+      // Build a simple user button with sign-out
+      const firstName = user.firstName || '';
+      const lastName  = user.lastName  || '';
+      const initials  = ((firstName[0] || '') + (lastName[0] || '')).toUpperCase() || '?';
+      const email     = user.primaryEmailAddress?.emailAddress || '';
+      userEl.innerHTML = `
+        <div style="position:relative;">
+          <button class="topbar-user-btn" onclick="document.getElementById('clerk-dropdown').classList.toggle('open')">
+            <span class="topbar-user-avatar">${initials}</span>
+            <span>${firstName || email}</span>
+          </button>
+          <div id="clerk-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 4px 16px rgba(0,31,96,.10);padding:8px;min-width:180px;z-index:1000;">
+            <div style="padding:8px 10px 10px;border-bottom:1px solid var(--border2);margin-bottom:6px;">
+              <div style="font-size:12px;font-weight:600;color:var(--navy);">${firstName} ${lastName}</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:2px;">${email}</div>
+            </div>
+            <button onclick="window.Clerk.signOut().then(()=>window.location.href='${SIGN_IN_URL}')"
+              style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;border-radius:var(--radius-sm);cursor:pointer;font-size:12px;color:var(--navy);font-family:var(--font);text-align:left;"
+              onmouseover="this.style.background='var(--bg)'" onmouseout="this.style.background='none'">
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"/>
+              </svg>
+              Sign out
+            </button>
+          </div>
+        </div>`;
+      // Close dropdown on outside click
+      document.addEventListener('click', e => {
+        const dd = document.getElementById('clerk-dropdown');
+        if (dd && !userEl.contains(e.target)) dd.style.display = 'none';
+      });
+      document.getElementById('clerk-dropdown').addEventListener('click', () => {});
+      // Toggle display properly
+      userEl.querySelector('.topbar-user-btn').addEventListener('click', () => {
+        const dd = document.getElementById('clerk-dropdown');
+        dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+      });
+      userEl.querySelector('.topbar-user-btn').setAttribute('onclick', '');
+    }
+
 
     let hasAccess = false;
     for (let page = 1; page <= 20 && !hasAccess; page++) {
