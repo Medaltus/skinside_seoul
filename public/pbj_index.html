@@ -1443,6 +1443,9 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 .prod-tab.active{background:var(--navy);color:#fff;}
 .prod-panel{display:none;}
 .prod-panel.active{display:block;}
+/* Run VOC Themes button — ported from skinside 2026-11-19 */
+.voc-run-btn{display:flex;align-items:center;gap:9px;background:var(--warn);color:#fff;border:none;border-radius:999px;padding:13px 26px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all .15s;box-shadow:0 2px 8px rgba(200,125,47,.35);}
+.voc-run-btn.running .spinner{display:block;}
 </style>
 <link rel="icon" type="image/png" href="PBJ_favicon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -4211,6 +4214,14 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
               <span class="btn-label">📈 Run PPC Analysis</span>
             </button>
             <div class="last-run-note" id="last-run-ppc">Last run: —</div>
+          </div>
+          <!-- Run VOC Themes for PB & Jay (2026-11-19) — runs api/run-voc-themes.js with { brand: 'pbj' } -->
+          <div>
+            <button class="voc-run-btn" id="run-voc-themes-btn" onclick="runVocThemesAnalysis()">
+              <div class="spinner"></div>
+              <span class="btn-label">⭐ Run VOC Themes</span>
+            </button>
+            <div class="last-run-note" id="last-run-voc">Last run: —</div>
           </div>
           <span class="upload-status" id="upload-status" style="align-self:center;"></span>
         </div>
@@ -20001,6 +20012,31 @@ function buildListingContext() {
 // tab, replacing the hardcoded "Strategy by Product" cards). Same
 // running/disabled/status pattern as runInsightAnalysis and
 // runListingAudit below.
+// Run VOC Themes — ported from skinside 2026-11-19. INSIGHTS_BRAND_TAB is 'pbj' in this file,
+// so this runs api/run-voc-themes.js for PB & Jay's reviews (6 products, wipes excluded).
+async function runVocThemesAnalysis() {
+  const btn = document.getElementById('run-voc-themes-btn');
+  const st = document.getElementById('upload-status');
+  btn.classList.add('running'); btn.disabled = true;
+  try {
+    st.textContent = 'Running VOC Themes…'; st.className = 'upload-status';
+    const res = await fetch('/api/run-voc-themes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ brand: INSIGHTS_BRAND_TAB }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('Request failed: ' + res.status));
+    const catCount = (data.categories || []).length;
+    st.textContent = `✓ Done — ${catCount} categor${catCount === 1 ? 'y' : 'ies'} — ` + new Date().toLocaleTimeString();
+    st.className = 'upload-status success';
+    if (typeof window.loadLastRunDates === 'function') window.loadLastRunDates();
+  } catch (err) {
+    console.error(err);
+    st.textContent = '✗ ' + err.message; st.className = 'upload-status error';
+  } finally { btn.classList.remove('running'); btn.disabled = false; }
+}
+
 async function runPpcStrategyAnalysis() {
   const btn = document.getElementById('run-ppc-strategy-btn');
   const st = document.getElementById('upload-status');
@@ -20077,6 +20113,22 @@ async function loadLastRunDates() {
     const el = document.getElementById('last-run-ppc');
     if (el) el.textContent = formatLastRun(latest);
   } catch (err) { console.warn('[LastRun] ppc failed:', err.message); }
+  // VOC Themes (2026-11-19) — newest uploaded_at on the VOC Themes sheet's PB & Jay tab.
+  // That tab has no gid in SHEET_CONFIG_PBJ until the first run creates it, so it's
+  // read by tab name; a missing tab returns no rows → "Last run: never".
+  try {
+    const vocCfg = window.SHEET_CFG.SHEET_VOC_THEMES;
+    if (vocCfg && vocCfg.fileId) {
+      const url = vocCfg.gid
+        ? ovCsvUrl(vocCfg.fileId, vocCfg.gid)
+        : `https://docs.google.com/spreadsheets/d/${vocCfg.fileId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(window.SHEET_CFG.BRAND_SLUG || 'pbj')}`;
+      const csv = await fetch(url + `&_cb=${Date.now()}`).then(r => r.ok ? r.text() : '').catch(() => '');
+      const rows = parseCsvToRows(csv);
+      const latest = rows.reduce((max, r) => ((r.uploaded_at || '') > max ? r.uploaded_at : max), '');
+      const el = document.getElementById('last-run-voc');
+      if (el) el.textContent = formatLastRun(latest);
+    }
+  } catch (err) { console.warn('[LastRun] voc themes failed:', err.message); }
 }
 window.loadLastRunDates = loadLastRunDates;
 
