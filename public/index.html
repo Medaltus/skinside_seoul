@@ -5198,7 +5198,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 // Loads /pbj_index.html once into #pbj-frame, then calls PB & Jay's own
 // showPage() inside it with PB & Jay's matching nav button (its showPage
 // needs one). Same origin, so the frame shares the Clerk sign-in.
-const PBJ_FRAME_VERSION = '2026-11-19c';
+const PBJ_FRAME_VERSION = '2026-11-19d';
 window.showPbjPage = function (pid, btn) {
   showPage('pbj', btn);
   const tb = document.getElementById('global-topbar'); if (tb) tb.style.display = 'none'; // PB & Jay's own top bar (incl. its PDF export) shows inside the frame
@@ -17420,6 +17420,69 @@ window.initBrandMomentum = function () {
 function csEscapeHtml(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 }
+// ── "Review Themes" card — external Inventory page (2026-11-19 per Jaclyn) ──
+// VBC's partner-facing design (vbc ddFillVocThemes): sentiment pill, theme, NEW tag,
+// "N reviews · X%" with a share bar, real example quote with its month. Resolved
+// themes move to a one-line footer. The internal-only `note` field (advice to us)
+// is deliberately NOT shown on this partner page. Share % = supporting reviews ÷
+// this product's reviews inside the cron's 2-year window (counted here from the
+// reviews already loaded, serial-number dates converted).
+const CS_RT_SENT = {
+  positive: { color: 'var(--green)', bg: 'rgba(36,233,163,.14)', label: 'Positive' }, // our brand green (#24E9A3), not VBC's darker green — per Jaclyn
+  negative: { color: '#db372d', bg: 'rgba(219,55,45,.08)', label: 'Negative' },
+  mixed:    { color: '#c48a00', bg: 'rgba(196,138,0,.10)', label: 'Mixed' },
+};
+function csRtReviewTime(r) {
+  const v = String((r && r.date) || '').trim();
+  if (/^\d{5}(\.\d+)?$/.test(v)) return Date.UTC(1899, 11, 30) + parseFloat(v) * 86400000;
+  return Date.parse(v) || 0;
+}
+function csRenderReviewThemesCard(themeRow, productReviews) {
+  const muted = t => `<div style="font-size:12px;color:var(--muted);line-height:1.7;">${t}</div>`;
+  let themes = null;
+  if (themeRow && themeRow.themes_json) { try { themes = JSON.parse(themeRow.themes_json); } catch (e) { themes = null; } }
+  const active = (Array.isArray(themes) ? themes : []).filter(t => t && t.status !== 'resolved');
+  const resolved = (Array.isArray(themes) ? themes : []).filter(t => t && t.status === 'resolved');
+  let sub = '', body;
+  if (!active.length && !resolved.length) {
+    body = muted('Themes for this product will appear after the next review-themes run.');
+  } else {
+    const runIso = String(themeRow.date || themeRow.uploaded_at || '').slice(0, 10);
+    const runT = Date.parse(runIso + 'T12:00:00') || Date.now();
+    const cutoff = runT - 730 * 86400000; // run-voc-themes.js RECENT_WINDOW_DAYS
+    const inWindow = (productReviews || []).filter(r => { const t = csRtReviewTime(r); return t && t >= cutoff && t <= runT + 86400000; }).length;
+    const base = inWindow || Number(themeRow.review_count) || 0;
+    const upd = runIso ? new Date(runIso + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    sub = `Based on ${base.toLocaleString()} review${base === 1 ? '' : 's'} (last 2 years)${upd ? ' · Updated ' + upd : ''}`;
+    const rows = active.map(t => {
+      const s = CS_RT_SENT[t.sentiment] || CS_RT_SENT.mixed;
+      const n = Number(t.supporting_review_count) || 0;
+      const pct = base ? Math.max(0, Math.min(100, Math.round(n / base * 100))) : 0;
+      const last = /^\d{4}-\d{2}-\d{2}/.test(t.most_recent_review_date || '')
+        ? new Date(t.most_recent_review_date.slice(0, 10) + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '';
+      return `<div style="padding:12px 0;border-top:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <span style="font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:${s.color};background:${s.bg};border-radius:999px;padding:3px 9px;">${s.label}</span>
+          <span style="font-size:13px;font-weight:700;color:var(--navy);flex:1;min-width:160px;">${csEscapeHtml(t.theme || '')}${t.status === 'new' ? ' <span style="font-size:10px;font-weight:700;color:var(--muted);margin-left:4px;">NEW</span>' : ''}</span>
+          <span style="font-size:11px;color:var(--muted);white-space:nowrap;">${n.toLocaleString()} review${n === 1 ? '' : 's'} · ${pct}%</span>
+        </div>
+        <div style="height:5px;background:var(--bg2);border-radius:999px;margin:8px 0 6px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${s.color};border-radius:999px;"></div></div>
+        ${t.example_quote ? `<div style="font-size:11.5px;color:var(--muted);font-style:italic;line-height:1.5;">“${csEscapeHtml(t.example_quote)}”${last ? ` <span style="font-style:normal;">— ${last}</span>` : ''}</div>` : ''}
+      </div>`;
+    }).join('');
+    const res = resolved.length
+      ? `<div style="font-size:11px;color:var(--muted);margin-top:10px;">No longer showing up in recent reviews: ${resolved.map(r => csEscapeHtml(r.theme || '')).join(' · ')}</div>` : '';
+    body = (rows || muted('No current themes — everything previously flagged has been resolved.')) + res;
+  }
+  return `<div class="card" style="margin-bottom:16px;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+      <div class="card-title" style="margin:0;">Review Themes</div>
+      <div style="font-size:11px;color:var(--muted);">${sub}</div>
+    </div>
+    ${body}
+  </div>`;
+}
+
 function csRenderVocThemes(themeRow) {
   if (!themeRow || !themeRow.themes_json) {
     return '<div style="font-size:12px;color:var(--muted);line-height:1.7;">📋 Not automated yet — categorizing review text into themes is a real analysis step, not a mechanical data pull. Coming later.</div>';
@@ -17580,10 +17643,7 @@ function csRenderVocThemes(themeRow) {
           const top5 = sorted.slice(0,5);
           const vocName = byProduct[key].vocProductName;
           return `<div class="prod-panel${j===0?' active':''}" id="prodpanel-${catSlug}-${csSlugify(key)}">
-            <div class="card" style="margin-bottom:14px;">
-              <div class="card-title">VOC Themes — ${csEscapeHtml(byProduct[key].label)}</div>
-              ${csRenderVocThemes(vocName ? themesByProduct[vocName] : null)}
-            </div>
+            ${csRenderReviewThemesCard(vocName ? themesByProduct[vocName] : null, byProduct[key].reviews)}
             ${top5.length ? top5.map(csRenderReviewCard).join('') : '<div style="color:var(--muted);font-size:12px;">No reviews found for this product.</div>'}
           </div>`;
         }).join('');
