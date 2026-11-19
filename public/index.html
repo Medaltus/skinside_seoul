@@ -103,7 +103,8 @@ nav > .nav-btn:not(.active):hover{color:#fff;}
 
 
 /* ── Topbar ── */
-.topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 28px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+/* CHANGED 2026-11-19 per Jaclyn: no white bar — the top row (sign-in / PDF controls) sits on the grey page background, same as PB & Jay's */
+.topbar{background:transparent;border-bottom:none;padding:0 28px;height:52px;display:flex;align-items:center;justify-content:flex-end;flex-shrink:0;}
 .topbar-title{font-size:14px;font-weight:600;color:var(--navy);letter-spacing:-.2px;}
 .topbar-right{display:flex;align-items:center;gap:10px;}
 .topbar-date{font-size:11px;color:var(--muted);background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 10px;}
@@ -5197,7 +5198,7 @@ details.inci-toggle[open] summary::before{content:'▾ ';}
 // Loads /pbj_index.html once into #pbj-frame, then calls PB & Jay's own
 // showPage() inside it with PB & Jay's matching nav button (its showPage
 // needs one). Same origin, so the frame shares the Clerk sign-in.
-const PBJ_FRAME_VERSION = '2026-11-19b';
+const PBJ_FRAME_VERSION = '2026-11-19c';
 window.showPbjPage = function (pid, btn) {
   showPage('pbj', btn);
   const tb = document.getElementById('global-topbar'); if (tb) tb.style.display = 'none'; // PB & Jay's own top bar (incl. its PDF export) shows inside the frame
