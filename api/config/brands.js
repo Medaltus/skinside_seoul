@@ -1,6 +1,12 @@
 /**
  * api/config/brands.js
- * Brand registry for Skinside Seoul's own repo.
+ * Brand registry for the combined skinside SEOUL • PB & Jay repo.
+ *
+ * UPDATED 2026-11-19: PB & Jay added — skinside SEOUL and PB & Jay share an owner and one
+ * combined dashboard (PB & Jay's pages run from public/pbj_index.html). Every function
+ * here looks a brand up by the id in its request (brands.find), none loops over all
+ * brands, so adding PB & Jay changes nothing for skinside's own runs. PB & Jay's entry
+ * is copied from the shared évolis-repo registry.
  *
  * Unlike évolis's repo (which shares one Amazon seller account across ~15
  * Medaltus brands and needs the full registry for crons that loop over
@@ -41,6 +47,14 @@ module.exports = [
     skuPrefix:       'SSS',
     displayName:     'Skinside Seoul',
     amazonBrandName: 'SKINSIDE SEOUL',
+    active:          true,
+  },
+  {
+    id:              'pbj',
+    tabName:         'pbj',
+    skuPrefix:       'PBJ',
+    displayName:     'PB & Jay',
+    amazonBrandName: 'PB & JAY',
     active:          true,
   },
 ];
